@@ -19,12 +19,7 @@ class PerformanceSpec extends Specification {
     }
   }
 
-  implicit def any2Bytes(in: Any): Array[Byte] = in.toString.getBytes
-  implicit def bytes2String(in: Array[Byte]): String = new String(in)
-
-  def reqs(iterations: Long, millis: Long): Double = iterations / (millis / 1000.0)
-
-  "Compared to not using actors, the akka redis client" should {
+  "Compared to not using actors, the akka redis client" ->- empty should {
     "Process more req/s" in {
       "Incrementing an integer then returning it" in {
         "100000 times" in { incrTest(100000) }
@@ -35,6 +30,11 @@ class PerformanceSpec extends Specification {
       }
     }
   }
+
+  implicit def any2Bytes(in: Any): Array[Byte] = in.toString.getBytes
+  implicit def bytes2String(in: Array[Byte]): String = new String(in)
+
+  def reqs(iterations: Long, millis: Long): Double = iterations / (millis / 1000.0)
 
   def incrTest(iterations: Int, reps: Int = 1) = {
     println("Testing with "+iterations+" iterations " +reps+" times")
