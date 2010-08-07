@@ -22,9 +22,10 @@ class RedisList[A](name: String, conn: AkkaRedisClient)(implicit toBytes: (A) =>
   }
 
   def +=(elem1: A, elem2: A, elems: A*): RedisList[A] = {
-    rpush(toBytes(elem1))
-    rpush(toBytes(elem2))
-    elems foreach (e => rpush(toBytes(e)))
+    conn ! commands.multiexec(
+      commands.rpush(nameBytes, toBytes(elem1)) ::
+      commands.rpush(nameBytes, toBytes(elem2)) ::
+      elems.map(e => commands.rpush(nameBytes, toBytes(e))).toList)
     this
   }
 
