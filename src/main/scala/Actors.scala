@@ -17,9 +17,9 @@ import se.scalablesolutions.akka.config.ScalaConfig.{LifeCycle, Permanent}
 import se.scalablesolutions.akka.dispatch._
 
 trait ChainedActor {
-  self: Actor =>
+  this: Actor =>
 
-    def nextActor: ActorRef
+  def nextActor: ActorRef
 
   def send(message: Message) {
     if (message.forward) {
