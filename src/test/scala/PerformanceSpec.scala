@@ -22,7 +22,7 @@ class PerformanceSpec extends Specification {
   "Compared to not using actors, the akka redis client" ->- empty should {
     "Process more req/s" in {
       "Incrementing an integer then returning it" in {
-        "100000 times" in { incrTest(100000) }
+        "100000 times" in { incrTest(100000) } // Overkill, but akka implementation needs good warmup
         "10000 times" in { incrTest(10000) }
         "1000 times" in { incrTest(1000, 10) }
         "100 times" in { incrTest(100, 100) }
