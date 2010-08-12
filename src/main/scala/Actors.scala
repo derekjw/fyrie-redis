@@ -95,15 +95,34 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
 
   dispatcher foreach (d => self.dispatcher = d)
 
+  // FIXME: Way too much repeated code, need to find a cleaner way of doing this
   def receive = {
     case Read(replyHandler: Reply[_], false) =>
       reader read replyHandler
     case Read(replyHandler: Reply[_], true) =>
       replyHandler match {
         case r: ReplyProxy[_,_] =>
-          send(Transform(reader read r.underlying, r, true))
+          self.senderFuture match {
+            case Some(future) =>
+              try {
+                send(Transform(reader read r.underlying, r, true))
+              } catch {
+                case e: RedisErrorException if self.senderFuture.isDefined =>
+                  self.senderFuture.foreach(_.completeWithException(this, e))
+              }
+            case _ => send(Transform(reader read r.underlying, r, true))
+          }
         case _ =>
-          self reply (reader read replyHandler)
+          self.senderFuture match {
+            case Some(future) =>
+              try {
+                self reply (reader read replyHandler)
+              } catch {
+                case e: RedisErrorException if self.senderFuture.isDefined =>
+                  self.senderFuture.foreach(_.completeWithException(this, e))
+              }
+            case _ => self reply (reader read replyHandler)
+          }
       }
   }
 }
