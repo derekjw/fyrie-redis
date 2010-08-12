@@ -62,6 +62,8 @@ class RedisListSpec extends Specification {
       list.rpop must_== ("test1")
       list must haveSize(0)
       list.rpop must throwA[NoSuchElementException]
+      list.lpush("test after exception")
+      list.rpop must_== ("test after exception")
     }
   }
 
