@@ -57,6 +57,11 @@ class ExceptionHandlingSpec extends Specification {
           (r send get("testint")).map(fromBytes) must_== Some("20000")
         }
       }
+      "One way commands" in {
+        r send set("testint", "invalid")
+        (1 to 10) foreach { i => r ! incr("testint") }
+        (r send get("testint")).map(fromBytes) must_== Some("invalid")
+      }
     }
   }
 }
