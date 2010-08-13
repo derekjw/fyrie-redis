@@ -1,11 +1,9 @@
 import sbt._
 import sbt.CompileOrder._
 
-class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info) 
+class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info) with AkkaProject
 {
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
-
-  val akka = "se.scalablesolutions.akka" %% "akka-core"  % "0.10" % "compile"
 
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
@@ -25,14 +23,5 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info)
   val fyrieSnapshots          = "Fyrie snapshots" at "http://repo.fyrie.net/snapshots"
   val scalaToolsSnapshots     = ScalaToolsSnapshots
 
-//  val akkaEmbedded            = "Akka embedded repo" at "http://repo.fyrie.net/akka-embedded-repo"
-  def guiceyFruitRepo         = "GuiceyFruit Repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases/"
-  val guiceyFruitModuleConfig = ModuleConfiguration("org.guiceyfruit", guiceyFruitRepo)
-  def jbossRepo               = "JBoss Repo" at "https://repository.jboss.org/nexus/content/groups/public/"
-  val jbossModuleConfig       = ModuleConfiguration("org.jboss", jbossRepo)
-  val nettyModuleConfig       = ModuleConfiguration("org.jboss.netty", jbossRepo)
-  val jgroupsModuleConfig     = ModuleConfiguration("jgroups", jbossRepo)
-  val liftModuleConfig        = ModuleConfiguration("net.liftweb", ScalaToolsSnapshots)
-  def codehausSnapshotRepo    = "Codehaus Snapshots" at "http://snapshots.repository.codehaus.org"
-  val multiverseModuleConfig  = ModuleConfiguration("org.multiverse", codehausSnapshotRepo)
+  val akkaEmbeddedRepo        = Resolver.file("Akka Embedded Repo", (Path.fromFile(System.getenv("AKKA_HOME")) / "embedded-repo").asFile)
 }
