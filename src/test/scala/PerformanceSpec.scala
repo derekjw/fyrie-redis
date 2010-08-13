@@ -2,13 +2,14 @@ package net.fyrie.redis
 package akka
 
 import commands._
+import net.fyrie.redis.akka.collection._
 
 import org.specs._
 import specification.Context
 
 class PerformanceSpec extends Specification {
   val rs = new RedisClient("localhost", 16379)
-  val ra = new AkkaRedisClient("localhost", 16379)
+  implicit val ra = new AkkaRedisClient("localhost", 16379)
 
   val empty = new Context {
     before {
@@ -31,18 +32,20 @@ class PerformanceSpec extends Specification {
     }
   }
 
-  implicit def any2Bytes(in: Any): Array[Byte] = in.toString.getBytes
-  implicit def bytes2String(in: Array[Byte]): String = new String(in)
+  implicit def toBytes(in: Any): Array[Byte] = in.toString.getBytes
+  implicit def fromBytes(in: Array[Byte]): String = new String(in)
 
   def reqs(iterations: Long, millis: Long): Double = iterations / (millis / 1000.0)
 
   def incrTest(iterations: Int, reps: Int = 1) = {
     println("Testing with "+iterations+" iterations " +reps+" times")
 
+    val raNum = RedisLongVar("ra")
+
     val raRes = bm(reps){
-      ra ! set("ra", 0)
-      (1 to iterations) foreach {i => ra ! incr("ra")}
-      new String(ra !! get("ra") getOrElse error("Timed Out") getOrElse error("Not Found")) must_== (iterations.toString)
+      raNum set 0
+      (1 to iterations) foreach {i => raNum.incrFast}
+      raNum.get must_== iterations
     }
 
     val raReqs = reqs((iterations * reps),raRes).toInt
@@ -52,7 +55,7 @@ class PerformanceSpec extends Specification {
     val rsRes = bm(reps){
       rs send set("rs", 0)
       (1 to iterations) foreach {i => rs send incr("rs")}
-      new String(rs send get("rs") getOrElse error("Not Found")) must_== (iterations.toString)
+      fromBytes(rs send get("rs") getOrElse error("Not Found")) must_== (iterations.toString)
     }
 
     val rsReqs = reqs((iterations * reps),rsRes).toInt
