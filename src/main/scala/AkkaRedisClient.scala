@@ -20,7 +20,7 @@ class AkkaRedisClient(address: String = "localhost", port: Int = 6379) {
     } catch {
       case e: FutureTimeoutException => None
     }
-    if (future.exception.isDefined) throw future.exception.get._2
+    if (future.exception.isDefined) throw future.exception.get
     else future.result
   }
   def !!![T](command: Command[T]): Future[T] = actorRef !!! Request(command, true)
@@ -28,7 +28,7 @@ class AkkaRedisClient(address: String = "localhost", port: Int = 6379) {
   def send[T](command: Command[T]): T = {
     val future = this !!! command
     future.await
-    if (future.exception.isDefined) throw future.exception.get._2
+    if (future.exception.isDefined) throw future.exception.get
     else future.result.get
   }
 

@@ -5,9 +5,8 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info)
 {
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
 
-  val akka = "se.scalablesolutions.akka" %% "akka-core"  % "0.10-SNAPSHOT" % "compile"
+  val akka = "se.scalablesolutions.akka" %% "akka-core"  % "0.10" % "compile"
 
-  val logback = "ch.qos.logback" % "logback-classic" % "0.9.24" % "test"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
   val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7" % "test"
@@ -26,7 +25,7 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info)
   val fyrieSnapshots          = "Fyrie snapshots" at "http://repo.fyrie.net/snapshots"
   val scalaToolsSnapshots     = ScalaToolsSnapshots
 
-  val akkaEmbedded            = "Akka embedded repo" at "http://repo.fyrie.net/akka-embedded-repo"
+//  val akkaEmbedded            = "Akka embedded repo" at "http://repo.fyrie.net/akka-embedded-repo"
   def guiceyFruitRepo         = "GuiceyFruit Repo" at "http://guiceyfruit.googlecode.com/svn/repo/releases/"
   val guiceyFruitModuleConfig = ModuleConfiguration("org.guiceyfruit", guiceyFruitRepo)
   def jbossRepo               = "JBoss Repo" at "https://repository.jboss.org/nexus/content/groups/public/"

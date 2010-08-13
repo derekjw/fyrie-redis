@@ -96,7 +96,7 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
       f
     } catch {
       case e: RedisErrorException =>
-        self.senderFuture.foreach(_.completeWithException(this, e))
+        self.senderFuture.foreach(_.completeWithException(e))
     }
   }
 
