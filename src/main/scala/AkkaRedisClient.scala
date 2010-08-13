@@ -5,8 +5,6 @@ package akka
 import actors.{RedisActor}
 import messages.{Request}
 
-import com.redis.commands.{Command}
-
 import se.scalablesolutions.akka.dispatch.{Future, FutureTimeoutException}
 import se.scalablesolutions.akka.actor.{Actor,ActorRef}
 import Actor.{actorOf}

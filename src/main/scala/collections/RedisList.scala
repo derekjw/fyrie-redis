@@ -1,7 +1,6 @@
-package net.fyrie.redis.akka
+package net.fyrie.redis
+package akka
 package collection
-
-import com.redis._
 
 import scala.collection.mutable.{IndexedSeq}
 

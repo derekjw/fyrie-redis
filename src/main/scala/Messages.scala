@@ -3,10 +3,6 @@ package redis
 package akka
 package messages
 
-import com.redis.{Reply}
-import com.redis.replies.{ReplyProxy}
-import com.redis.commands.{Command}
-
 trait Message {
   val forward: Boolean
 }

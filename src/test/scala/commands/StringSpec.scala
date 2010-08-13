@@ -1,12 +1,12 @@
-package com.redis
+package net.fyrie.redis
 package commands
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class StringOperationsSpec extends Spec 
-                           with ShouldMatchers
-                           with RedisTestServer {
+class StringSpec extends Spec 
+                 with ShouldMatchers
+                 with RedisTestServer {
 
   describe("set") {
     it("should set key/value pairs") {

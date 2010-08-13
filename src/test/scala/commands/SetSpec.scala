@@ -1,12 +1,12 @@
-package com.redis
+package net.fyrie.redis
 package commands
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class SetOperationsSpec extends Spec 
-                        with ShouldMatchers
-                        with RedisTestServer {
+class SetSpec extends Spec 
+              with ShouldMatchers
+              with RedisTestServer {
 
   describe("sadd") {
     it("should add a non-existent value to the set") {

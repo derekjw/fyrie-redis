@@ -1,12 +1,12 @@
-package com.redis
+package net.fyrie.redis
 package commands
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class SortedSetOperationsSpec extends Spec 
-                        with ShouldMatchers
-                        with RedisTestServer {
+class SortedSetSpec extends Spec 
+                    with ShouldMatchers
+                    with RedisTestServer {
 
   private def add = {
     r send zadd("hackers", 1965, "yukihiro matsumoto") should be(true)

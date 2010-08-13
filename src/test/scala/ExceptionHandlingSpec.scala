@@ -3,7 +3,6 @@ package akka
 
 import ByteStringHelpers._
 
-import com.redis._
 import commands._
 
 import org.specs._

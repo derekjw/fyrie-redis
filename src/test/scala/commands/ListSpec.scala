@@ -1,12 +1,12 @@
-package com.redis
+package net.fyrie.redis
 package commands
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class ListOperationsSpec extends Spec 
-                         with ShouldMatchers
-                         with RedisTestServer {
+class ListSpec extends Spec 
+               with ShouldMatchers
+               with RedisTestServer {
 
   describe("lpush") {
     it("should add to the head of the list") {

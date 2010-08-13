@@ -1,7 +1,6 @@
-package com.redis
+package net.fyrie.redis
 
 import commands._
-import replies._
 
 import net.fyrie.redis.akka._
 

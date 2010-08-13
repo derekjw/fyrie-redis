@@ -3,10 +3,6 @@ package redis
 package akka
 package actors
 
-import com.redis._
-import commands.{Command}
-import replies.{ReplyProxy}
-
 import messages._
 
 import se.scalablesolutions.akka.actor.{Actor, ActorRef}

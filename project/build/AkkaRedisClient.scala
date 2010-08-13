@@ -6,7 +6,6 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info)
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
 
   val akka = "se.scalablesolutions.akka" %% "akka-core"  % "0.10-SNAPSHOT" % "compile"
-  val redis = "com.redis" %% "redisclient"  % "2.0-SNAPSHOT" % "compile"
 
   val logback = "ch.qos.logback" % "logback-classic" % "0.9.24" % "test"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
