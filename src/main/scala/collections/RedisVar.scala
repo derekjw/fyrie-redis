@@ -79,11 +79,19 @@ class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: Ak
 
   def incrFast: Unit = conn ! commands.incr(key)
 
-  def incrFastBy(num: Long): Unit = conn ! commands.incrby(key, num)
+  def incrByFast(num: Long): Unit = conn ! commands.incrby(key, num)
 
   def decrFast: Unit = conn ! commands.decr(key)
 
-  def decrFastBy(num: Long): Unit = conn ! commands.decrby(key, num)
+  def decrByFast(num: Long): Unit = conn ! commands.decrby(key, num)
+
+  def incrFuture = conn !!! commands.incr(key)
+
+  def incrByFuture(num: Long) = conn !!! commands.incrby(key, num)
+
+  def decrFuture = conn !!! commands.decr(key)
+
+  def decrByFuture(num: Long) = conn !!! commands.decrby(key, num)
 
   override def toString: String = "RedisLongVar("+name+")"
 }
