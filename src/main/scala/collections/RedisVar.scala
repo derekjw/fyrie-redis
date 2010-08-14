@@ -2,6 +2,8 @@ package net.fyrie.redis
 package akka
 package collection
 
+import se.scalablesolutions.akka.dispatch._
+
 object RedisVar {
   def apply[A](name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A): RedisVar[A] =
     new RedisVar[A](name, default)(conn, toBytes, fromBytes)
@@ -19,6 +21,8 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
   def isDefined: Boolean = (conn send commands.getType(key)) == "string"
 
   def get: A = this.toOption.get
+
+  def getFuture = new WrappedFuture(conn !!! commands.get(key))(_.map(fromBytes))
 
   def set(in: A): Unit = conn ! commands.set(key, toBytes(in))
 
@@ -69,7 +73,7 @@ class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: Ak
 
   def incrBy(num: Long): Long = conn send commands.incrby(key, num)
 
-  def decr: Long = conn send commands.incr(key)
+  def decr: Long = conn send commands.decr(key)
 
   def decrBy(num: Long): Long = conn send commands.decrby(key, num)
 
@@ -77,9 +81,25 @@ class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: Ak
 
   def incrFastBy(num: Long): Unit = conn ! commands.incrby(key, num)
 
-  def decrFast: Unit = conn ! commands.incr(key)
+  def decrFast: Unit = conn ! commands.decr(key)
 
   def decrFastBy(num: Long): Unit = conn ! commands.decrby(key, num)
 
   override def toString: String = "RedisLongVar("+name+")"
+}
+
+class WrappedFuture[T, U](val future: Future[U])(implicit convert: (U) => T) {
+  def await = {
+    future.await
+    this
+  }
+  def awaitBlocking = {
+    future.awaitBlocking
+    this
+  }
+  def isCompleted = future.isCompleted
+  def isExpired = future.isExpired
+  def timeoutInNanos = future.timeoutInNanos
+  def result = future.result.map(convert)
+  def exception = future.exception
 }
