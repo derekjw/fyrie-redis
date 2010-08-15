@@ -57,7 +57,6 @@ class RedisActor(address: String, port: Int) extends Actor with ChainedActor {
   override def shutdown = {
     self.shutdownLinkedActors
     client.disconnect
-    super.shutdown
   }
 
   override def postRestart(reason: Throwable) = client.reconnect
