@@ -26,13 +26,11 @@ trait ChainedActor {
   }
 }
 
-class RedisActor(address: String, port: Int) extends Actor with ChainedActor {
+class RedisActor(address: String, port: Int)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
   self.faultHandler = Some(AllForOneStrategy(5, 5000))
   self.trapExit = List(classOf[Exception])
 
-  implicit val dispatcher = Some(new HawtDispatcher(false))
-
-  dispatcher foreach (d => self.dispatcher = d)
+  self.dispatcher = implicitly
 
   val client = new RedisClient(address, port)
 
@@ -63,20 +61,20 @@ class RedisActor(address: String, port: Int) extends Actor with ChainedActor {
 
 }
 
-class PreparerActor(val nextActor: ActorRef)(implicit dispatcher: Option[MessageDispatcher] = None) extends Actor with ChainedActor {
+class PreparerActor(val nextActor: ActorRef)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
   self.lifeCycle = Some(LifeCycle(Permanent))
 
-  dispatcher foreach (d => self.dispatcher = d)
+  self.dispatcher = implicitly
 
   def receive = {
     case Prepare(cmd, frwd) => send(Write(cmd.toBytes, cmd.replyHandler, frwd))
   }
 }
 
-class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implicit dispatcher: Option[MessageDispatcher] = None) extends Actor with ChainedActor {
+class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
   self.lifeCycle = Some(LifeCycle(Permanent))
 
-  dispatcher foreach (d => self.dispatcher = d)
+  self.dispatcher = implicitly
 
   def receive = {
     case Write(bytes, replyHandler, frwd) =>
@@ -85,10 +83,10 @@ class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implic
   }
 }
 
-class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implicit dispatcher: Option[MessageDispatcher] = None) extends Actor with ChainedActor {
+class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
   self.lifeCycle = Some(LifeCycle(Permanent))
 
-  dispatcher foreach (d => self.dispatcher = d)
+  self.dispatcher = implicitly
 
   def handleRedisError(f: => Unit) {
     try {
@@ -119,10 +117,10 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
   }
 }
 
-class TransformerActor(implicit dispatcher: Option[MessageDispatcher] = None) extends Actor {
+class TransformerActor(implicit dispatcher: MessageDispatcher) extends Actor {
   self.lifeCycle = Some(LifeCycle(Permanent))
 
-  dispatcher foreach (d => self.dispatcher = d)
+  self.dispatcher = implicitly
 
   def receive = {
     case t: Transform[_,_] =>

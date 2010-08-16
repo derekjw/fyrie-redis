@@ -8,8 +8,13 @@ import messages.{Request}
 import se.scalablesolutions.akka.dispatch.{Future, FutureTimeoutException}
 import se.scalablesolutions.akka.actor.{Actor,ActorRef}
 import Actor.{actorOf}
+import se.scalablesolutions.akka.dispatch._
 
-class AkkaRedisClient(address: String = "localhost", port: Int = 6379) {
+object AkkaRedisClient {
+  lazy val dispatcher: MessageDispatcher = new HawtDispatcher(false)
+}
+
+class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit dispatcher: MessageDispatcher = AkkaRedisClient.dispatcher) {
   val actorRef = actorOf(new RedisActor(address, port)).start
 
   def !(command: Command[_])(implicit sender: Option[ActorRef] = None): Unit = actorRef ! Request(command, sender.isDefined)
