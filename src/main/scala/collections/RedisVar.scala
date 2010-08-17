@@ -2,8 +2,6 @@ package net.fyrie.redis
 package akka
 package collection
 
-import se.scalablesolutions.akka.dispatch._
-
 object RedisVar {
   def apply[A](name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A): RedisVar[A] =
     new RedisVar[A](name, default)(conn, toBytes, fromBytes)
@@ -94,20 +92,4 @@ class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: Ak
   def decrByFuture(num: Long) = conn !!! commands.decrby(key, num)
 
   override def toString: String = "RedisLongVar("+name+")"
-}
-
-class WrappedFuture[T, U](val future: Future[U])(implicit convert: (U) => T) {
-  def await = {
-    future.await
-    this
-  }
-  def awaitBlocking = {
-    future.awaitBlocking
-    this
-  }
-  def isCompleted = future.isCompleted
-  def isExpired = future.isExpired
-  def timeoutInNanos = future.timeoutInNanos
-  def result = future.result.map(convert)
-  def exception = future.exception
 }

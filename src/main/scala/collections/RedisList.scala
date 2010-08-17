@@ -44,6 +44,10 @@ class RedisList[A](name: String)(implicit conn: AkkaRedisClient, toBytes: (A) =>
 
   def rpop: A = fromBytes(conn !! commands.rpop(key) getOrElse error("Timed out") getOrElse (throw new NoSuchElementException))
 
+  def lpopFuture = new WrappedFuture(conn !!! commands.lpop(key))(_.map(fromBytes))
+
+  def rpopFuture = new WrappedFuture(conn !!! commands.rpop(key))(_.map(fromBytes))
+
   override def toString: String = "RedisList("+name+")"
 
 }
