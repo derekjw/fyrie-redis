@@ -22,6 +22,4 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info) wit
   val fyrieReleases           = "Fyrie releases" at "http://repo.fyrie.net/releases"
   val fyrieSnapshots          = "Fyrie snapshots" at "http://repo.fyrie.net/snapshots"
   val scalaToolsSnapshots     = ScalaToolsSnapshots
-
-  val akkaEmbeddedRepo        = Resolver.file("Akka Embedded Repo", (Path.fromFile(System.getenv("AKKA_HOME")) / "embedded-repo").asFile)
 }
