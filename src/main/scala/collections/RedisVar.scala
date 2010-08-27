@@ -2,6 +2,8 @@ package net.fyrie.redis
 package akka
 package collection
 
+import se.scalablesolutions.akka.dispatch.{Future}
+
 object RedisVar {
   def apply[A](name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A): RedisVar[A] =
     new RedisVar[A](name, default)(conn, toBytes, fromBytes)
@@ -12,6 +14,8 @@ object RedisVar {
 class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A) {
   protected val key = name.getBytes
 
+  protected implicit def fromBulk(in: Option[Array[Byte]]): Option[A] = in.map(fromBytes)
+
   default.foreach(this.setnx)
 
   def isEmpty: Boolean = !isDefined
@@ -20,7 +24,7 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
   def get: A = this.toOption.get
 
-  def getFuture = new WrappedFuture(conn !!! commands.get(key))(_.map(fromBytes))
+  def getFuture: Future[Option[A]] = conn !!! commands.get(key)
 
   def set(in: A): Unit = conn ! commands.set(key, toBytes(in))
 
@@ -31,6 +35,8 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
   def orNull[A1 >: A](implicit ev: Null <:< A1): A1 = this.toOption.orNull(ev)
 
   def map[B](f: A => B): Option[B] = this.toOption.map(f)
+
+  def mapFuture[B](f: A => B): Future[Option[B]] = (conn !!! commands.get(key))(_.map(f compose fromBytes))
 
   // Not transactional, yet
   def alter(f: A => A): Boolean = this.toOption.map(x => this.set(f(x))).isDefined
@@ -47,7 +53,7 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
   def iterator: Iterator[A] = this.toOption.iterator
 
-  def toOption: Option[A] = (conn send commands.get(key)).map(fromBytes)
+  def toOption: Option[A] = conn send commands.get(key)
 
   def toList: List[A] = this.toOption.toList
 

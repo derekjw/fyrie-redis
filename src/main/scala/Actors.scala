@@ -49,7 +49,7 @@ class RedisActor(address: String, port: Int)(implicit dispatcher: MessageDispatc
   val nextActor = preparer
 
   def receive = {
-    case Request(cmd, frwd) => send(Prepare(cmd, frwd))
+    case r: Request[_,_] => send(Prepare(r.command, r.forward, r.transform))
   }
 
   override def shutdown = {
@@ -67,7 +67,7 @@ class PreparerActor(val nextActor: ActorRef)(implicit dispatcher: MessageDispatc
   self.dispatcher = implicitly
 
   def receive = {
-    case Prepare(cmd, frwd) => send(Write(cmd.toBytes, cmd.replyHandler, frwd))
+    case p: Prepare[_,_] => send(Write(p.command.toBytes, p.command.replyHandler, p.forward, p.transform))
   }
 }
 
@@ -77,9 +77,9 @@ class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implic
   self.dispatcher = implicitly
 
   def receive = {
-    case Write(bytes, replyHandler, frwd) =>
-      send(Read(replyHandler, frwd))
-      writer write bytes
+    case w: Write[_,_] =>
+      send(Read(w.replyHandler, w.forward, w.transform))
+      writer write w.bytes
   }
 }
 
@@ -98,21 +98,14 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
   }
 
   def receive = {
-    case Read(replyHandler: Reply[_], false) =>
+    case r: Read[_,_] if !r.forward =>
       handleRedisError{
-        reader read replyHandler
+        reader read r.replyHandler
         () // Get ClassCastException when an AnyVal is returned, so must return Unit
       }
-    case Read(replyHandler: Reply[_], true) =>
-      replyHandler match {
-        case r: ReplyProxy[_,_] =>
-          handleRedisError{
-            send(Transform(reader read r.underlying, r, true))
-          }
-        case _ =>
-          handleRedisError{
-            self reply (reader read replyHandler)
-          }
+    case r: Read[_,_] =>
+      handleRedisError{
+        send(Transform(reader read r.replyHandler, true, r.transform))
       }
   }
 }
@@ -124,6 +117,6 @@ class TransformerActor(implicit dispatcher: MessageDispatcher) extends Actor {
 
   def receive = {
     case t: Transform[_,_] =>
-      self reply t.execute
+      self reply t.transform(t.data)
   }
 }
