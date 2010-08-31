@@ -16,3 +16,5 @@ case class Write[T, V](bytes: Array[Byte], replyHandler: Reply[T], forward: Bool
 case class Read[T, V](replyHandler: Reply[T], forward: Boolean, transform: (T) => V) extends Message
 
 case class Transform[T, V](data: T, forward: Boolean, transform: (T) => V) extends Message
+
+case class Work[T,V](command: Command[T], transform: (T) => V)

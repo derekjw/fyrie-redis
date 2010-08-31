@@ -26,7 +26,7 @@ trait ChainedActor {
   }
 }
 
-class RedisActor(address: String, port: Int)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
+class RedisPipelineActor(address: String, port: Int)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
   self.faultHandler = Some(AllForOneStrategy(5, 5000))
   self.trapExit = List(classOf[Exception])
 
@@ -59,6 +59,23 @@ class RedisActor(address: String, port: Int)(implicit dispatcher: MessageDispatc
 
   override def postRestart(reason: Throwable) = client.reconnect
 
+}
+
+class RedisWorkerActor(address: String, port: Int)(implicit dispatcher: MessageDispatcher) extends Actor {
+
+  self.dispatcher = implicitly
+
+  val client = new RedisClient(address, port)
+
+  override def shutdown = {
+    client.disconnect
+  }
+
+  def receive = {
+    case Work(command, transform) =>
+      self.reply_?(transform(client send command))
+  }
+  
 }
 
 class PreparerActor(val nextActor: ActorRef)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
