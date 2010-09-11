@@ -2,6 +2,7 @@ package net.fyrie.redis
 package commands
 
 import replies._
+import Helpers._
 import scala.collection.mutable.ArrayBuilder
 
 case class keys(pattern: Array[Byte] = "*".getBytes) extends Command[MultiBulk]
@@ -48,4 +49,14 @@ case class multiexec(commandList: Seq[Command[_]]) extends Command[MultiExec]()(
     b ++= Helpers.cmd(Seq("EXEC".getBytes))
     b.result
   }
+}
+
+case class sort(key: Array[Byte], by: Option[Array[Byte]] = None, limit: Option[(Int, Int)] = None, get: Seq[Array[Byte]] = Nil, order: Option[SortOrder] = None, alpha: Boolean = false, store: Option[Array[Byte]] = None) extends Command[MultiBulk] {
+  override def args = getBytesSeq(Seq(key,
+                                      by.map(Seq("BY", _)),
+                                      limit.map{case (start, count) => Seq("LIMIT", start, count)},
+                                      get.map(Seq("GET", _)),
+                                      order,
+                                      if (alpha) (Some("ALPHA".getBytes)) else (None),
+                                      store.map(Seq("STORE", _))))
 }
