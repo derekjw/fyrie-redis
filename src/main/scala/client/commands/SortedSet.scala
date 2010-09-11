@@ -44,12 +44,19 @@ case class zrevrangeWithScores(key: Array[Byte], start: Int = 0, end: Int = -1) 
 // ZRANGEBYSCORE
 // 
 case class zrangebyscore(key: Array[Byte], min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
-  override def args = Seq(key, getBytes(min, minInclusive), getBytes(max, maxInclusive)) ++ limit.toList.map(x => List("LIMIT".getBytes, getBytes(x._1), getBytes(x._2))).flatten
+  override def args = getBytesSeq(Seq(key,
+                                      getBytes(min, minInclusive),
+                                      getBytes(max, maxInclusive),
+                                      limit.map{case (start, count) => Seq("LIMIT", start, count)}))
 }
 
 case class zrangebyscoreWithScores(key: Array[Byte], min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
   override def name = "ZRANGEBYSCORE".getBytes
-  override def args = Seq(key, getBytes(min, minInclusive), getBytes(max, maxInclusive)) ++ limit.toList.map(x => List("LIMIT".getBytes, getBytes(x._1), getBytes(x._2))).flatten :+ "WITHSCORES".getBytes
+  override def args = getBytesSeq(Seq(key,
+                                      getBytes(min, minInclusive),
+                                      getBytes(max, maxInclusive),
+                                      limit.map{case (start, count) => Seq("LIMIT", start, count)},
+                                      "WITHSCORES"))
 }
 
 case class zcount(key: Array[Byte], min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true) extends Command[Int] {

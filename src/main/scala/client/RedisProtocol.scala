@@ -155,14 +155,7 @@ object replies {
 
 abstract class Command[T](implicit val replyHandler: Reply[T]) extends Product {
   def name: Array[Byte] = productPrefix.toUpperCase.getBytes
-  def args: Seq[Array[Byte]] = productIterator.map{
-    case b: Array[Byte] => b
-    case s: String => s.getBytes
-    case i: Int => Helpers.getBytes(i)
-    case l: Long => Helpers.getBytes(l)
-    case d: Double => Helpers.getBytes(d)
-      case x => error("Unable to serialize: "+x)
-  }.toSeq
+  def args: Seq[Array[Byte]] = Helpers.getBytesSeq(productIterator.toSeq)
   def toBytes: Array[Byte] = Helpers.cmd(name +: args)
 }
 
@@ -185,6 +178,18 @@ object Helpers {
       }
     }
   }.getBytes
+  def getBytes(s: String): Array[Byte] = s.getBytes
+
+  def getBytesSeq(seq: Seq[Any]): Seq[Array[Byte]] = seq.flatMap{
+    case b: Array[Byte] => Seq(b)
+    case s: String => Seq(getBytes(s))
+    case i: Int => Seq(getBytes(i))
+    case l: Long => Seq(getBytes(l))
+    case d: Double => Seq(getBytes(d))
+    case s: TraversableOnce[_] => getBytesSeq(s.toSeq)
+    case p: Product => getBytesSeq(p.productIterator.toSeq)
+    case x => Seq(getBytes(x.toString))
+  }
 
   object cmd {
     val LS     = "\r\n".getBytes.toList
