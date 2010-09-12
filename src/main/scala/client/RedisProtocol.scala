@@ -2,155 +2,137 @@ package net.fyrie.redis
 
 import scala.collection.mutable.ArrayBuilder
 
-sealed trait Reply[T] {
-  def marker: Char
-
-  def parse(s: String): T
-
-  def parse(r: RedisStreamReader, s: String): T = parse(s)
-
+trait Reply[T] {
+  def apply(r: RedisStreamReader): T
 }
 
-sealed abstract class ReplyBase[T] extends Reply[T]
+package object replies {
 
-abstract class ReplyProxy[T, U: ReplyBase] extends Reply[T] {
-  val underlying = implicitly[Reply[U]]
-  def marker = underlying.marker
-  def parse(s: String) = transform(underlying.parse(s))
-  override def parse(r: RedisStreamReader, s: String) = transform(underlying.parse(r,s))
-  def transform(in: U): T
-}
-
-object replies {
-
-  implicit object NoReply extends ReplyBase[Nothing] {
-    val marker = ' '
-
-    def parse(s: String): Nothing = error("Can't parse No Reply")
+  implicit object NoReply extends Reply[Nothing] {
+    def apply(r: RedisStreamReader): Nothing = error("Can't parse No Reply")
   }
 
   type Status = String
 
-  implicit object StatusReply extends ReplyBase[Status] {
-    val marker = '+'
-
-    def parse(s: String): Status = s
+  implicit object StatusReply extends Reply[Status] {
+    def apply(r: RedisStreamReader): Status = status(r)
   }
 
   type OkStatus = Unit
 
-  implicit object OkStatusReply extends ReplyProxy[Unit, Status] {
-    def transform(in: Status): Unit = if (in != "OK") throw new RedisProtocolException("Expected 'OK' reply, got: "+in)
+  implicit object OkStatusReply extends Reply[Unit] {
+    def apply(r: RedisStreamReader): Unit = {
+      val result = status(r)
+      if (result != "OK") throw new RedisProtocolException("Expected 'OK' reply, got: "+result)
+    }
   }
 
-  implicit object IntReply extends ReplyBase[Int] {
-    val marker = ':'
-
-    def parse(s: String): Int = s.toInt
+  implicit object IntReply extends Reply[Int] {
+    def apply(r: RedisStreamReader): Int = integer(r).toInt
   }
 
   type IntAsBoolean = Boolean
 
-  implicit object IntAsBooleanReply extends ReplyProxy[IntAsBoolean, Int] {
-    def transform(in: Int): IntAsBoolean = in >= 1
+  implicit object BooleanReply extends Reply[Boolean] {
+    def apply(r: RedisStreamReader): Boolean = integer(r) >= 1L
   }
 
-  implicit object LongReply extends ReplyBase[Long] {
-    val marker = ':'
-
-    def parse(s: String): Long = s.toLong
+  implicit object LongReply extends Reply[Long] {
+    def apply(r: RedisStreamReader): Long = integer(r)
   }
 
   type Bulk = Option[Array[Byte]]
 
-  implicit object BulkReply extends ReplyBase[Bulk] {
-    val marker = '$'
-
-    def parse(s: String): Bulk = error("Must use parse(RedisStreamReader, String)")
-
-    override def parse(r: RedisStreamReader, s: String): Bulk =
-      s.toInt match {
-        case -1 => None
-        case l =>
-          val bytes = r.readBulk(l)
-          Some(bytes)
-      }
+  implicit object BulkReply extends Reply[Bulk] {
+    def apply(r: RedisStreamReader): Bulk = bulk(r)
   }
 
   type MultiBulk = Option[Seq[Bulk]]
 
-  implicit object MultiBulkReply extends ReplyBase[MultiBulk] {
-    val marker = '*'
-
-    def parse(s: String): MultiBulk = error("Must use parse(RedisStreamReader, String)")
-
-    override def parse(r: RedisStreamReader, s: String): MultiBulk =
-      s.toInt match {
-        case -1 => None
-        case n =>  Some(List.fill[Bulk](n)(None).map { i => r.read(BulkReply) })
-      }
-
+  implicit object MultiBulkReply extends Reply[MultiBulk] {
+    def apply(r: RedisStreamReader): MultiBulk = multibulk(r).map(_.toList)
   }
 
   type MultiBulkAsSet = Option[Set[Array[Byte]]]
 
-  implicit object MultiBulkAsSetReply extends ReplyProxy[MultiBulkAsSet, MultiBulk] {
-    def transform(in: MultiBulk): MultiBulkAsSet = in.map(_.flatten.toSet)
+  implicit object MultiBulkAsSetReply extends Reply[MultiBulkAsSet] {
+    def apply(r: RedisStreamReader): MultiBulkAsSet = multibulk(r).map(_.flatten.toSet)
   }
 
   type MultiBulkAsMap = Option[Map[Array[Byte], Array[Byte]]]
 
-  implicit object MultiBulkAsMapReply extends ReplyProxy[MultiBulkAsMap, MultiBulk] {
-    def transform(in: MultiBulk): MultiBulkAsMap = in.map(_.toSeq.grouped(2).collect{
+  implicit object MultiBulkAsMapReply extends Reply[MultiBulkAsMap] {
+    def apply(r: RedisStreamReader): MultiBulkAsMap = multibulk(r).map(_.grouped(2).collect{
       case Seq(Some(k),Some(v)) => (k,v)
     }.toMap)
   }
 
   type MultiBulkWithScores = Option[Seq[(Array[Byte], Double)]]
 
-  implicit object MultiBulkWithScoresReply extends ReplyProxy[MultiBulkWithScores, MultiBulk] {
-    def transform(in: MultiBulk): MultiBulkWithScores = in.map(_.toSeq.grouped(2).collect{
+  implicit object MultiBulkWithScoresReply extends Reply[MultiBulkWithScores] {
+    def apply(r: RedisStreamReader): MultiBulkWithScores = multibulk(r).map(_.grouped(2).collect{
       case Seq(Some(k),Some(v)) => (k,new String(v).toDouble)
     }.toSeq)
   }
 
   type MultiBulkAsFlat = Option[Seq[Array[Byte]]]
 
-  implicit object MultiBulkAsFlatReply extends ReplyProxy[MultiBulkAsFlat, MultiBulk] {
-    def transform(in: MultiBulk): MultiBulkAsFlat = in.map(_.flatten)
+  implicit object MultiBulkAsFlatReply extends Reply[MultiBulkAsFlat] {
+    def apply(r: RedisStreamReader): MultiBulkAsFlat = multibulk(r).map(_.flatten.toList)
   }
 
   type MultiExec = Option[Seq[_]]
 
-  final class MultiExecReply(replyList: Seq[Reply[_]]) extends ReplyBase[MultiExec] {
-    val marker = '+'
-
-    def parse(s: String): MultiExec = error("Must use parse(RedisStreamReader, String)")
-
-    override def parse(r: RedisStreamReader, s: String): MultiExec = {
-      if (s != "OK") throw new Exception("Expected 'OK' reply, got: "+s)
-      replyList.foreach(x => r.read(QueuedStatusReply))
-      r.read(ExecReply)
-    }
-
-    object QueuedStatusReply extends ReplyProxy[Unit, Status] {
-      def transform(in: Status): Unit = if (in != "QUEUED") throw new RedisProtocolException("Expected 'QUEUED' reply, got: "+in)
-    }
-
-    object ExecReply extends ReplyBase[MultiExec] {
-      val marker = '*'
-
-      def parse(s: String): MultiExec = error("Must use parse(RedisStreamReader, String)")
-
-      override def parse(r: RedisStreamReader, s: String): MultiExec = {
-        s.toInt match {
-          case -1 => None
-          case n =>  Some(replyList.map(x => r.read(x)))
-        }
-      }
+  final class MultiExecReply(replyList: Seq[Reply[_]]) extends Reply[MultiExec] {
+    def apply(r: RedisStreamReader): MultiExec = {
+      OkStatusReply(r)
+      replyList.foreach(x => QueuedStatusReply(r))
+      multiexec(r, replyList)
     }
   }
 
+  object QueuedStatusReply extends Reply[Unit] {
+    def apply(r: RedisStreamReader): Unit = {
+      val result = status(r)
+      if (result != "QUEUED") throw new RedisProtocolException("Expected 'QUEUED' reply, got: "+result)
+    }
+  }
+
+  private def parse(marker: Char, r: RedisStreamReader): String = {
+    val reply = r.readReply
+    val m = reply(0).toChar
+    val s = new String(reply, 1, reply.size - 1)
+    if (m != marker) {
+      if (m == '-') (throw new RedisErrorException(s))
+      //reconnect
+      throw new RedisProtocolException("Got '" + m + s + "' as reply")
+    }
+    s
+  }
+
+  private def status(r: RedisStreamReader): String = parse('+', r)
+
+  private def integer(r: RedisStreamReader): Long = parse(':', r).toLong
+
+  private def bulk(r: RedisStreamReader): Option[Array[Byte]] =
+    parse('$', r).toInt match {
+      case -1 => None
+      case l =>
+        val bytes = r.readBulk(l)
+        Some(bytes)
+    }
+
+  private def multibulk(r: RedisStreamReader): Option[Seq[Option[Array[Byte]]]] =
+    parse('*', r).toInt match {
+      case -1 => None
+      case n =>  Some(List.fill[Option[Array[Byte]]](n)(None).toStream.map { i => bulk(r) })
+    }
+
+  private def multiexec(r: RedisStreamReader, replyList: Seq[Reply[_]]): Option[Seq[_]] =
+    parse('*', r).toInt match {
+      case -1 => None
+      case n =>  Some(replyList.map(_(r)))
+    }
 }
 
 abstract class Command[T](implicit val replyHandler: Reply[T]) extends Product {

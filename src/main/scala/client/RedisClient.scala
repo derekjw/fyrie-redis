@@ -25,7 +25,7 @@ object AggregateScore {
 trait Redis extends IO {
   def send[T](cmd: Command[T]): T = {
     writer.write(cmd.toBytes)
-    reader.read(cmd.replyHandler)
+    cmd.replyHandler(reader)
   }
 }
 

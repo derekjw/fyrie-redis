@@ -117,12 +117,12 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
   def receive = {
     case r: Read[_,_] if !r.forward =>
       handleRedisError{
-        reader read r.replyHandler
+        r.replyHandler(reader)
         () // Get ClassCastException when an AnyVal is returned, so must return Unit
       }
     case r: Read[_,_] =>
       handleRedisError{
-        send(Transform(reader read r.replyHandler, true, r.transform))
+        send(Transform(r.replyHandler(reader), true, r.transform))
       }
   }
 }

@@ -69,7 +69,7 @@ trait IO {
 
     private val crlf = List(13,10)
 
-    def read[T](handler: Reply[T]): T = {
+    def readReply: Array[Byte] = {
       if(!connected) connect;
       stream.map{is =>
         var delimiter = crlf
@@ -89,18 +89,7 @@ trait IO {
             build += next.toByte
           }
         }
-
-        // TODO: Refactor this stuff somewhere else
-        val arr = build.result
-        val m = arr(0).toChar
-        val s = new String(arr, 1, arr.size - 1)
-        if (m == handler.marker) {
-          handler.parse(this, s)
-        } else {
-          if (m == '-') (throw new RedisErrorException(s))
-          reconnect
-          throw new RedisProtocolException("Got '" + m + s + "' as initial reply byte")
-        }
+        build.result
       }.get
     }
 
@@ -140,7 +129,7 @@ trait IO {
 }
 
 trait RedisStreamReader {
-  def read[T](handler: Reply[T]): T
+  def readReply: Array[Byte]
   def readBulk(count: Int): Array[Byte]
 }
 
