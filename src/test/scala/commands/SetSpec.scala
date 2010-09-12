@@ -153,16 +153,16 @@ class SetSpec extends Spec
       r send sadd("set-3", "bat") should equal(true)
       r send sadd("set-3", "bay") should equal(true)
 
-      r send sinterstore(Seq("set-r", "set-1", "set-2")) should equal(2)
+      r send sinterstore("set-r", Seq("set-1", "set-2")) should equal(2)
       r send scard("set-r") should equal(2)
-      r send sinterstore(Seq("set-s", "set-1", "set-3")) should equal(0)
+      r send sinterstore("set-s", Seq("set-1", "set-3")) should equal(0)
       r send scard("set-s") should equal(0)
     }
     it("should return empty set for non-existing key") {
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send sinterstore(Seq("set-r", "set-1", "set-4")) should equal(0)
+      r send sinterstore("set-r", Seq("set-1", "set-4")) should equal(0)
       r send scard("set-r") should equal(0)
     }
   }
@@ -206,16 +206,16 @@ class SetSpec extends Spec
       r send sadd("set-3", "bat") should equal(true)
       r send sadd("set-3", "bay") should equal(true)
 
-      r send sunionstore(Seq("set-r", "set-1", "set-2")) should equal(4)
+      r send sunionstore("set-r", Seq("set-1", "set-2")) should equal(4)
       r send scard("set-r") should equal(4)
-      r send sunionstore(Seq("set-s", "set-1", "set-3")) should equal(6)
+      r send sunionstore("set-s", Seq("set-1", "set-3")) should equal(6)
       r send scard("set-s") should equal(6)
     }
     it("should treat non-existing keys as empty sets") {
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send sunionstore(Seq("set-r", "set-1", "set-4")) should equal(3)
+      r send sunionstore("set-r", Seq("set-1", "set-4")) should equal(3)
       r send scard("set-r") should equal(3)
     }
   }

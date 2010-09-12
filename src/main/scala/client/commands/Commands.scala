@@ -2,7 +2,6 @@ package net.fyrie.redis
 package commands
 
 import replies._
-import Helpers._
 import scala.collection.mutable.ArrayBuilder
 
 case class keys(pattern: Any = "*") extends Command[MultiBulk]
@@ -20,7 +19,7 @@ case class exists(key: Any) extends Command[IntAsBoolean]
 case class del(keys: Iterable[Any]) extends Command[Int]
 
 case class getType(key: Any) extends Command[Status] {
-  override def name = "TYPE".getBytes
+  override def name = "TYPE"
 }
 
 case class expire(key: Any, seconds: Int) extends Command[IntAsBoolean]
@@ -42,19 +41,19 @@ case class auth(secret: Any) extends Command[OkStatus]
 case class multiexec(commandList: Seq[Command[_]]) extends Command[MultiExec]()(new MultiExecReply(commandList.map(_.replyHandler))) {
   override def toBytes = {
     val b = new ArrayBuilder.ofByte
-    b ++= Helpers.cmd(Seq("MULTI".getBytes))
+    b ++= Command.create(Seq("MULTI".getBytes))
     commandList.foreach(b ++= _.toBytes)
-    b ++= Helpers.cmd(Seq("EXEC".getBytes))
+    b ++= Command.create(Seq("EXEC".getBytes))
     b.result
   }
 }
 
 case class sort(key: Any, by: Option[Any] = None, limit: Option[(Int, Int)] = None, get: Seq[Any] = Nil, order: Option[SortOrder] = None, alpha: Boolean = false, store: Option[Any] = None) extends Command[MultiBulkAsFlat] {
-  override def args = getBytesSeq(Seq(key,
-                                      by.map(Seq("BY", _)),
-                                      limit.map(("LIMIT", _)),
-                                      get.map(Seq("GET", _)),
-                                      order,
-                                      if (alpha) (Some("ALPHA")) else (None),
-                                      store.map(Seq("STORE", _))))
+  override def args = Seq(key,
+                          by.map(("BY", _)),
+                          limit.map(("LIMIT", _)),
+                          get.map(("GET", _)),
+                          order,
+                          if (alpha) (Some("ALPHA")) else (None),
+                          store.map(("STORE", _)))
 }

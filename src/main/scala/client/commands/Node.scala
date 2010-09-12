@@ -2,7 +2,6 @@ package net.fyrie.redis
 package commands
 
 import replies._
-import Helpers._
 
 // SAVE
 // save the DB on disk now.
@@ -35,22 +34,19 @@ case object monitor extends Command[OkStatus]
 // SLAVEOF
 // The SLAVEOF command can change the replication settings of a slave on the fly.
 case class slaveof(hostPort: Option[(String, Int)]) extends Command[OkStatus] {
-  override def args = hostPort match {
-    case Some((h: String, p: Int)) => Seq(h.getBytes, p.toString.getBytes)
-    case None => Seq("NO ONE".getBytes)
-  }
+  override def args = Seq(hostPort getOrElse "NO ONE")
 }
 
 object config {
 
   case class get(param: Any) extends Command[MultiBulk] {
-    override def name = "CONFIG".getBytes
-    override def args = getBytesSeq(Seq("GET", param))
+    override def name = "CONFIG"
+    override def args = Seq("GET", param)
   }
 
   case class set(param: Any, value: Any) extends Command[OkStatus] {
-    override def name = "CONFIG".getBytes
-    override def args = getBytesSeq(Seq("SET", param, value))
+    override def name = "CONFIG"
+    override def args = Seq("SET", param, value)
   }
 
 }

@@ -2,7 +2,6 @@ package net.fyrie.redis
 package commands
 
 import replies._
-import Helpers._
 
 // LPUSH
 // add string value to the head of the list stored at key
@@ -52,10 +51,6 @@ case class rpop(key: Any) extends Command[Bulk]
 // Remove the first count occurrences of the value element from the list.
 case class rpoplpush(srcKey: Any, dstKey: Any) extends Command[Bulk]
 
-case class blpop(key: Any, timeoutInSeconds: Int, values: Iterable[Any]) extends Command[MultiBulk] {
-  override def args = getBytesSeq(Seq(key, values, timeoutInSeconds))
-}
+case class blpop(key: Any, values: Iterable[Any], timeoutInSeconds: Int) extends Command[MultiBulk]
 
-case class brpop(key: Any, timeoutInSeconds: Int, values: Iterable[Any]) extends Command[MultiBulk] {
-  override def args = getBytesSeq(Seq(key, values, timeoutInSeconds))
-}
+case class brpop(key: Any, values: Iterable[Any], timeoutInSeconds: Int) extends Command[MultiBulk]

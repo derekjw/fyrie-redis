@@ -2,7 +2,6 @@ package net.fyrie.redis
 package commands
 
 import replies._
-import Helpers._
 
 // SET KEY (key, value)
 // sets the key with the specified value.

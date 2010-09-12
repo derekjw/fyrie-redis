@@ -154,22 +154,21 @@ object replies {
 }
 
 abstract class Command[T](implicit val replyHandler: Reply[T]) extends Product {
-  def name: Array[Byte] = productPrefix.toUpperCase.getBytes
-  def args: Seq[Array[Byte]] = Helpers.getBytesSeq(productIterator.toSeq)
-  def toBytes: Array[Byte] = Helpers.cmd(name +: args)
+  def name: String = productPrefix.toUpperCase
+  def args: Seq[Any] = productIterator.toSeq
+  def toBytes: Array[Byte] = Command.create(Command.serialize(name +: args))
 }
 
-object Helpers {
-  def getBytes(i: Int): Array[Byte] = i.toString.getBytes
-  def getBytes(l: Long): Array[Byte] = l.toString.getBytes
-  def getBytes(d: Double): Array[Byte] = {
-    if (d.isInfinity) {
-      if (d > 0.0) "+inf" else "-inf"
-    } else {
-      d.toString
-    }
-  }.getBytes
-  def getBytes(d: Double, inclusive: Boolean): Array[Byte] = {
+object Command {
+  def serialize(seq: Seq[Any]): Seq[Array[Byte]] = seq.flatMap{
+    case b: Array[Byte] => Seq(b)
+    case d: Double => Seq(serializeDouble(d))
+    case s: TraversableOnce[_] => serialize(s.toSeq)
+    case p: Product => serialize(p.productIterator.toSeq)
+    case x => Seq(x.toString.getBytes("UTF-8"))
+  }
+
+  def serializeDouble(d: Double, inclusive: Boolean = true): Array[Byte] = {
     (if (inclusive) ("") else ("(")) + {
       if (d.isInfinity) {
         if (d > 0.0) "+inf" else "-inf"
@@ -178,33 +177,19 @@ object Helpers {
       }
     }
   }.getBytes
-  def getBytes(s: String): Array[Byte] = s.getBytes
 
-  def getBytesSeq(seq: Seq[Any]): Seq[Array[Byte]] = seq.flatMap{
-    case b: Array[Byte] => Seq(b)
-    case s: String => Seq(getBytes(s))
-    case i: Int => Seq(getBytes(i))
-    case l: Long => Seq(getBytes(l))
-    case d: Double => Seq(getBytes(d))
-    case s: TraversableOnce[_] => getBytesSeq(s.toSeq)
-    case p: Product => getBytesSeq(p.productIterator.toSeq)
-    case x => Seq(getBytes(x.toString))
-  }
+  val EOL = "\r\n".getBytes.toSeq
 
-  object cmd {
-    val LS     = "\r\n".getBytes.toList
-    def apply(args: Seq[Array[Byte]]): Array[Byte] = {
-      val b = new ArrayBuilder.ofByte
-      b ++= "*%d".format(args.size).getBytes
-      b ++= LS
-      args foreach { arg =>
-        b ++= "$%d".format(arg.size).getBytes
-        b ++= LS
-        b ++= arg
-        b ++= LS
-      }
-      b.result
+  def create(args: Seq[Array[Byte]]): Array[Byte] = {
+    val b = new ArrayBuilder.ofByte
+    b ++= "*%d".format(args.size).getBytes
+    b ++= EOL
+    args foreach { arg =>
+      b ++= "$%d".format(arg.size).getBytes
+      b ++= EOL
+      b ++= arg
+      b ++= EOL
     }
+    b.result
   }
-
 }

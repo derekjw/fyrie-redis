@@ -2,7 +2,6 @@ package net.fyrie.redis
 package commands
 
 import replies._
-import Helpers._
 
 case class hset(key: Any, field: Any, value: Any) extends Command[IntAsBoolean]
 
@@ -12,7 +11,7 @@ case class hmset(key : Any, fvs: Iterable[(Any,Any)]) extends Command[OkStatus]
 
 case class hget(key : Any, field : Any) extends Command[Bulk]
 
-case class hmget(key : Any, fields : Iterable[Any]) extends Command[MultiBulk]
+case class hmget(key : Any, fields : Seq[Any]) extends Command[MultiBulk]
 
 case class hkeys(key : Any) extends Command[MultiBulkAsSet]
 
