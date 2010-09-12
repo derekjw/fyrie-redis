@@ -110,5 +110,23 @@ class CommandsSpec extends Spec
       }) should be(Some(List((), 1, (), 2, Some(List(Some("testvalue1"), Some("testvalue2"))))))
     }
   }
-}
 
+  def mkList {
+    List(6, 3, 5, 47, 1, 1, 4, 9) foreach (r send lpush("sortlist", _))
+  }
+
+  def mkStringList {
+    List("lorem", "ipsum", "dolor", "sit", "amet", 3, 7) foreach (r send lpush("sortlist", _))
+  }
+
+  describe("sort") {
+    it("should do a simple sort") {
+      mkList
+      (r send sort("sortlist")).map(mkString(_).map(_.toInt)) should be(Some(List(1, 1, 3, 4, 5, 6, 9, 47)))
+    }
+    it("should do a lexical sort") {
+      mkStringList
+      (r send sort("sortlist", alpha = true)).map(mkString) should be(Some(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
+    }
+  }   
+}

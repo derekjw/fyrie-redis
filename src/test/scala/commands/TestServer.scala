@@ -11,10 +11,6 @@ import org.scalatest.BeforeAndAfterAll
 trait RedisByteHelpers {
   val basePort = 16379
 
-  implicit def str2Bytes(in: String): Array[Byte] = in.getBytes
-  implicit def int2Bytes(in: Int): Array[Byte] = in.toString.getBytes
-  implicit def double2Bytes(in: Double): Array[Byte] = in.toString.getBytes
-  implicit def strPair2BytesPair(in: (String, String)): (Array[Byte], Array[Byte]) = (in._1.getBytes, in._2.getBytes)
   def mkString(in: Seq[Array[Byte]]): Seq[String] = in.map(new String(_))
   def mkString(in: Map[Array[Byte], Array[Byte]]): Map[String, String] = in.map{case (k,v) => (new String(k), new String(v))}
   implicit def mkString(in: Array[Byte]): String = new String(in)

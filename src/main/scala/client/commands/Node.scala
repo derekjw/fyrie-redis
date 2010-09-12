@@ -2,6 +2,7 @@ package net.fyrie.redis
 package commands
 
 import replies._
+import Helpers._
 
 // SAVE
 // save the DB on disk now.
@@ -42,14 +43,14 @@ case class slaveof(hostPort: Option[(String, Int)]) extends Command[OkStatus] {
 
 object config {
 
-  case class get(param: Array[Byte]) extends Command[MultiBulk] {
+  case class get(param: Any) extends Command[MultiBulk] {
     override def name = "CONFIG".getBytes
-    override def args = Seq("GET".getBytes, param)
+    override def args = getBytesSeq(Seq("GET", param))
   }
 
-  case class set(param: Array[Byte], value: Array[Byte]) extends Command[OkStatus] {
+  case class set(param: Any, value: Any) extends Command[OkStatus] {
     override def name = "CONFIG".getBytes
-    override def args = Seq("SET".getBytes, param, value)
+    override def args = getBytesSeq(Seq("SET", param, value))
   }
 
 }

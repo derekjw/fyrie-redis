@@ -6,51 +6,51 @@ import Helpers._
 
 // ZADD
 // Add the specified member having the specified score to the sorted set stored at key.
-case class zadd(key: Array[Byte], score: Double, member: Array[Byte]) extends Command[IntAsBoolean]
+case class zadd(key: Any, score: Double, member: Any) extends Command[IntAsBoolean]
 
 // ZREM
 // Remove the specified member from the sorted set value stored at key.
-case class zrem(key: Array[Byte], member: Array[Byte]) extends Command[Int]
+case class zrem(key: Any, member: Any) extends Command[Int]
 
 // ZINCRBY
 // 
-case class zincrby(key: Array[Byte], incr: Double, member: Array[Byte]) extends Command[Bulk]
+case class zincrby(key: Any, incr: Double, member: Any) extends Command[Bulk]
 
 // ZCARD
 // 
-case class zcard(key: Array[Byte]) extends Command[Int]
+case class zcard(key: Any) extends Command[Int]
 
 // ZSCORE
 // 
-case class zscore(key: Array[Byte], element: Array[Byte]) extends Command[Bulk]
+case class zscore(key: Any, element: Any) extends Command[Bulk]
 
 // ZRANGE
 // 
 
-case class zrange(key: Array[Byte], start: Int = 0, end: Int = -1) extends Command[MultiBulkAsFlat]
+case class zrange(key: Any, start: Int = 0, end: Int = -1) extends Command[MultiBulkAsFlat]
 
-case class zrangeWithScores(key: Array[Byte], start: Int = 0, end: Int = -1) extends Command[MultiBulkWithScores] {
+case class zrangeWithScores(key: Any, start: Int = 0, end: Int = -1) extends Command[MultiBulkWithScores] {
   override def name = "ZRANGE".getBytes
   override def args = super.args :+ "WITHSCORES".getBytes
 }
 
-case class zrevrange(key: Array[Byte], start: Int = 0, end: Int = -1) extends Command[MultiBulkAsFlat]
+case class zrevrange(key: Any, start: Int = 0, end: Int = -1) extends Command[MultiBulkAsFlat]
 
-case class zrevrangeWithScores(key: Array[Byte], start: Int = 0, end: Int = -1) extends Command[MultiBulkWithScores] {
+case class zrevrangeWithScores(key: Any, start: Int = 0, end: Int = -1) extends Command[MultiBulkWithScores] {
   override def name = "ZREVRANGE".getBytes
   override def args = super.args :+ "WITHSCORES".getBytes
 }
 
 // ZRANGEBYSCORE
 // 
-case class zrangebyscore(key: Array[Byte], min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
+case class zrangebyscore(key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
   override def args = getBytesSeq(Seq(key,
                                       getBytes(min, minInclusive),
                                       getBytes(max, maxInclusive),
                                       limit.map{case (start, count) => Seq("LIMIT", start, count)}))
 }
 
-case class zrangebyscoreWithScores(key: Array[Byte], min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
+case class zrangebyscoreWithScores(key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
   override def name = "ZRANGEBYSCORE".getBytes
   override def args = getBytesSeq(Seq(key,
                                       getBytes(min, minInclusive),
@@ -59,36 +59,43 @@ case class zrangebyscoreWithScores(key: Array[Byte], min: Double = Double.MinVal
                                       "WITHSCORES"))
 }
 
-case class zcount(key: Array[Byte], min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true) extends Command[Int] {
-  override def args = Seq(key, getBytes(min, minInclusive), getBytes(max, maxInclusive))
+case class zcount(key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true) extends Command[Int] {
+  override def args = getBytesSeq(Seq(key,
+                                      getBytes(min, minInclusive),
+                                      getBytes(max, maxInclusive)))
 }
 
 // ZRANK
 // ZREVRANK
 //
-case class zrank(key: Array[Byte], member: Array[Byte]) extends Command[Int]
+case class zrank(key: Any, member: Any) extends Command[Int]
 
-case class zrevrank(key: Array[Byte], member: Array[Byte]) extends Command[Int]
+case class zrevrank(key: Any, member: Any) extends Command[Int]
 
 // ZREMRANGEBYRANK
 //
-case class zremrangebyrank(key: Array[Byte], start: Int = 0, end: Int = -1) extends Command[Int]
+case class zremrangebyrank(key: Any, start: Int = 0, end: Int = -1) extends Command[Int]
 
 // ZREMRANGEBYSCORE
 //
-case class zremrangebyscore(key: Array[Byte], start: Double, end: Double) extends Command[Int]
+case class zremrangebyscore(key: Any, start: Double, end: Double) extends Command[Int]
 
 // ZUNION
 //
-case class zunionstore(dstKey: Array[Byte], keys: Iterable[Array[Byte]], aggregate: Option[AggregateScore] = None) extends Command[Int] {
-  override def args = Seq(dstKey, getBytes(keys.size)) ++ keys ++ aggregate.toList.flatMap(x => List("AGGREGATE".getBytes, x.getBytes))
+case class zunionstore(dstKey: Any, keys: Iterable[Any], aggregate: Option[AggregateScore] = None) extends Command[Int] {
+  override def args = getBytesSeq(Seq(dstKey,
+                                     keys.size,
+                                     keys,
+                                     aggregate.map(x => ("AGGREGATE", x.getBytes))))
 }
 
-case class zunionstoreWeighted(dstKey: Array[Byte], kws: Iterable[(Array[Byte], Double)], aggregate: Option[AggregateScore] = None) extends Command[Int] {
+case class zunionstoreWeighted(dstKey: Any, kws: Iterable[(Any, Double)], aggregate: Option[AggregateScore] = None) extends Command[Int] {
   override def name = "ZUNIONSTORE".getBytes
-  override def args = {
-    val (ks, ws) = kws.unzip
-    Seq(Seq(dstKey), Seq(getBytes(kws.size)), ks.toSeq, Seq("WEIGHTS".getBytes), ws.map(getBytes).toSeq, aggregate.toList.flatMap(x => List("AGGREGATE".getBytes, x.getBytes))).flatten
-  }
+  override def args = getBytesSeq(Seq(dstKey,
+                                      kws.size,
+                                      kws.iterator.map(_._1),
+                                      "WEIGHTS",
+                                      kws.iterator.map(_._2),
+                                      aggregate.map(x => ("AGGREGATE", x.getBytes))))
 }
 
