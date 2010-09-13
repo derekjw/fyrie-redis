@@ -50,10 +50,10 @@ case class multiexec(commandList: Seq[Command[_]]) extends Command[MultiExec]()(
 
 case class sort(key: Any, by: Option[Any] = None, limit: Option[(Int, Int)] = None, get: Seq[Any] = Nil, order: Option[SortOrder] = None, alpha: Boolean = false, store: Option[Any] = None) extends Command[MultiBulkAsFlat] {
   override def args = Seq(key,
-                          by.map(("BY", _)),
-                          limit.map(("LIMIT", _)),
-                          get.map(("GET", _)),
+                          by.map(Seq("BY", _)),
+                          limit.map(x => Seq("LIMIT", x._1, x._2)),
+                          get.map(Seq("GET", _)),
                           order,
                           if (alpha) (Some("ALPHA")) else (None),
-                          store.map(("STORE", _)))
+                          store.map(Seq("STORE", _)))
 }

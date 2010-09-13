@@ -7,7 +7,9 @@ case class hset(key: Any, field: Any, value: Any) extends Command[IntAsBoolean]
 
 case class hsetnx(key: Any, field: Any, value: Any) extends Command[IntAsBoolean]
 
-case class hmset(key : Any, fvs: Iterable[(Any,Any)]) extends Command[OkStatus]
+case class hmset(key : Any, fvs: Iterable[Product2[Any,Any]]) extends Command[OkStatus] {
+  override def args = Seq(key, fvs.toStream.map(x => Seq(x._1, x._2)))
+}
 
 case class hget(key : Any, field : Any) extends Command[Bulk]
 

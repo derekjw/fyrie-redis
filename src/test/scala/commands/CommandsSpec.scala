@@ -128,5 +128,21 @@ class CommandsSpec extends Spec
       mkStringList
       (r send sort("sortlist", alpha = true)).map(mkString) should be(Some(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
     }
-  }   
+  }
+
+  case class TestPerson(name: String, age: Int)
+  val person1 = TestPerson("Alan", 30)
+
+  describe("serializers") {
+    it("should use default serializers") {
+      r send set("testperson1", person1)
+      (r send get("testperson1")).map(mkString) should be(Some("TestPerson(Alan,30)"))
+    }
+    it("should use custom serializers") {
+      r.send(set("testperson1", person1).withSerializers{
+        case TestPerson(name, age) => ("Hi, I'm "+name+". I'm "+age+" years old.").getBytes
+      })
+      (r send get("testperson1")).map(mkString) should be(Some("Hi, I'm Alan. I'm 30 years old."))
+    }
+  }
 }

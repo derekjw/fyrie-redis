@@ -34,7 +34,7 @@ case object monitor extends Command[OkStatus]
 // SLAVEOF
 // The SLAVEOF command can change the replication settings of a slave on the fly.
 case class slaveof(hostPort: Option[(String, Int)]) extends Command[OkStatus] {
-  override def args = Seq(hostPort getOrElse "NO ONE")
+  override def args = hostPort map (x => Seq(x._1, x._2)) getOrElse Seq("NO ONE")
 }
 
 object config {

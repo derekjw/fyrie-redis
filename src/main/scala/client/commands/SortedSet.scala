@@ -46,7 +46,7 @@ case class zrangebyscore(key: Any, min: Double = Double.MinValue, minInclusive: 
   override def args = Seq(key,
                           Command.serializeDouble(min, minInclusive),
                           Command.serializeDouble(max, maxInclusive),
-                          limit.map{case (start, count) => ("LIMIT", start, count)})
+                          limit.map{case (start, count) => Seq("LIMIT", start, count)})
 }
 
 case class zrangebyscoreWithScores(key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None) extends Command[MultiBulk] {
@@ -54,7 +54,7 @@ case class zrangebyscoreWithScores(key: Any, min: Double = Double.MinValue, minI
   override def args = Seq(key,
                           Command.serializeDouble(min, minInclusive),
                           Command.serializeDouble(max, maxInclusive),
-                          limit.map{case (start, count) => ("LIMIT", start, count)},
+                          limit.map{case (start, count) => Seq("LIMIT", start, count)},
                           "WITHSCORES")
 }
 
@@ -85,16 +85,16 @@ case class zunionstore(dstKey: Any, keys: Iterable[Any], aggregate: Option[Aggre
   override def args = Seq(dstKey,
                           keys.size,
                           keys,
-                          aggregate.map(x => ("AGGREGATE", x.getBytes)))
+                          aggregate.map(x => Seq("AGGREGATE", x.getBytes)))
 }
 
-case class zunionstoreWeighted(dstKey: Any, kws: Iterable[(Any, Double)], aggregate: Option[AggregateScore] = None) extends Command[Int] {
+case class zunionstoreWeighted(dstKey: Any, kws: Iterable[Product2[Any, Double]], aggregate: Option[AggregateScore] = None) extends Command[Int] {
   override def name = "ZUNIONSTORE"
   override def args = Seq(dstKey,
                           kws.size,
                           kws.iterator.map(_._1),
                           "WEIGHTS",
                           kws.iterator.map(_._2),
-                          aggregate.map(x => ("AGGREGATE", x.getBytes)))
+                          aggregate.map(x => Seq("AGGREGATE", x.getBytes)))
 }
 

@@ -41,8 +41,12 @@ case class mget(keys: Iterable[Any]) extends Command[MultiBulk]
 
 // MSET (key1 value1 key2 value2 ..)
 // set the respective key value pairs. Overwrite value if key exists
-case class mset(kvs: Iterable[(Any, Any)]) extends Command[OkStatus]
+case class mset(kvs: Iterable[Product2[Any, Any]]) extends Command[OkStatus] {
+  override def args = kvs.toStream.map(x => Seq(x._1, x._2))
+}
 
 // MSETNX (key1 value1 key2 value2 ..)
 // set the respective key value pairs. Noop if any key exists
-case class msetnx(kvs: Iterable[(Any, Any)]) extends Command[IntAsBoolean]
+case class msetnx(kvs: Iterable[Product2[Any, Any]]) extends Command[IntAsBoolean] {
+  override def args = kvs.toStream.map(x => Seq(x._1, x._2))
+}

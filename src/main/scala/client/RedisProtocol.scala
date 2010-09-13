@@ -94,15 +94,31 @@ package object replies {
 abstract class Command[T](implicit val replyHandler: Reply[T]) extends Product {
   def name: String = productPrefix.toUpperCase
   def args: Seq[Any] = productIterator.toSeq
-  def toBytes: Array[Byte] = Command.create(Command.serialize(name +: args))
+  def toBytes: Array[Byte] = Command.create(name.getBytes +: Command.serialize(args, serializers))
+  def serializers: PartialFunction[Any, Array[Byte]] = {
+    case d: Double => Command.serializeDouble(d)
+  }
+  def withSerializers(in: PartialFunction[Any, Array[Byte]]): Command[T] =
+    new CommandWrapper(this) {
+      override def serializers = in orElse underlying.serializers
+    }
+}
+
+class CommandWrapper[T](val underlying: Command[T]) extends Command[T]()(underlying.replyHandler) {
+  override def name = underlying.name
+  override def args = underlying.args
+  override def productPrefix = underlying.productPrefix
+  def productArity: Int = underlying.productArity
+  def productElement(n: Int): Any = underlying.productElement(n)
+  def canEqual(that: Any): Boolean = underlying.canEqual(that)
 }
 
 object Command {
-  def serialize(seq: Seq[Any]): Seq[Array[Byte]] = seq.flatMap{
+  def serialize(seq: Seq[Any], serializers: PartialFunction[Any, Array[Byte]] = Map()): Seq[Array[Byte]] = seq.flatMap{
     case b: Array[Byte] => Seq(b)
-    case d: Double => Seq(serializeDouble(d))
-    case s: TraversableOnce[_] => serialize(s.toSeq)
-    case p: Product => serialize(p.productIterator.toSeq)
+    case x if serializers.isDefinedAt(x) => Seq(serializers(x))
+    case s: TraversableOnce[_] => serialize(s.toSeq, serializers)
+    case o: Option[_] => serialize(o.toList, serializers)
     case x => Seq(x.toString.getBytes("UTF-8"))
   }
 
