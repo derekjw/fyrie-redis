@@ -2,112 +2,68 @@ package net.fyrie.redis
 
 import scala.collection.mutable.ArrayBuilder
 
-trait Reply[T] {
-  def apply(r: RedisStreamReader): T
+class Reply[T](handler: (RedisStreamReader) => T) {
+  def apply(r: RedisStreamReader): T = handler(r)
 }
 
 package object replies {
-
-  implicit object NoReply extends Reply[Nothing] {
-    def apply(r: RedisStreamReader): Nothing = error("Can't parse No Reply")
-  }
+  implicit object NoReply extends Reply[Nothing](r => error("Can't parse No Reply"))
 
   type Status = String
-
-  implicit object StatusReply extends Reply[Status] {
-    def apply(r: RedisStreamReader): Status = status(r)
-  }
+  implicit object StatusReply extends Reply[Status](status)
 
   type OkStatus = Unit
+  implicit object OkStatusReply extends Reply[Unit](r => verify(status(r), "OK"))
 
-  implicit object OkStatusReply extends Reply[Unit] {
-    def apply(r: RedisStreamReader): Unit = {
-      val result = status(r)
-      if (result != "OK") throw new RedisProtocolException("Expected 'OK' reply, got: "+result)
-    }
-  }
-
-  implicit object IntReply extends Reply[Int] {
-    def apply(r: RedisStreamReader): Int = integer(r).toInt
-  }
+  implicit object IntReply extends Reply[Int](integer(_).toInt)
 
   type IntAsBoolean = Boolean
+  implicit object BooleanReply extends Reply[IntAsBoolean](integer(_) >= 1L)
 
-  implicit object BooleanReply extends Reply[Boolean] {
-    def apply(r: RedisStreamReader): Boolean = integer(r) >= 1L
-  }
-
-  implicit object LongReply extends Reply[Long] {
-    def apply(r: RedisStreamReader): Long = integer(r)
-  }
+  implicit object LongReply extends Reply[Long](integer)
 
   type Bulk = Option[Array[Byte]]
-
-  implicit object BulkReply extends Reply[Bulk] {
-    def apply(r: RedisStreamReader): Bulk = bulk(r)
-  }
+  implicit object BulkReply extends Reply[Bulk](bulk)
 
   type MultiBulk = Option[Seq[Bulk]]
-
-  implicit object MultiBulkReply extends Reply[MultiBulk] {
-    def apply(r: RedisStreamReader): MultiBulk = multibulk(r).map(_.toList)
-  }
+  implicit object MultiBulkReply extends Reply[MultiBulk](multibulk(_).map(_.toList))
 
   type MultiBulkAsSet = Option[Set[Array[Byte]]]
-
-  implicit object MultiBulkAsSetReply extends Reply[MultiBulkAsSet] {
-    def apply(r: RedisStreamReader): MultiBulkAsSet = multibulk(r).map(_.flatten.toSet)
-  }
+  implicit object MultiBulkAsSetReply extends Reply[MultiBulkAsSet](multibulk(_).map(_.flatten.toSet))
 
   type MultiBulkAsMap = Option[Map[Array[Byte], Array[Byte]]]
-
-  implicit object MultiBulkAsMapReply extends Reply[MultiBulkAsMap] {
-    def apply(r: RedisStreamReader): MultiBulkAsMap = multibulk(r).map(_.grouped(2).collect{
-      case Seq(Some(k),Some(v)) => (k,v)
-    }.toMap)
-  }
+  implicit object MultiBulkAsMapReply extends Reply[MultiBulkAsMap](
+    multibulk(_).map(_.grouped(2).collect{case Seq(Some(k),Some(v)) => (k,v)}.toMap))
 
   type MultiBulkWithScores = Option[Seq[(Array[Byte], Double)]]
-
-  implicit object MultiBulkWithScoresReply extends Reply[MultiBulkWithScores] {
-    def apply(r: RedisStreamReader): MultiBulkWithScores = multibulk(r).map(_.grouped(2).collect{
-      case Seq(Some(k),Some(v)) => (k,new String(v).toDouble)
-    }.toSeq)
-  }
+  implicit object MultiBulkWithScoresReply extends Reply[MultiBulkWithScores](
+    multibulk(_).map(_.grouped(2).collect{case Seq(Some(k),Some(v)) => (k,new String(v).toDouble)}.toSeq))
 
   type MultiBulkAsFlat = Option[Seq[Array[Byte]]]
-
-  implicit object MultiBulkAsFlatReply extends Reply[MultiBulkAsFlat] {
-    def apply(r: RedisStreamReader): MultiBulkAsFlat = multibulk(r).map(_.flatten.toList)
-  }
+  implicit object MultiBulkAsFlatReply extends Reply[MultiBulkAsFlat](multibulk(_).map(_.flatten.toList))
 
   type MultiExec = Option[Seq[_]]
+  final class MultiExecReply(replyList: Seq[Reply[_]]) extends Reply[MultiExec]({ r =>
+    OkStatusReply(r)
+    replyList.foreach(x => QueuedStatusReply(r))
+    multiexec(r, replyList)
+  })
 
-  final class MultiExecReply(replyList: Seq[Reply[_]]) extends Reply[MultiExec] {
-    def apply(r: RedisStreamReader): MultiExec = {
-      OkStatusReply(r)
-      replyList.foreach(x => QueuedStatusReply(r))
-      multiexec(r, replyList)
-    }
-  }
+  object QueuedStatusReply extends Reply[Unit](r => verify(status(r), "QUEUED"))
 
-  object QueuedStatusReply extends Reply[Unit] {
-    def apply(r: RedisStreamReader): Unit = {
-      val result = status(r)
-      if (result != "QUEUED") throw new RedisProtocolException("Expected 'QUEUED' reply, got: "+result)
-    }
-  }
+  private def verify(in: String, expect: String): Unit =
+    if (in != expect) throw new RedisProtocolException("Expected '"+expect+"' reply, got: "+in)
 
   private def parse(marker: Char, r: RedisStreamReader): String = {
     val reply = r.readReply
     val m = reply(0).toChar
-    val s = new String(reply, 1, reply.size - 1)
-    if (m != marker) {
-      if (m == '-') (throw new RedisErrorException(s))
-      //reconnect
-      throw new RedisProtocolException("Got '" + m + s + "' as reply")
+    val result = new String(reply, 1, reply.size - 1)
+    if (m == marker) {
+      result
+    } else {
+      if (m == '-') (throw new RedisErrorException(result))
+      throw new RedisProtocolException("Got '" + m + result + "' as reply")
     }
-    s
   }
 
   private def status(r: RedisStreamReader): String = parse('+', r)
