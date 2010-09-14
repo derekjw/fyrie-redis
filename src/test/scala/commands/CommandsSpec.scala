@@ -139,9 +139,9 @@ class CommandsSpec extends Spec
       (r send get("testperson1")).map(mkString) should be(Some("TestPerson(Alan,30)"))
     }
     it("should use custom serializers") {
-      r.send(set("testperson1", person1).withSerializers{
+      r send set("testperson1", person1).withSerializers{
         case TestPerson(name, age) => ("Hi, I'm "+name+". I'm "+age+" years old.").getBytes
-      })
+      }
       (r send get("testperson1")).map(mkString) should be(Some("Hi, I'm Alan. I'm 30 years old."))
     }
   }

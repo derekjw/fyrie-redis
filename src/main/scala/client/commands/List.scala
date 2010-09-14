@@ -1,6 +1,7 @@
 package net.fyrie.redis
 package commands
 
+import helpers._
 import replies._
 
 // LPUSH
@@ -51,6 +52,10 @@ case class rpop(key: Any) extends Command[Bulk]
 // Remove the first count occurrences of the value element from the list.
 case class rpoplpush(srcKey: Any, dstKey: Any) extends Command[Bulk]
 
-case class blpop(key: Any, values: Iterable[Any], timeoutInSeconds: Int) extends Command[MultiBulk]
+case class blpop(key: Any, values: Iterable[Any], timeoutInSeconds: Int) extends Command[MultiBulk] {
+  override def args = arg1(key) ++ values.iterator ++ arg1(timeoutInSeconds)
+}
 
-case class brpop(key: Any, values: Iterable[Any], timeoutInSeconds: Int) extends Command[MultiBulk]
+case class brpop(key: Any, values: Iterable[Any], timeoutInSeconds: Int) extends Command[MultiBulk] {
+  override def args = arg1(key) ++ values.iterator ++ arg1(timeoutInSeconds)
+}

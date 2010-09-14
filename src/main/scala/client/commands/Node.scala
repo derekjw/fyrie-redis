@@ -34,19 +34,19 @@ case object monitor extends Command[OkStatus]
 // SLAVEOF
 // The SLAVEOF command can change the replication settings of a slave on the fly.
 case class slaveof(hostPort: Option[(String, Int)]) extends Command[OkStatus] {
-  override def args = hostPort map (x => Seq(x._1, x._2)) getOrElse Seq("NO ONE")
+  override def args = hostPort map (x => Iterator(x._1, x._2)) getOrElse Iterator("NO ONE")
 }
 
 object config {
 
   case class get(param: Any) extends Command[MultiBulk] {
     override def name = "CONFIG"
-    override def args = Seq("GET", param)
+    override def args = Iterator("GET", param)
   }
 
   case class set(param: Any, value: Any) extends Command[OkStatus] {
     override def name = "CONFIG"
-    override def args = Seq("SET", param, value)
+    override def args = Iterator("SET", param, value)
   }
 
 }

@@ -93,10 +93,12 @@ package object replies {
 
 abstract class Command[T](implicit val replyHandler: Reply[T]) extends Product {
   def name: String = productPrefix.toUpperCase
-  def args: Seq[Any] = productIterator.toSeq
-  def toBytes: Array[Byte] = Command.create(name.getBytes +: Command.serialize(args, serializers))
+  def args: Iterator[Any] = productIterator
+  def toBytes: Array[Byte] = Command.create((Iterator.single(name.getBytes) ++ args.map(serializers)).toSeq)
   def serializers: PartialFunction[Any, Array[Byte]] = {
+    case b: Array[Byte] => b
     case d: Double => Command.serializeDouble(d)
+    case x => x.toString.getBytes("UTF-8")
   }
   def withSerializers(in: PartialFunction[Any, Array[Byte]]): Command[T] =
     new CommandWrapper(this) {
@@ -114,14 +116,6 @@ class CommandWrapper[T](val underlying: Command[T]) extends Command[T]()(underly
 }
 
 object Command {
-  def serialize(seq: Seq[Any], serializers: PartialFunction[Any, Array[Byte]] = Map()): Seq[Array[Byte]] = seq.flatMap{
-    case b: Array[Byte] => Seq(b)
-    case x if serializers.isDefinedAt(x) => Seq(serializers(x))
-    case s: TraversableOnce[_] => serialize(s.toSeq, serializers)
-    case o: Option[_] => serialize(o.toList, serializers)
-    case x => Seq(x.toString.getBytes("UTF-8"))
-  }
-
   def serializeDouble(d: Double, inclusive: Boolean = true): Array[Byte] = {
     (if (inclusive) ("") else ("(")) + {
       if (d.isInfinity) {
@@ -145,5 +139,15 @@ object Command {
       b ++= EOL
     }
     b.result
+  }
+}
+
+package commands {
+  package object helpers {
+    def arg1(value: Any): Iterator[Any] = Iterator.single(value)
+    def argN1(value: Iterable[Any]): Iterator[Any] = value.iterator
+    def argN1(name: Any, value: Iterable[Any]): Iterator[Any] = value.iterator.flatMap(Iterator(name, _))
+    def argN2(value: Iterable[Product2[Any,Any]]): Iterator[Any] = value.iterator.flatMap(_.productIterator)
+    def argN2(name: Any, value: Iterable[Product2[Any,Any]]): Iterator[Any] = value.iterator.flatMap(Iterator.single(name) ++ _.productIterator)
   }
 }

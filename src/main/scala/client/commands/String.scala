@@ -1,6 +1,7 @@
 package net.fyrie.redis
 package commands
 
+import helpers._
 import replies._
 
 // SET KEY (key, value)
@@ -37,16 +38,18 @@ case class decrby(key: Any, increment: Long) extends Command[Long]
 
 // MGET (key, key, key, ...)
 // get the values of all the specified keys.
-case class mget(keys: Iterable[Any]) extends Command[MultiBulk]
+case class mget(keys: Iterable[Any]) extends Command[MultiBulk] {
+  override def args = keys.iterator
+}
 
 // MSET (key1 value1 key2 value2 ..)
 // set the respective key value pairs. Overwrite value if key exists
 case class mset(kvs: Iterable[Product2[Any, Any]]) extends Command[OkStatus] {
-  override def args = kvs.toStream.map(x => Seq(x._1, x._2))
+  override def args = argN2(kvs)
 }
 
 // MSETNX (key1 value1 key2 value2 ..)
 // set the respective key value pairs. Noop if any key exists
 case class msetnx(kvs: Iterable[Product2[Any, Any]]) extends Command[IntAsBoolean] {
-  override def args = kvs.toStream.map(x => Seq(x._1, x._2))
+  override def args = argN2(kvs)
 }

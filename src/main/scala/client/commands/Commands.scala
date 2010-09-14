@@ -1,6 +1,7 @@
 package net.fyrie.redis
 package commands
 
+import helpers._
 import replies._
 import scala.collection.mutable.ArrayBuilder
 
@@ -16,7 +17,9 @@ case object dbsize extends Command[Int]
 
 case class exists(key: Any) extends Command[IntAsBoolean]
 
-case class del(keys: Iterable[Any]) extends Command[Int]
+case class del(keys: Iterable[Any]) extends Command[Int] {
+  override def args = keys.iterator
+}
 
 case class getType(key: Any) extends Command[Status] {
   override def name = "TYPE"
@@ -49,11 +52,5 @@ case class multiexec(commandList: Seq[Command[_]]) extends Command[MultiExec]()(
 }
 
 case class sort(key: Any, by: Option[Any] = None, limit: Option[(Int, Int)] = None, get: Seq[Any] = Nil, order: Option[SortOrder] = None, alpha: Boolean = false, store: Option[Any] = None) extends Command[MultiBulkAsFlat] {
-  override def args = Seq(key,
-                          by.map(Seq("BY", _)),
-                          limit.map(x => Seq("LIMIT", x._1, x._2)),
-                          get.map(Seq("GET", _)),
-                          order,
-                          if (alpha) (Some("ALPHA")) else (None),
-                          store.map(Seq("STORE", _)))
+  override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get) ++ argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None)) ++ argN1("STORE", store)
 }
