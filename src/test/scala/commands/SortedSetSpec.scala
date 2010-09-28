@@ -1,5 +1,6 @@
 package net.fyrie.redis
-package commands
+
+import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers

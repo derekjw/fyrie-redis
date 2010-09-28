@@ -17,10 +17,10 @@ object AkkaRedisClient {
 class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit dispatcher: MessageDispatcher = AkkaRedisClient.dispatcher) {
   val actorRef = actorOf(new RedisPipelineActor(address, port)).start
 
-  def ![T, V](command: Command[T])(implicit transform: (T) => V = identity _, sender: Option[ActorRef] = None): Unit =
-    actorRef ! Request(command, sender.isDefined, transform)
+  def ![A, B](command: Command[A, B])(implicit sender: Option[ActorRef] = None): Unit =
+    actorRef ! Request(command, sender.isDefined)
 
-  def !![T, V](command: Command[T])(implicit transform: (T) => V = identity _): Option[V] = {
+  def !![A, B](command: Command[A, B]): Option[B] = {
     val future = this !!! command
     try {
       future.await
@@ -31,10 +31,10 @@ class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit 
     else future.result
   }
 
-  def !!![T, V](command: Command[T])(implicit transform: (T) => V = identity _): Future[V] =
-    actorRef !!! Request(command, true, transform)
+  def !!![A, B](command: Command[A, B]): Future[B] =
+    actorRef !!! Request(command, true)
 
-  def send[T, V](command: Command[T])(implicit transform: (T) => V = identity _): V = {
+  def send[A, B](command: Command[A, B]): B = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get
@@ -51,10 +51,10 @@ class AkkaRedisWorkerPool(address: String = "localhost", port: Int = 6379, size:
   val pool = (1 to size).map(i => actorOf(new RedisWorkerActor(address, port)).start).toList
   val actorRef = pool.head
 
-  def ![T, V](command: Command[T])(implicit transform: (T) => V = identity _, sender: Option[ActorRef] = None): Unit =
-    actorRef ! Work(command, transform)
+  def ![A, B](command: Command[A, B])(implicit sender: Option[ActorRef] = None): Unit =
+    actorRef ! Work(command)
 
-  def !![T, V](command: Command[T])(implicit transform: (T) => V = identity _): Option[V] = {
+  def !![A, B](command: Command[A, B]): Option[B] = {
     val future = this !!! command
     try {
       future.await
@@ -65,10 +65,10 @@ class AkkaRedisWorkerPool(address: String = "localhost", port: Int = 6379, size:
     else future.result
   }
 
-  def !!![T, V](command: Command[T])(implicit transform: (T) => V = identity _): Future[V] =
-    actorRef !!! Work(command, transform)
+  def !!![A, B](command: Command[A, B]): Future[B] =
+    actorRef !!! Work(command)
 
-  def send[T, V](command: Command[T])(implicit transform: (T) => V = identity _): V = {
+  def send[A, B](command: Command[A, B]): B = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get

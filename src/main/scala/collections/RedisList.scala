@@ -2,23 +2,23 @@ package net.fyrie.redis
 package akka
 package collection
 
+import serialization._
+
 import scala.collection.mutable.{IndexedSeq}
 
 import se.scalablesolutions.akka.dispatch.{Future}
 
 object RedisList {
-  def apply[A](name: String)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A): RedisList[A] =
-    new RedisList[A](name)(conn, toBytes, fromBytes)
+  def apply[A](name: String)(implicit conn: AkkaRedisClient, format: Format, parser: Parse[A]): RedisList[A] =
+    new RedisList[A](name)(conn, format, parser)
 }
 
-class RedisList[A](name: String)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A) extends IndexedSeq[A] {
+class RedisList[A](name: String)(implicit conn: AkkaRedisClient, format: Format, parser: Parse[A]) extends IndexedSeq[A] {
   protected val key = name.getBytes
 
-  protected implicit def fromBulk(in: Option[Array[Byte]]): Option[A] = in.map(fromBytes)
-
-  def update(idx: Int, elem: A): Unit = conn ! commands.lset(key, idx, elem)
-  def apply(idx: Int): A = conn send commands.lindex(key, idx) getOrElse (throw new IndexOutOfBoundsException)
-  def length: Int = conn send commands.llen(key)
+  def update(idx: Int, elem: A): Unit = conn ! Commands.lset(key, idx, elem)
+  def apply(idx: Int): A = conn send Commands.lindex(key, idx) getOrElse (throw new IndexOutOfBoundsException)
+  def length: Int = conn send Commands.llen(key)
 
   def +=(elem: A): RedisList[A] = {
     rpush(elem)
@@ -26,10 +26,10 @@ class RedisList[A](name: String)(implicit conn: AkkaRedisClient, toBytes: (A) =>
   }
 
   def +=(elem1: A, elem2: A, elems: A*): RedisList[A] = {
-    conn ! commands.multiexec(
-      commands.rpush(key, elem1) ::
-      commands.rpush(key, elem2) ::
-      elems.map(e => commands.rpush(key, e)).toList)
+    conn ! Commands.multiexec(
+      Commands.rpush(key, elem1) ::
+      Commands.rpush(key, elem2) ::
+      elems.map(e => Commands.rpush(key, e)).toList)
     this
   }
 
@@ -39,19 +39,19 @@ class RedisList[A](name: String)(implicit conn: AkkaRedisClient, toBytes: (A) =>
   }
 
   override def slice(from: Int, until: Int): IndexedSeq[A] =
-    (conn send commands.lrange(key, from, until))(x => IndexedSeq[A](x.toList.flatten.map(fromBytes): _*))
+    IndexedSeq((conn send Commands.lrange(key, from, until)).toList.flatten:_*)
 
-  def lpush(elem: A) { conn ! commands.lpush(key, elem) }    
+  def lpush(elem: A) { conn ! Commands.lpush(key, elem) }    
 
-  def rpush(elem: A) { conn ! commands.rpush(key, elem) }
+  def rpush(elem: A) { conn ! Commands.rpush(key, elem) }
 
-  def lpop: A = conn send commands.lpop(key) getOrElse (throw new NoSuchElementException)
+  def lpop: A = conn send Commands.lpop(key) getOrElse (throw new NoSuchElementException)
 
-  def rpop: A = conn send commands.rpop(key) getOrElse (throw new NoSuchElementException)
+  def rpop: A = conn send Commands.rpop(key) getOrElse (throw new NoSuchElementException)
 
-  def lpopFuture: Future[Option[A]] = conn !!! commands.lpop(key)
+  def lpopFuture: Future[Option[A]] = conn !!! Commands.lpop(key)
 
-  def rpopFuture: Future[Option[A]] = conn !!! commands.rpop(key)
+  def rpopFuture: Future[Option[A]] = conn !!! Commands.rpop(key)
 
   override def toString: String = "RedisList("+name+")"
 

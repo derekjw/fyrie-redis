@@ -5,6 +5,7 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info) wit
 {
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
 
+  val fyrieredis = "net.fyrie" %% "fyrieredis" % "2.0-SNAPSHOT"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
   val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7" % "test"

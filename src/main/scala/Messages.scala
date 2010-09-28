@@ -3,18 +3,23 @@ package redis
 package akka
 package messages
 
+import handlers.{Handler, BulkHandler}
+
 trait Message {
   val forward: Boolean
 }
 
-case class Request[T, V](command: Command[T], forward: Boolean, transform: (T) => V) extends Message
+case class Request[A, B](command: Command[A, B], forward: Boolean) extends Message
 
-case class Prepare[T, V](command: Command[T], forward: Boolean, transform: (T) => V) extends Message
+case class Serialize[A, B](command: Command[A, B], forward: Boolean) extends Message
 
-case class Write[T, V](bytes: Array[Byte], replyHandler: Reply[T], forward: Boolean, transform: (T) => V) extends Message
+case class Write[A, B](bytes: Array[Byte], handler: Handler[A, B], forward: Boolean) extends Message
 
-case class Read[T, V](replyHandler: Reply[T], forward: Boolean, transform: (T) => V) extends Message
+case class Read[A, B](handler: Handler[A, B], forward: Boolean) extends Message
 
-case class Transform[T, V](data: T, forward: Boolean, transform: (T) => V) extends Message
+case class Deserialize[A, B](data: A, handler: BulkHandler[A, B]) extends Message {
+  val forward = true
+  def parse: B = handler.parse(data)
+}
 
-case class Work[T,V](command: Command[T], transform: (T) => V)
+case class Work[A, B](command: Command[A, B])

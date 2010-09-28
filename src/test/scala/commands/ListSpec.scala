@@ -1,5 +1,6 @@
 package net.fyrie.redis
-package commands
+
+import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
@@ -57,19 +58,19 @@ class ListSpec extends Spec
       r send lpush("list-1", "2") should equal(5)
       r send lpush("list-1", "1") should equal(6)
       r send llen("list-1") should equal(6)
-      r send lrange("list-1", 0, 4) map (_.map(mkString)) should equal(Some(List("1", "2", "3", "4", "5")))
+      r send lrange("list-1", 0, 4) should equal(Some(List("1", "2", "3", "4", "5")))
     }
     it("should return empty list if start > end") {
       r send lpush("list-1", "3") should equal(1)
       r send lpush("list-1", "2") should equal(2)
       r send lpush("list-1", "1") should equal(3)
-      r send lrange("list-1", 2, 0) map (_.map(mkString)) should equal(Some(Nil))
+      r send lrange("list-1", 2, 0) should equal(Some(Nil))
     }
     it("should treat as end of list if end is over the actual end of list") {
       r send lpush("list-1", "3") should equal(1)
       r send lpush("list-1", "2") should equal(2)
       r send lpush("list-1", "1") should equal(3)
-      r send lrange("list-1", 0, 7) map (_.map(mkString)) should equal(Some(List("1", "2", "3")))
+      r send lrange("list-1", 0, 7) should equal(Some(List("1", "2", "3")))
     }
   }
 
@@ -108,9 +109,9 @@ class ListSpec extends Spec
       r send lpush("list-1", "3") should equal(4)
       r send lpush("list-1", "2") should equal(5)
       r send lpush("list-1", "1") should equal(6)
-      r send lindex("list-1", 2) map (mkString) should equal(Some("3"))
-      r send lindex("list-1", 3) map (mkString) should equal(Some("4"))
-      r send lindex("list-1", -1) map (mkString) should equal(Some("6"))
+      r send lindex("list-1", 2) should equal(Some("3"))
+      r send lindex("list-1", 3) should equal(Some("4"))
+      r send lindex("list-1", -1) should equal(Some("6"))
     }
     it("should return None if the key does not point to a list") {
       r send set("anshin-1", "debasish")
@@ -133,7 +134,7 @@ class ListSpec extends Spec
       r send lpush("list-1", "2") should equal(5)
       r send lpush("list-1", "1") should equal(6)
       r send lset("list-1", 2, "30")
-      r send lindex("list-1", 2) map (mkString) should equal(Some("30"))
+      r send lindex("list-1", 2) should equal(Some("30"))
     }
     it("should generate error for out of range index") {
       r send lpush("list-1", "6") should equal(1)
@@ -174,7 +175,7 @@ class ListSpec extends Spec
       r send lpush("list-1", "hello") should equal(6)
       r send lrem("list-1", -2, "hello") should equal(2)
       r send llen("list-1") should equal(4)
-      r send lindex("list-1", -2) map (mkString) should equal(Some("4"))
+      r send lindex("list-1", -2) should equal(Some("4"))
     }
   }
 
@@ -186,15 +187,15 @@ class ListSpec extends Spec
       r send lpush("list-1", "3") should equal(4)
       r send lpush("list-1", "2") should equal(5)
       r send lpush("list-1", "1") should equal(6)
-      r send lpop("list-1") map (mkString) should equal(Some("1"))
-      r send lpop("list-1") map (mkString) should equal(Some("2"))
-      r send lpop("list-1") map (mkString) should equal(Some("3"))
+      r send lpop("list-1") should equal(Some("1"))
+      r send lpop("list-1") should equal(Some("2"))
+      r send lpop("list-1") should equal(Some("3"))
       r send llen("list-1") should equal(3)
     }
     it("should give nil for non-existent key") {
       r send lpush("list-1", "6") should equal(1)
       r send lpush("list-1", "5") should equal(2)
-      r send lpop("list-2") map (mkString) should equal(None)
+      r send lpop("list-2") should equal(None)
       r send llen("list-1") should equal(2)
     }
   }
@@ -207,15 +208,15 @@ class ListSpec extends Spec
       r send lpush("list-1", "3") should equal(4)
       r send lpush("list-1", "2") should equal(5)
       r send lpush("list-1", "1") should equal(6)
-      r send rpop("list-1") map (mkString) should equal(Some("6"))
-      r send rpop("list-1") map (mkString) should equal(Some("5"))
-      r send rpop("list-1") map (mkString) should equal(Some("4"))
+      r send rpop("list-1") should equal(Some("6"))
+      r send rpop("list-1") should equal(Some("5"))
+      r send rpop("list-1") should equal(Some("4"))
       r send llen("list-1") should equal(3)
     }
     it("should give nil for non-existent key") {
       r send lpush("list-1", "6") should equal(1)
       r send lpush("list-1", "5") should equal(2)
-      r send rpop("list-2") map (mkString) should equal(None)
+      r send rpop("list-2") should equal(None)
       r send llen("list-1") should equal(2)
     }
   }
@@ -228,8 +229,8 @@ class ListSpec extends Spec
 
       r send rpush("list-2", "foo") should equal(1)
       r send rpush("list-2", "bar") should equal(2)
-      r send rpoplpush("list-1", "list-2") map (mkString) should equal(Some("c"))
-      r send lindex("list-2", 0) map (mkString) should equal(Some("c"))
+      r send rpoplpush("list-1", "list-2") should equal(Some("c"))
+      r send lindex("list-2", 0) should equal(Some("c"))
       r send llen("list-1") should equal(2)
       r send llen("list-2") should equal(3)
     }
@@ -238,17 +239,17 @@ class ListSpec extends Spec
       r send rpush("list-1", "a") should equal(1)
       r send rpush("list-1", "b") should equal(2)
       r send rpush("list-1", "c") should equal(3)
-      r send rpoplpush("list-1", "list-1") map (mkString) should equal(Some("c"))
-      r send lindex("list-1", 0) map (mkString) should equal(Some("c"))
-      r send lindex("list-1", 2) map (mkString) should equal(Some("b"))
+      r send rpoplpush("list-1", "list-1") should equal(Some("c"))
+      r send lindex("list-1", 0) should equal(Some("c"))
+      r send lindex("list-1", 2) should equal(Some("b"))
       r send llen("list-1") should equal(3)
     }
 
     it("should give None for non-existent key") {
-      r send rpoplpush("list-1", "list-2") map (mkString) should equal(None)
+      r send rpoplpush("list-1", "list-2") should equal(None)
       r send rpush("list-1", "a") should equal(1)
       r send rpush("list-1", "b") should equal(2)
-      r send rpoplpush("list-1", "list-2") map (mkString) should equal(Some("b"))
+      r send rpoplpush("list-1", "list-2") should equal(Some("b"))
     }
   }
 
@@ -256,8 +257,8 @@ class ListSpec extends Spec
     it("should add to the head of the list") {
       r send lpush("list-1", "foo\nbar\nbaz") should equal(1)
       r send lpush("list-1", "bar\nfoo\nbaz") should equal(2)
-      r send lpop("list-1") map (mkString) should equal(Some("bar\nfoo\nbaz"))
-      r send lpop("list-1") map (mkString) should equal(Some("foo\nbar\nbaz"))
+      r send lpop("list-1") should equal(Some("bar\nfoo\nbaz"))
+      r send lpop("list-1") should equal(Some("foo\nbar\nbaz"))
     }
   }
 

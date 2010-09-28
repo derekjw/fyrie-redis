@@ -2,33 +2,33 @@ package net.fyrie.redis
 package akka
 package collection
 
+import serialization._
+
 import se.scalablesolutions.akka.dispatch.{Future}
 
 object RedisVar {
-  def apply[A](name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A): RedisVar[A] =
-    new RedisVar[A](name, default)(conn, toBytes, fromBytes)
+  def apply[A](name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, format: Format, parser: Parse[A]): RedisVar[A] =
+    new RedisVar[A](name, default)(conn, format, parser)
 }
 
 /**  Modeled to be similar to Option
  */
-class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, toBytes: (A) => Array[Byte], fromBytes: (Array[Byte]) => A) {
+class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: AkkaRedisClient, format: Format, parser: Parse[A]) {
   protected val key = name.getBytes
-
-  protected implicit def fromBulk(in: Option[Array[Byte]]): Option[A] = in.map(fromBytes)
 
   default.foreach(this.setnx)
 
   def isEmpty: Boolean = !isDefined
 
-  def isDefined: Boolean = (conn send commands.getType(key)) == "string"
+  def isDefined: Boolean = (conn send Commands.getType(key)) == "string"
 
   def get: A = this.toOption.get
 
-  def getFuture: Future[Option[A]] = conn !!! commands.get(key)
+  def getFuture: Future[Option[A]] = conn !!! Commands.get(key)
 
-  def set(in: A): Unit = conn ! commands.set(key, toBytes(in))
+  def set(in: A): Unit = conn ! Commands.set(key, in)
 
-  def setnx(in: A): Boolean = conn send commands.setnx(key, toBytes(in))
+  def setnx(in: A): Boolean = conn send Commands.setnx(key, in)
 
   def getOrElse[B >: A](default: => B): B = this.toOption.getOrElse(default)
 
@@ -36,7 +36,10 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
   def map[B](f: A => B): Option[B] = this.toOption.map(f)
 
-  def mapFuture[B](f: A => B): Future[Option[B]] = (conn !!! commands.get(key))(_.map(f compose fromBytes))
+  def mapFuture[B](f: A => B): Future[Option[B]] = {
+    implicit val parserB: Parse[B] = Parse[B](x => f(parser(x)))
+    conn !!! Commands.get[B](key)
+  }
 
   // Not transactional, yet
   def alter(f: A => A): Boolean = this.toOption.map(x => this.set(f(x))).isDefined
@@ -53,7 +56,7 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
   def iterator: Iterator[A] = this.toOption.iterator
 
-  def toOption: Option[A] = conn send commands.get(key)
+  def toOption: Option[A] = conn send Commands.get(key)
 
   def toList: List[A] = this.toOption.toList
 
@@ -66,36 +69,33 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
 object RedisLongVar {
   def apply(name: String, default: Option[Long] = None)(implicit conn: AkkaRedisClient): RedisLongVar = new RedisLongVar(name, default)(conn)
-
-  implicit def toBytes(in: Long): Array[Byte] = in.toString.getBytes
-  implicit def fromBytes(in: Array[Byte]): Long = (new String(in)).toLong
 }
 
-class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: AkkaRedisClient) extends RedisVar[Long](name, default)(conn, RedisLongVar.toBytes, RedisLongVar.fromBytes) {
+class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: AkkaRedisClient) extends RedisVar[Long](name, default)(conn, Format.default, Parse.Implicits.parseLong) {
 
-  def incr: Long = conn send commands.incr(key)
+  def incr: Long = conn send Commands.incr(key)
 
-  def incrBy(num: Long): Long = conn send commands.incrby(key, num)
+  def incrBy(num: Long): Long = conn send Commands.incrby(key, num)
 
-  def decr: Long = conn send commands.decr(key)
+  def decr: Long = conn send Commands.decr(key)
 
-  def decrBy(num: Long): Long = conn send commands.decrby(key, num)
+  def decrBy(num: Long): Long = conn send Commands.decrby(key, num)
 
-  def incrFast: Unit = conn ! commands.incr(key)
+  def incrFast: Unit = conn ! Commands.incr(key)
 
-  def incrByFast(num: Long): Unit = conn ! commands.incrby(key, num)
+  def incrByFast(num: Long): Unit = conn ! Commands.incrby(key, num)
 
-  def decrFast: Unit = conn ! commands.decr(key)
+  def decrFast: Unit = conn ! Commands.decr(key)
 
-  def decrByFast(num: Long): Unit = conn ! commands.decrby(key, num)
+  def decrByFast(num: Long): Unit = conn ! Commands.decrby(key, num)
 
-  def incrFuture = conn !!! commands.incr(key)
+  def incrFuture = conn !!! Commands.incr(key)
 
-  def incrByFuture(num: Long) = conn !!! commands.incrby(key, num)
+  def incrByFuture(num: Long) = conn !!! Commands.incrby(key, num)
 
-  def decrFuture = conn !!! commands.decr(key)
+  def decrFuture = conn !!! Commands.decr(key)
 
-  def decrByFuture(num: Long) = conn !!! commands.decrby(key, num)
+  def decrByFuture(num: Long) = conn !!! Commands.decrby(key, num)
 
   override def toString: String = "RedisLongVar("+name+")"
 }

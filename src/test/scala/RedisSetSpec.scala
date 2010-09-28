@@ -2,16 +2,13 @@ package net.fyrie.redis
 package akka
 package collection
 
-import commands._
+import Commands._
 
 import org.specs._
 import specification.Context
 
 class RedisSetSpec extends Specification {
   implicit val r = new AkkaRedisClient("localhost", 16379)
-
-  implicit def strToBytes(in: String): Array[Byte] = in.getBytes
-  implicit def bytesToStr(in: Array[Byte]): String = new String(in)
 
   val empty = new Context {
     before {

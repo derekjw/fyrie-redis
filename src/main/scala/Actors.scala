@@ -5,6 +5,8 @@ package actors
 
 import messages._
 
+import handlers.{Handler, BulkHandler}
+
 import se.scalablesolutions.akka.actor.{Actor, ActorRef}
 import Actor.{actorOf}
 import se.scalablesolutions.akka.config.{AllForOneStrategy}
@@ -34,22 +36,23 @@ class RedisPipelineActor(address: String, port: Int)(implicit dispatcher: Messag
 
   val client = new RedisClient(address, port)
 
-  val transformer = actorOf(new TransformerActor)
-  self.startLink(transformer)
+  val deserializer = actorOf(new DeserializerActor)
+  self.startLink(deserializer)
 
-  val reader = actorOf(new ReaderActor(transformer, client.reader))
+  val reader = actorOf(new ReaderActor(deserializer, client.reader))
   self.startLink(reader)
 
   val writer = actorOf(new WriterActor(reader, client.writer))
   self.startLink(writer)
 
-  val preparer = actorOf(new PreparerActor(writer))
-  self.startLink(preparer)
+  val serializer = actorOf(new SerializerActor(writer))
+  self.startLink(serializer)
 
-  val nextActor = preparer
+  val nextActor = serializer
 
   def receive = {
-    case r: Request[_,_] => send(Prepare(r.command, r.forward, r.transform))
+    case r: Request[_,_] =>
+      send(Serialize(r.command, r.forward))
   }
 
   override def shutdown = {
@@ -72,19 +75,20 @@ class RedisWorkerActor(address: String, port: Int)(implicit dispatcher: MessageD
   }
 
   def receive = {
-    case Work(command, transform) =>
-      self.reply_?(transform(client send command))
+    case Work(command) =>
+      self.reply_?(client send command)
   }
   
 }
 
-class PreparerActor(val nextActor: ActorRef)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
+class SerializerActor(val nextActor: ActorRef)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
   self.lifeCycle = Some(LifeCycle(Permanent))
 
   self.dispatcher = implicitly
 
   def receive = {
-    case p: Prepare[_,_] => send(Write(p.command.toBytes, p.command.replyHandler, p.forward, p.transform))
+    case p: Serialize[_,_] =>
+      send(Write(p.command.toBytes, p.command.handler, p.forward))
   }
 }
 
@@ -95,7 +99,7 @@ class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implic
 
   def receive = {
     case w: Write[_,_] =>
-      send(Read(w.replyHandler, w.forward, w.transform))
+      send(Read(w.handler, w.forward))
       writer write w.bytes
   }
 }
@@ -110,6 +114,7 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
       f
     } catch {
       case e: RedisErrorException =>
+        println("Got Redis Exception: "+e)
         self.senderFuture.map(_.completeWithException(e)).getOrElse(log.error(e.toString))
     }
   }
@@ -117,23 +122,27 @@ class ReaderActor(val nextActor: ActorRef, val reader: RedisStreamReader)(implic
   def receive = {
     case r: Read[_,_] if !r.forward =>
       handleRedisError{
-        r.replyHandler(reader)
+        r.handler.read(reader)
         () // Get ClassCastException when an AnyVal is returned, so must return Unit
       }
-    case r: Read[_,_] =>
+    case Read(h: BulkHandler[_,_], true) =>
       handleRedisError{
-        send(Transform(r.replyHandler(reader), true, r.transform))
+        send(Deserialize(h.read(reader), h))
+      }
+    case Read(h: Handler[_,_], true) =>
+      handleRedisError{
+        self reply h(reader)
       }
   }
 }
 
-class TransformerActor(implicit dispatcher: MessageDispatcher) extends Actor {
+class DeserializerActor(implicit dispatcher: MessageDispatcher) extends Actor {
   self.lifeCycle = Some(LifeCycle(Permanent))
 
   self.dispatcher = implicitly
 
   def receive = {
-    case t: Transform[_,_] =>
-      self reply t.transform(t.data)
+    case t: Deserialize[_,_] =>
+      self reply t.parse
   }
 }

@@ -1,12 +1,13 @@
 package net.fyrie.redis
-package commands
+
+import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class CommandsSpec extends Spec 
-                   with ShouldMatchers
-                   with RedisTestServer {
+class OperationsSpec extends Spec 
+                     with ShouldMatchers
+                     with RedisTestServer {
 
   describe("keys") {
     it("should fetch keys") {
@@ -26,7 +27,7 @@ class CommandsSpec extends Spec
     it("should give") {
       r send set("anshin-1", "debasish")
       r send set("anshin-2", "maulindu")
-      r send randomkey map (mkString) getOrElse fail("No key returned") should startWith("anshin")
+      r send randomkey() getOrElse fail("No key returned") should startWith("anshin")
     }
   }
 
@@ -104,10 +105,18 @@ class CommandsSpec extends Spec
         set("testkey2", "testvalue2"),
         dbsize,
         mget(Seq("testkey1", "testkey2"))
-      )) map (_.map{
-        case Some(List(Some(x: Array[Byte]), Some(y: Array[Byte]))) => Some(List(Some(new String(x)), Some(new String(y))))
-        case x => x
-      }) should be(Some(List((), 1, (), 2, Some(List(Some("testvalue1"), Some("testvalue2"))))))
+      )) should be(Some(List((), 1, (), 2, Some(List(Some("testvalue1"), Some("testvalue2"))))))
+    }
+    it("should survive an error") {
+      r send multiexec(Seq(
+        set("a", "abc"),
+        lpop("a"),
+        get("a")
+      )) match {
+        case Some(() :: (e: RedisErrorException) :: Some("abc") :: Nil) =>
+          e.message should be("ERR Operation against a key holding the wrong kind of value")
+        case _ => fail("Did not receive expected response")
+      }
     }
   }
 
@@ -122,27 +131,11 @@ class CommandsSpec extends Spec
   describe("sort") {
     it("should do a simple sort") {
       mkList
-      (r send sort("sortlist")).map(mkString(_).map(_.toInt)) should be(Some(List(1, 1, 3, 4, 5, 6, 9, 47)))
+      (r send sort("sortlist")).map(_.map(_.toInt)) should be(Some(List(1, 1, 3, 4, 5, 6, 9, 47)))
     }
     it("should do a lexical sort") {
       mkStringList
-      (r send sort("sortlist", alpha = true)).map(mkString) should be(Some(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
-    }
-  }
-
-  case class TestPerson(name: String, age: Int)
-  val person1 = TestPerson("Alan", 30)
-
-  describe("serializers") {
-    it("should use default serializers") {
-      r send set("testperson1", person1)
-      (r send get("testperson1")).map(mkString) should be(Some("TestPerson(Alan,30)"))
-    }
-    it("should use custom serializers") {
-      r send set("testperson1", person1).withSerializers{
-        case TestPerson(name, age) => ("Hi, I'm "+name+". I'm "+age+" years old.").getBytes
-      }
-      (r send get("testperson1")).map(mkString) should be(Some("Hi, I'm Alan. I'm 30 years old."))
+      r send sort[String]("sortlist", alpha = true) should be(Some(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
     }
   }
 }

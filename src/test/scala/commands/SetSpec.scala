@@ -1,5 +1,6 @@
 package net.fyrie.redis
-package commands
+
+import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
@@ -47,10 +48,10 @@ class SetSpec extends Spec
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send spop("set-1") map (mkString) should (equal(Some("foo")) or equal(Some("bar")) or equal(Some("baz")))
+      r send spop("set-1") should (equal(Some("foo")) or equal(Some("bar")) or equal(Some("baz")))
     }
     it("should return nil if the key does not exist") {
-      r send spop("set-1") map (mkString) should equal(None)
+      r send spop("set-1") should equal(None)
     }
   }
 
@@ -128,14 +129,14 @@ class SetSpec extends Spec
       r send sadd("set-3", "bat") should equal(true)
       r send sadd("set-3", "bay") should equal(true)
 
-      r send sinter(Seq("set-1", "set-2")) map (mkString) should equal(Some(Set("foo", "baz")))
-      r send sinter(Seq("set-1", "set-3")) map (mkString) should equal(Some(Set.empty))
+      r send sinter(Seq("set-1", "set-2")) should equal(Some(Set("foo", "baz")))
+      r send sinter(Seq("set-1", "set-3")) should equal(Some(Set.empty))
     }
     it("should return empty set for non-existing key") {
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send sinter(Seq("set-1", "set-4")) map (mkString) should equal(Some(Set())) 
+      r send sinter(Seq("set-1", "set-4")) should equal(Some(Set())) 
     }
   }
 
@@ -181,14 +182,14 @@ class SetSpec extends Spec
       r send sadd("set-3", "bat") should equal(true)
       r send sadd("set-3", "bay") should equal(true)
 
-      r send sunion(Seq("set-1", "set-2")) map (mkString) should equal(Some(Set("foo", "bar", "baz", "bat")))
-      r send sunion(Seq("set-1", "set-3")) map (mkString) should equal(Some(Set("foo", "bar", "baz", "for", "bat", "bay")))
+      r send sunion(Seq("set-1", "set-2")) should equal(Some(Set("foo", "bar", "baz", "bat")))
+      r send sunion(Seq("set-1", "set-3")) should equal(Some(Set("foo", "bar", "baz", "for", "bat", "bay")))
     }
     it("should return empty set for non-existing key") {
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send sunion(Seq("set-1", "set-2")) map (mkString) should equal(Some(Set("foo", "bar", "baz")))
+      r send sunion(Seq("set-1", "set-2")) should equal(Some(Set("foo", "bar", "baz")))
     }
   }
 
@@ -234,13 +235,13 @@ class SetSpec extends Spec
       r send sadd("set-3", "bat") should equal(true)
       r send sadd("set-3", "bay") should equal(true)
 
-      r send sdiff(Seq("set-1", "set-2", "set-3")) map (mkString) should equal(Some(Set("bar")))
+      r send sdiff(Seq("set-1", "set-2", "set-3")) should equal(Some(Set("bar")))
     }
     it("should treat non-existing keys as empty sets") {
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send sdiff(Seq("set-1", "set-2")) map (mkString) should equal(Some(Set("foo", "bar", "baz")))
+      r send sdiff(Seq("set-1", "set-2")) should equal(Some(Set("foo", "bar", "baz")))
     }
   }
 
@@ -249,10 +250,10 @@ class SetSpec extends Spec
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send smembers("set-1") map (mkString) should equal(Some(Set("foo", "bar", "baz")))
+      r send smembers("set-1") should equal(Some(Set("foo", "bar", "baz")))
     }
     it("should return None for an empty set") {
-      r send smembers("set-1") map (mkString) should equal(Some(Set()))
+      r send smembers("set-1") should equal(Some(Set()))
     }
   }
 
@@ -261,10 +262,10 @@ class SetSpec extends Spec
       r send sadd("set-1", "foo") should equal(true)
       r send sadd("set-1", "bar") should equal(true)
       r send sadd("set-1", "baz") should equal(true)
-      r send srandmember("set-1") map (mkString) should (equal(Some("foo")) or equal(Some("bar")) or equal(Some("baz")))
+      r send srandmember("set-1") should (equal(Some("foo")) or equal(Some("bar")) or equal(Some("baz")))
     }
     it("should return None for a non-existing key") {
-      r send srandmember("set-1") map (mkString) should equal(None)
+      r send srandmember("set-1") should equal(None)
     }
   }
 }
