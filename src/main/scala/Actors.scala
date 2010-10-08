@@ -91,7 +91,7 @@ class ReaderActor(val reader: RedisStreamReader)(implicit dispatcher: MessageDis
 
   self.dispatcher = implicitly
 
-  def handleRedisError[U](f: => U) {
+  def handleRedisError(f: => Unit) {
     try {
       f
     } catch {
