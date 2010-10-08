@@ -4,25 +4,28 @@ import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 
-class HashSpec extends Spec with ShouldMatchers with RedisTestServer {
+@RunWith(classOf[JUnitRunner])
+class HashOperationsSpec extends Spec with ShouldMatchers with RedisTestServer {
 
   describe("hset") {
     it("should set and get fields") {
       r send hset("hash1", "field1", "val")
-      r send hget("hash1", "field1") should be(Some("val"))
+      r send hget("hash1", "field1") should be(Result("val"))
     }
     
     it("should set and get maps") {
       r send hmset("hash2", Map("field1" -> "val1", "field2" -> "val2"))
-      r send hmget("hash2", Seq("field1")) should be(Some(Seq(Some("val1"))))
-      r send hmget("hash2", Seq("field1", "field2")) should be(Some(Seq(Some("val1"), Some("val2"))))
-      r send hmget("hash2", Seq("field1", "field2", "field3")) should be(Some(Seq(Some("val1"), Some("val2"), None)))
+      r send hmget("hash2", Seq("field1")) should be(Result(Seq(Some("val1"))))
+      r send hmget("hash2", Seq("field1", "field2")) should be(Result(Seq(Some("val1"), Some("val2"))))
+      r send hmget("hash2", Seq("field1", "field2", "field3")) should be(Result(Seq(Some("val1"), Some("val2"), None)))
     }
     
     it("should increment map values") {
       r send hincrby("hash3", "field1", 1) should be(1)
-      r send hget("hash3", "field1") should be(Some("1"))
+      r send hget("hash3", "field1") should be(Result("1"))
     }
     
     it("should check existence") {
@@ -45,9 +48,9 @@ class HashSpec extends Spec with ShouldMatchers with RedisTestServer {
     
     it("should return the aggregates") {
       r send hmset("hash7", Map("field1" -> "val1", "field2" -> "val2"))
-      r send hkeys("hash7") should be(Some(Set("field1", "field2")))
-      r send hvals("hash7") should be(Some(Seq("val1", "val2")))
-      r send hgetall("hash7") should be(Some(Map("field1" -> "val1", "field2" -> "val2")))
+      r send hkeys("hash7") map (_.toSet) should be(Result(Set("field1", "field2")))
+      r send hvals("hash7") should be(Result(Seq("val1", "val2")))
+      r send hgetall("hash7") map (_.toMap) should be(Result(Map("field1" -> "val1", "field2" -> "val2")))
     }
   }
 }

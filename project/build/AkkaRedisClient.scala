@@ -9,6 +9,7 @@ class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info) wit
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
   val scalacheck = "org.scala-tools.testing" %% "scalacheck" % "1.7" % "test"
+  val junit = "junit" % "junit" % "4.8.1" % "test"
 
   override def managedStyle = ManagedStyle.Maven
   val publishUser = "derek"

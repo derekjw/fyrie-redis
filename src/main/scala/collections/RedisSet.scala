@@ -54,7 +54,7 @@ class RedisSet[A](name: String)(implicit conn: AkkaRedisClient, format: Format, 
   def spopCmd = Commands.spop(rediskey)
   def spop: Option[A] = conn send spopCmd
   def spopFast: Unit = conn ! spopCmd
-  def spopFuture: Future[Option[A]] = conn !!! spopCmd
+  def spopFuture: Future[Result[A]] = conn !!! spopCmd
 
   def smoveCmd(dest: String, elem: A) = Commands.smove(rediskey, dest, elem)
   def smove(dest: String, elem: A): Boolean = conn send smoveCmd(dest, elem)
@@ -68,7 +68,7 @@ class RedisSet[A](name: String)(implicit conn: AkkaRedisClient, format: Format, 
   def sismember(elem: A): Boolean = conn send sismemberCmd(elem)
 
   def smembersCmd = Commands.smembers(rediskey)
-  def smembers: Option[Set[A]] = conn send smembersCmd
+  def smembers: Option[Set[A]] = conn send smembersCmd map (_.toSet)
 
   override def toString: String = "RedisSet("+name+")"
 

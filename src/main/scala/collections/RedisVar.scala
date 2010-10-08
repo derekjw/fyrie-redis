@@ -24,7 +24,7 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
   def get: A = this.toOption.get
 
-  def getFuture: Future[Option[A]] = conn !!! Commands.get(key)
+  def getFuture: Future[Result[A]] = conn !!! Commands.get(key)
 
   def set(in: A): Unit = conn ! Commands.set(key, in)
 
@@ -36,7 +36,7 @@ class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: Ak
 
   def map[B](f: A => B): Option[B] = this.toOption.map(f)
 
-  def mapFuture[B](f: A => B): Future[Option[B]] = {
+  def mapFuture[B](f: A => B): Future[Result[B]] = {
     implicit val parserB: Parse[B] = Parse[B](x => f(parser(x)))
     conn !!! Commands.get[B](key)
   }

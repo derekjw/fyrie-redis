@@ -4,10 +4,14 @@ import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 
-class SortedSetSpec extends Spec 
-                    with ShouldMatchers
-                    with RedisTestServer {
+
+@RunWith(classOf[JUnitRunner])
+class SortedSetOperationsSpec extends Spec 
+                        with ShouldMatchers
+                        with RedisTestServer {
 
   private def add = {
     r send zadd("hackers", 1965, "yukihiro matsumoto") should be(true)
@@ -70,12 +74,11 @@ class SortedSetSpec extends Spec
       r send zunionstore("hackers", Seq("hackers 1", "hackers 2", "hackers 3", "hackers 4")) should equal(6)
       r send zcard("hackers") should equal(6)
 
-      r send zrangeWithScores("hackers", 0, -1) map (_.map(_._2)) should equal(Some(List(1912, 1916, 1940, 1953, 1965, 1969)))
+      r send zrangeWithScores("hackers", 0, -1) should equal(Result(List(("alan turing", 1912), ("claude shannon",1916), ("alan kay",1940), ("richard stallman",1953), ("yukihiro matsumoto",1965), ("linus torvalds",1969))))
 
       // union with modified weights
       r send zunionstoreWeighted("hackers weighted", Map(("hackers 1", 1), ("hackers 2", 2), ("hackers 3", 3), ("hackers 4", 4))) should equal(6)
-      r send zrangeWithScores("hackers weighted", 0, -1) map (_.map(_._2)) should equal(Some(List(1953, 1965, 3832, 3938, 5820, 7648)))
+      r send zrangeWithScores("hackers weighted", 0, -1) map (_.map(_._2)) should equal(Result(List(1953, 1965, 3832, 3938, 5820, 7648)))
     }
   }
 }
-

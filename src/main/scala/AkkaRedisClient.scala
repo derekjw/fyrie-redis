@@ -17,10 +17,10 @@ object AkkaRedisClient {
 class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit dispatcher: MessageDispatcher = AkkaRedisClient.dispatcher) {
   val actorRef = actorOf(new RedisPipelineActor(address, port)).start
 
-  def ![A, B](command: Command[A, B])(implicit sender: Option[ActorRef] = None): Unit =
-    actorRef ! Request(command, sender.isDefined)
+  def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None): Unit =
+    actorRef ! Request(command.toBytes, command.handler, sender.isDefined)
 
-  def !![A, B](command: Command[A, B]): Option[B] = {
+  def !![A](command: Command[A]): Option[A] = {
     val future = this !!! command
     try {
       future.await
@@ -31,10 +31,10 @@ class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit 
     else future.result
   }
 
-  def !!![A, B](command: Command[A, B]): Future[B] =
-    actorRef !!! Request(command, true)
+  def !!![A](command: Command[A]): Future[A] =
+    actorRef !!! Request(command.toBytes, command.handler, true)
 
-  def send[A, B](command: Command[A, B]): B = {
+  def send[A](command: Command[A]): A = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get
@@ -51,10 +51,10 @@ class AkkaRedisWorkerPool(address: String = "localhost", port: Int = 6379, size:
   val pool = (1 to size).map(i => actorOf(new RedisWorkerActor(address, port)).start).toList
   val actorRef = pool.head
 
-  def ![A, B](command: Command[A, B])(implicit sender: Option[ActorRef] = None): Unit =
+  def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None): Unit =
     actorRef ! Work(command)
 
-  def !![A, B](command: Command[A, B]): Option[B] = {
+  def !![A](command: Command[A]): Option[A] = {
     val future = this !!! command
     try {
       future.await
@@ -65,10 +65,10 @@ class AkkaRedisWorkerPool(address: String = "localhost", port: Int = 6379, size:
     else future.result
   }
 
-  def !!![A, B](command: Command[A, B]): Future[B] =
+  def !!![A](command: Command[A]): Future[A] =
     actorRef !!! Work(command)
 
-  def send[A, B](command: Command[A, B]): B = {
+  def send[A](command: Command[A]): A = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get

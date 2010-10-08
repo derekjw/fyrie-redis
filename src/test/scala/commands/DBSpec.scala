@@ -4,7 +4,11 @@ import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 
+
+@RunWith(classOf[JUnitRunner])
 class OperationsSpec extends Spec 
                      with ShouldMatchers
                      with RedisTestServer {
@@ -13,13 +17,13 @@ class OperationsSpec extends Spec
     it("should fetch keys") {
       r send set("anshin-1", "debasish")
       r send set("anshin-2", "maulindu")
-      r send keys("anshin*") map (_.size) should equal(Some(2))
+      r send keys("anshin*") map (_.size) should equal(Result(2))
     }
 
     it("should fetch keys with spaces") {
       r send set("anshin 1", "debasish")
       r send set("anshin 2", "maulindu")
-      r send keys("anshin*") map (_.size) should equal(Some(2))
+      r send keys("anshin*") map (_.size) should equal(Result(2))
     }
   }
 
@@ -96,7 +100,7 @@ class OperationsSpec extends Spec
 
   describe("Multi exec commands") {
     it("should work with single commands") {
-      r send multiexec(Seq(set("testkey1", "testvalue1"))) should be(Some(List(())))
+      r send multiexec(Seq(set("testkey1", "testvalue1"))) should be(Result(List(())))
     }
     it("should work with several commands") {
       r send multiexec(Seq(
@@ -105,7 +109,7 @@ class OperationsSpec extends Spec
         set("testkey2", "testvalue2"),
         dbsize,
         mget(Seq("testkey1", "testkey2"))
-      )) should be(Some(List((), 1, (), 2, Some(List(Some("testvalue1"), Some("testvalue2"))))))
+      )) should be(Result(List((), 1, (), 2, Result(List(Some("testvalue1"), Some("testvalue2"))))))
     }
     it("should survive an error") {
       r send multiexec(Seq(
@@ -113,9 +117,9 @@ class OperationsSpec extends Spec
         lpop("a"),
         get("a")
       )) match {
-        case Some(() :: (e: RedisErrorException) :: Some("abc") :: Nil) =>
+        case Result(() :: (e: RedisErrorException) :: Result("abc") :: Nil) =>
           e.message should be("ERR Operation against a key holding the wrong kind of value")
-        case _ => fail("Did not receive expected response")
+        case NoResult => fail("Did not receive expected response")
       }
     }
   }
@@ -131,11 +135,11 @@ class OperationsSpec extends Spec
   describe("sort") {
     it("should do a simple sort") {
       mkList
-      (r send sort("sortlist")).map(_.map(_.toInt)) should be(Some(List(1, 1, 3, 4, 5, 6, 9, 47)))
+      (r send sort("sortlist")).map(_.map(_.toInt)) should be(Result(List(1, 1, 3, 4, 5, 6, 9, 47)))
     }
     it("should do a lexical sort") {
       mkStringList
-      r send sort[String]("sortlist", alpha = true) should be(Some(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
+      r send sort[String]("sortlist", alpha = true) should be(Result(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
     }
   }
 }

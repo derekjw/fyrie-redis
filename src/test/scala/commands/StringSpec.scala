@@ -4,7 +4,11 @@ import Commands._
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
 
+
+@RunWith(classOf[JUnitRunner])
 class StringOperationsSpec extends Spec 
                            with ShouldMatchers
                            with RedisTestServer {
@@ -19,31 +23,19 @@ class StringOperationsSpec extends Spec
   describe("get") {
     it("should retrieve key/value pairs for existing keys") {
       r send set("anshin-1", "debasish")
-      r send get("anshin-1") match {
-        case Some(s: String) => s should equal("debasish")
-        case None => fail("should return debasish")
-      }
+      r send get("anshin-1") should equal(Result("debasish"))
     }
     it("should fail for non-existent keys") {
-      r send get("anshin-2") should be(None)
+      r send get("anshin-2") should be(NoResult)
     }
   }
 
   describe("getset") {
     it("should set new values and return old values") {
       r send set("anshin-1", "debasish")
-      r send get("anshin-1") match {
-        case Some(s: String) => s should equal("debasish")
-        case None => fail("should return debasish")
-      }
-      r send getset("anshin-1", "maulindu") match {
-        case Some(s: String) => s should equal("debasish")
-        case None => fail("should return debasish")
-      }
-      r send get("anshin-1") match {
-        case Some(s: String) => s should equal("maulindu")
-        case None => fail("should return maulindu")
-      }
+      r send get("anshin-1") should equal(Result("debasish"))
+      r send getset("anshin-1", "maulindu") should equal(Result("debasish"))
+      r send get("anshin-1") should equal(Result("maulindu"))
     }
   }
 
@@ -106,12 +98,12 @@ class StringOperationsSpec extends Spec
       r send set("anshin-1", "debasish")
       r send set("anshin-2", "maulindu")
       r send set("anshin-3", "nilanjan")
-      r send mget(Seq("anshin-1", "anshin-2", "anshin-3")) should equal(Some(List(Some("debasish"), Some("maulindu"), Some("nilanjan"))))
+      r send mget(Seq("anshin-1", "anshin-2", "anshin-3")) should equal(Result(List(Some("debasish"), Some("maulindu"), Some("nilanjan"))))
     }
     it("should give None for non-existing keys") {
       r send set("anshin-1", "debasish")
       r send set("anshin-2", "maulindu")
-      r send mget(Seq("anshin-1", "anshin-2", "anshin-4")) should equal(Some(List(Some("debasish"), Some("maulindu"), None)))
+      r send mget(Seq("anshin-1", "anshin-2", "anshin-4")) should equal(Result(List(Some("debasish"), Some("maulindu"), None)))
     }
   }
 
@@ -142,13 +134,10 @@ class StringOperationsSpec extends Spec
   describe("get with spaces in keys") {
     it("should retrieve key/value pairs for existing keys") {
       r send set("anshin software", "debasish ghosh")
-      r send get("anshin software") match {
-        case Some(s: String) => s should equal("debasish ghosh")
-        case None => fail("should return debasish ghosh")
-      }
+      r send get("anshin software") should equal(Result("debasish ghosh"))
 
       r send set("test key with spaces", "I am a value with spaces")
-      r send get("test key with spaces") should equal(Some("I am a value with spaces"))
+      r send get("test key with spaces") should equal(Result("I am a value with spaces"))
     }
   }
 
@@ -162,10 +151,7 @@ class StringOperationsSpec extends Spec
   describe("get with newline values") {
     it("should retrieve key/value pairs for existing keys") {
       r send set("anshin-x", "debasish\nghosh\nfather")
-      r send get("anshin-x") match {
-        case Some(s: String) => s should equal("debasish\nghosh\nfather")
-        case None => fail("should return debasish")
-      }
+      r send get("anshin-x") should equal(Result("debasish\nghosh\nfather"))
     }
   }
 }
