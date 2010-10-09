@@ -43,7 +43,7 @@ class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit 
 }
 
 class AkkaRedisWorkerPool(address: String = "localhost", port: Int = 6379, size: Int = 4, name: String = "AkkaRedisWorkers") {
-  implicit val dispatcher = Dispatchers.newExecutorBasedEventDrivenWorkStealingDispatcher(name, 0)
+  implicit val dispatcher = Dispatchers.newExecutorBasedEventDrivenWorkStealingDispatcher(name, UnboundedMailbox())
   val pool = (1 to size).map(i => actorOf(new RedisWorkerActor(address, port)).start).toList
   val actorRef = pool.head
 

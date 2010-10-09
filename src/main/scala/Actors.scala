@@ -29,8 +29,7 @@ trait ChainedActor {
 }
 
 class RedisPipelineActor(address: String, port: Int)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
-  self.faultHandler = Some(AllForOneStrategy(5, 5000))
-  self.trapExit = List(classOf[Exception])
+  self.faultHandler = AllForOneStrategy(List(classOf[Exception]), 5, 5000)
 
   self.dispatcher = implicitly
 
@@ -48,7 +47,7 @@ class RedisPipelineActor(address: String, port: Int)(implicit dispatcher: Messag
     case r: Request => send(r)
   }
 
-  override def shutdown = {
+  override def postStop = {
     self.shutdownLinkedActors
     client.disconnect
   }
@@ -63,7 +62,7 @@ class RedisWorkerActor(address: String, port: Int)(implicit dispatcher: MessageD
 
   val client = new RedisClient(address, port)
 
-  override def shutdown = {
+  override def postStop = {
     client.disconnect
   }
 
@@ -75,7 +74,7 @@ class RedisWorkerActor(address: String, port: Int)(implicit dispatcher: MessageD
 }
 
 class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implicit dispatcher: MessageDispatcher) extends Actor with ChainedActor {
-  self.lifeCycle = Some(LifeCycle(Permanent))
+  self.lifeCycle = Permanent
 
   self.dispatcher = implicitly
 
@@ -87,7 +86,7 @@ class WriterActor(val nextActor: ActorRef, val writer: RedisStreamWriter)(implic
 }
 
 class ReaderActor(val reader: RedisStreamReader)(implicit dispatcher: MessageDispatcher) extends Actor {
-  self.lifeCycle = Some(LifeCycle(Permanent))
+  self.lifeCycle = Permanent
 
   self.dispatcher = implicitly
 
