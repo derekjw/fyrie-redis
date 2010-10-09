@@ -10,11 +10,7 @@ import se.scalablesolutions.akka.actor.{Actor,ActorRef}
 import Actor.{actorOf}
 import se.scalablesolutions.akka.dispatch._
 
-object AkkaRedisClient {
-  lazy val dispatcher: MessageDispatcher = new HawtDispatcher(false)
-}
-
-class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit dispatcher: MessageDispatcher = AkkaRedisClient.dispatcher) {
+class AkkaRedisClient(address: String = "localhost", port: Int = 6379)(implicit dispatcher: MessageDispatcher = Dispatchers.defaultGlobalDispatcher) {
   val actorRef = actorOf(new RedisPipelineActor(address, port)).start
 
   def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None): Unit =
