@@ -90,9 +90,13 @@ class ReaderActor(val reader: RedisStreamReader)(implicit dispatcher: MessageDis
 
   self.dispatcher = implicitly
 
+  val baseHandlers = new handlers.BaseHandlers
+
   def handleRedisError(f: => Unit) {
     try {
+      baseHandlers.forceLazyResults
       f
+      baseHandlers.forceLazyResults
     } catch {
       case e: RedisErrorException =>
         println("Got Redis Exception: "+e)
@@ -102,8 +106,8 @@ class ReaderActor(val reader: RedisStreamReader)(implicit dispatcher: MessageDis
 
   def receive = {
     case Response(handler, false) =>
-      handleRedisError( handler(reader) )
+      handleRedisError( handler(reader, baseHandlers) )
     case Response(handler, true) =>
-      handleRedisError( self reply handler(reader) )
+      handleRedisError( self reply handler(reader, baseHandlers) )
   }
 }

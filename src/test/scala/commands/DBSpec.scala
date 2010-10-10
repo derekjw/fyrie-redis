@@ -113,11 +113,7 @@ class OperationsSpec extends Spec
       r send multiexec(Seq(
         set("a", "abc"),
         lpop("a"),
-        get("a"))) match {
-        case Result(() ::(e: RedisErrorException) :: Result("abc") :: Nil) =>
-          e.message should be("ERR Operation against a key holding the wrong kind of value")
-        case NoResult => fail("Did not receive expected response")
-      }
+        get("a"))) should be(Result(List((), ErrorResult(new RedisErrorException("ERR Operation against a key holding the wrong kind of value")), Result("abc"))))
     }
   }
 
