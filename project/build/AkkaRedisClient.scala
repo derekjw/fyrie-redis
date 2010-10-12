@@ -1,12 +1,11 @@
 import sbt._
 import sbt.CompileOrder._
 
-class AkkaRedisClientProject(info: ProjectInfo) extends DefaultProject(info) with AkkaBaseProject
+class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with AkkaBaseProject
 {
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
 
   val akkaActor = "se.scalablesolutions.akka" % "akka-actor_2.8.0"  % "1.0-SNAPSHOT"
-  val fyrieredis = "net.fyrie" %% "fyrieredis" % "2.0-SNAPSHOT"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
   val junit = "junit" % "junit" % "4.8.1" % "test"
