@@ -34,10 +34,10 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   var closed = false
 
-  val writeQueue = new mutable.Queue[Array[Byte]]
-  var writeBuf: Option[ByteBuffer] = None
+  val writeQueue = new mutable.Queue[ByteBuffer]
   val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
-  val sharedReadBuf = ByteBuffer.allocate(bufferSize) 
+  val sharedReadBuf = ByteBuffer.allocate(bufferSize)
+  sharedReadBuf.limit(0)
   var readBuf = sharedReadBuf
   val overflow = new mutable.Queue[Array[Byte]]
 
@@ -73,6 +73,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
   }
 
   def read(): Unit = catchio {
+      readBuf.compact
       channel.read(readBuf) match {
         case -1 => close
         case 0 if !readBuf.hasRemaining =>
@@ -80,29 +81,23 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
           readBuf.rewind
           val ar = new Array[Byte](readBuf.remaining - 1)
           readBuf.get(ar)
-          readBuf.compact
           overflow += ar
         case 0 => Unit
         case count: Int =>
           log.debug("IO: read "+count)
-          readHandler(count)
+          readBuf.flip
+          readHandler.apply
       }
   }
 
   def write(): Unit = catchio {
-      writeBuf match {
-        case Some(buf) =>
-          log.debug("IO: writing")
-          channel.write(buf)
-          if (!buf.hasRemaining)
-            log.debug("IO: writing done")
-            writeBuf = None
-        case None if writeQueue.isEmpty =>
-          writeSource.suspend
-        case None =>
-          writeBuf = Some(ByteBuffer.wrap(writeQueue.dequeue))
-          write
-      }
+    if (writeQueue.isEmpty) {
+      writeSource.suspend
+    } else {
+      log.debug("IO: writing")
+      channel.write(writeQueue.toArray)
+      while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) (writeQueue.dequeue)
+    }
   }
 
   def close() = {
@@ -114,7 +109,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   def receive = {
     case Request(bytes, handler) =>
-      writeQueue += bytes
+      writeQueue += ByteBuffer.wrap(bytes)
       handlerQueue += ((handler, self.senderFuture))
       readSource.resume
       writeSource.resume
@@ -136,15 +131,16 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
     future foreach (_.completeWithResult(Error(new RedisErrorException(new String(data, "UTF-8")))))
   }
 
-  abstract class ReadHandler extends Function1[Int, Unit]
+  abstract class ReadHandler {
+    def apply: Unit
+  }
 
   var readHandler: ReadHandler = Idle
 
   object Idle extends ReadHandler {
-    def apply(count: Int) {
-      if (count > 0) {
-        val marker = readBuf.get(readBuf.position - count).toChar
-        readHandler = marker match {
+    def apply {
+      if (readBuf.remaining > 0) {
+        readHandler = readBuf.get.toChar match {
           case '+' => ReadString
           case '-' => ReadError
           case ':' => ReadString
@@ -152,64 +148,61 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
           case '*' => ReadMultiBulk
           case x => error("Invalid Byte: "+x.toByte)
         }
-        readHandler(count - 1)
+        readHandler.apply
       }
     }
   }
 
   val EOL = Array(13.toByte, 10.toByte)
 
-  def readSingleLine(count: Int): Option[Array[Byte]] =
-    ((count).to(1, -1)) find (n =>
-      readBuf.get(readBuf.position - n - 1) == EOL(0) &&
-      readBuf.get(readBuf.position - n) == EOL(1)) map { n =>
-        readBuf.limit(readBuf.position)
-        val ar = new Array[Byte](overflow.foldLeft(readBuf.position - n - 2)(_ + _.length))
-        var skippedFirst = false
-        var pos = 0
-        while (!overflow.isEmpty) {
-          val o = overflow.dequeue
-          Array.copy(o, if (skippedFirst) 0 else 1, ar, pos, o.length - (if (skippedFirst) 0 else 1))
-          pos += o.length - (if (skippedFirst) 0 else 1)
-          skippedFirst = true
+  def readSingleLine: Option[Array[Byte]] = {
+    if (readBuf.remaining < 2) None else
+      (0 to (readBuf.remaining - 2)) find (n =>
+        readBuf.get(readBuf.position + n) == EOL(0) &&
+        readBuf.get(readBuf.position + n + 1) == EOL(1)) map { n =>
+          val ar = new Array[Byte](overflow.foldLeft(n)(_ + _.length))
+          var pos = 0
+          while (!overflow.isEmpty) {
+            val o = overflow.dequeue
+            Array.copy(o, 0, ar, pos, o.length)
+            pos += o.length
+          }
+          if (ar.length - pos > 0)
+            readBuf.get(ar, pos, ar.length - pos)
+          readBuf.position(readBuf.position + 2) // skip EOL
+          ar
         }
-        readBuf.position(if (skippedFirst) 0 else 1)
-        if (ar.length - pos > 0)
-          readBuf.get(ar, pos, ar.length - pos)
-        readBuf.position(readBuf.limit - n + 1)
-        readBuf.compact
-        ar
-      }
+  }
 
   object ReadString extends ReadHandler {
-    def apply(count: Int) {
-      readSingleLine(count) foreach { (data) =>
+    def apply {
+      readSingleLine foreach { (data) =>
         processResponse(data)
         readHandler = Idle
-        readHandler(readBuf.position)
+        readHandler.apply
       }
     }
   }
 
   object ReadError extends ReadHandler {
-    def apply(count: Int) {
-      readSingleLine(count) foreach { (data) =>
+    def apply {
+      readSingleLine foreach { (data) =>
         errorResponse(data)
         readHandler = Idle
-        readHandler(readBuf.position)
+        readHandler.apply
       }
     }
   }
 
   object ReadBulk extends ReadHandler {
-    def apply(count: Int) {
-      readSingleLine(count) foreach { (data) =>
+    def apply {
+      readSingleLine foreach { (data) =>
         val size = new String(data, "UTF-8").toInt
         readHandler = if (size > -1) (new ReadBulkData(size)) else {
           notFoundResponse
           Idle
         }
-        readHandler(readBuf.position)
+        readHandler.apply
       }
     }
   }
@@ -222,16 +215,14 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
       log.debug("IO: Buffer too small, creating a temporary buffer for data")
       val buf = ByteBuffer.allocate(size)
       val ar = buf.array
-      readBuf.flip
-      val pos = readBuf.remaining
-      readBuf.get(ar, 0, pos)
-      readBuf.clear
-      buf.position(pos)
+      buf.limit(readBuf.remaining)
+      readBuf.get(ar, 0, readBuf.remaining)
+      readBuf.limit(0)
       readBuf = buf
     }
     
-    def apply(count: Int) {
-      if (size <= readBuf.position) {
+    def apply {
+      if (size <= readBuf.remaining) {
         val data = if (tempBuffer) {
           log.debug("IO: Releasing temporary buffer")
           val ar = readBuf.array
@@ -239,36 +230,34 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
           ar
         } else {
           val ar = new Array[Byte](size)
-          readBuf.flip
           readBuf.get(ar)
-          readBuf.compact
           ar
         }
         processResponse(data)
         readHandler = ReadEOL
-        readHandler(readBuf.position)
+        readHandler.apply
       }
     }
   }
 
   object ReadEOL extends ReadHandler {
-    def apply(count: Int) {
-      if (readBuf.get(0) == EOL(0) && readBuf.get(1) == EOL(1)) {
-        readBuf.flip
-        readBuf.position(2)
-        readBuf.compact
-        readHandler = Idle
-        readHandler(readBuf.position)
+    def apply {
+      if (readBuf.remaining >= 2) {
+        if (readBuf.get(readBuf.position) == EOL(0) && readBuf.get(readBuf.position + 1) == EOL(1)) {
+          readBuf.position(readBuf.position + 2)
+          readHandler = Idle
+          readHandler.apply
+        }
       }
     }
   }
 
   object ReadMultiBulk extends ReadHandler {
-    def apply(count: Int) {
-      readSingleLine(count) foreach { (data) =>
+    def apply {
+      readSingleLine foreach { (data) =>
         processResponse(data)
         readHandler = Idle
-        readHandler(readBuf.position)
+        readHandler.apply
       }
     }
   }
