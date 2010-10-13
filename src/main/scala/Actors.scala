@@ -1,6 +1,5 @@
 package net.fyrie
 package redis
-package akka
 package actors
 
 import messages._
@@ -37,7 +36,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   val writeQueue = new mutable.Queue[Array[Byte]]
   var writeBuf: Option[ByteBuffer] = None
-  val readQueue = new mutable.Queue[Handler[_]]
+  val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
   val sharedReadBuf = ByteBuffer.allocate(bufferSize) 
   var readBuf = sharedReadBuf
   val overflow = new mutable.Queue[Array[Byte]]
@@ -116,10 +115,25 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
   def receive = {
     case Request(bytes, handler) =>
       writeQueue += bytes
-      readQueue += handler
+      handlerQueue += ((handler, self.senderFuture))
       readSource.resume
       writeSource.resume
       write
+  }
+
+  def processResponse(data: Array[Byte]) {
+    val (handler, future) = handlerQueue.dequeue
+    handler(data, future).reverse.foreach( _ +=: handlerQueue)
+  }
+
+  def notFoundResponse {
+    val (handler, future) = handlerQueue.dequeue
+    future foreach (_.completeWithResult(Result(None)))
+  }
+
+  def errorResponse(data: Array[Byte]) {
+    val (handler, future) = handlerQueue.dequeue
+    future foreach (_.completeWithResult(Error(new RedisErrorException(new String(data, "UTF-8")))))
   }
 
   abstract class ReadHandler extends Function1[Int, Unit]
@@ -133,7 +147,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
         readHandler = marker match {
           case '+' => ReadString
           case '-' => ReadError
-          case ':' => ReadInteger
+          case ':' => ReadString
           case '$' => ReadBulk
           case '*' => ReadMultiBulk
           case x => error("Invalid Byte: "+x.toByte)
@@ -145,7 +159,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   val EOL = Array(13.toByte, 10.toByte)
 
-  def readSingleLine(count: Int): Option[String] =
+  def readSingleLine(count: Int): Option[Array[Byte]] =
     ((count).to(1, -1)) find (n =>
       readBuf.get(readBuf.position - n - 1) == EOL(0) &&
       readBuf.get(readBuf.position - n) == EOL(1)) map { n =>
@@ -164,13 +178,13 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
           readBuf.get(ar, pos, ar.length - pos)
         readBuf.position(readBuf.limit - n + 1)
         readBuf.compact
-        new String(ar, "UTF-8")
+        ar
       }
 
   object ReadString extends ReadHandler {
     def apply(count: Int) {
-      readSingleLine(count) foreach { (string) =>
-        println("Got String: "+string)
+      readSingleLine(count) foreach { (data) =>
+        processResponse(data)
         readHandler = Idle
         readHandler(readBuf.position)
       }
@@ -179,18 +193,8 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   object ReadError extends ReadHandler {
     def apply(count: Int) {
-      readSingleLine(count) foreach { (string) =>
-        println("Got Error: "+string)
-        readHandler = Idle
-        readHandler(readBuf.position)
-      }
-    }
-  }
-
-  object ReadInteger extends ReadHandler {
-    def apply(count: Int) {
-      readSingleLine(count) foreach { (string) =>
-        println("Got Integer: "+string.toLong)
+      readSingleLine(count) foreach { (data) =>
+        errorResponse(data)
         readHandler = Idle
         readHandler(readBuf.position)
       }
@@ -199,10 +203,12 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   object ReadBulk extends ReadHandler {
     def apply(count: Int) {
-      readSingleLine(count) foreach { (string) =>
-        val bulkSize = string.toInt
-        println("Got Bulk: "+bulkSize)
-        readHandler = new ReadBulkData(bulkSize)
+      readSingleLine(count) foreach { (data) =>
+        val size = new String(data, "UTF-8").toInt
+        readHandler = if (size > -1) (new ReadBulkData(size)) else {
+          notFoundResponse
+          Idle
+        }
         readHandler(readBuf.position)
       }
     }
@@ -238,7 +244,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
           readBuf.compact
           ar
         }
-        println("Got Bulk Data: " + new String(data, "UTF-8"))
+        processResponse(data)
         readHandler = ReadEOL
         readHandler(readBuf.position)
       }
@@ -259,8 +265,8 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   object ReadMultiBulk extends ReadHandler {
     def apply(count: Int) {
-      readSingleLine(count) foreach { (string) =>
-        println("Got MultiBulk: "+string.toInt)
+      readSingleLine(count) foreach { (data) =>
+        processResponse(data)
         readHandler = Idle
         readHandler(readBuf.position)
       }

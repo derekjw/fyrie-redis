@@ -21,7 +21,7 @@ object AggregateScore {
   }
 }
 
-
+/*
 trait Redis extends IO {
   private val baseHandlers = new handlers.BaseHandlers
 
@@ -38,3 +38,4 @@ class RedisClient(override val host: String, override val port: Int) extends Red
   def this() = this("localhost", 6379)
   override def toString = host + ":" + String.valueOf(port)
 }
+*/

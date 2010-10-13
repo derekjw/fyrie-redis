@@ -2,100 +2,122 @@ package net.fyrie.redis
 package handlers
 
 import serialization.{ Parse }
+import Parse.Implicits._
 
-class Handler[A](f: (RedisStreamReader, BaseHandlers) => A) {
-  def apply(r: RedisStreamReader, h: BaseHandlers): A = f(r, h)
+import se.scalablesolutions.akka.dispatch.{CompletableFuture, DefaultCompletableFuture}
+
+abstract class Handler[A] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]): Seq[(Handler[_], Option[CompletableFuture[Any]])]
+
+  def verify(in: String, expect: String): Unit =
+    if (in != expect) throw new RedisProtocolException(in)
+//    if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
+
+  def string(in: Array[Byte]): String = new String(in, "UTF-8")
+
+  def complete[A](future: Option[CompletableFuture[Any]], value: => A) =
+    future foreach { f =>
+      try {
+        f.completeWithResult(Result(value))
+      } catch {
+        case e: Exception => f.completeWithException(e)
+      }
+    }
 }
 
-case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Result[Stream[_]]]({ (r, h) =>
+/*
+case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Option[Stream[_]]]({ (r, h) =>
   OkStatus(r, h)
   // Need some kind of protection against protocol exceptions, like the following, but need a way of testing:
   // handlers.filter{x => try{QueuedStatus(r); true} catch {case e: RedisProtocolException => false}}
   handlers.foreach(x => QueuedStatus(r, h))
   h.multiexec(r, handlers)
 })
-
-case object NoHandler extends Handler[Unit]( (r, h) => error("Can't handle reply"))
-
-case object Status extends Handler( (r, h) => h.status(r))
-
-case object OkStatus extends Handler( (r, h) => h.verify(h.status(r), "OK"))
-
-case object QueuedStatus extends Handler( (r, h) => h.verify(h.status(r), "QUEUED"))
-
-case object ShortInt extends Handler( (r, h) => h.integer(r).toInt)
-
-case object IntAsBoolean extends Handler( (r, h) => h.integer(r) >= 1L)
-
-case object LongInt extends Handler( (r, h) => h.integer(r))
-
-case class Bulk[A](implicit parse: Parse[A]) extends Handler[Result[A]](
-  (r, h) => h.bulk(r).map(x => parse(x)))
-
-case class MultiBulk[A](implicit parse: Parse[A]) extends Handler[Result[Stream[Option[A]]]](
-  (r, h) => h.multibulk(r).map(_.map(_.map(x => parse(x)))))
-
-case class MultiBulkAsPairs[K, V](implicit parseK: Parse[K], parseV: Parse[V]) extends Handler[Result[Stream[(K, V)]]](
-  (r, h) => h.multibulk(r).map(_.grouped(2).collect { case Seq(Some(k), Some(v)) => (parseK(k), parseV(v)) }.toStream))
-
-case class MultiBulkWithScores[A](implicit parse: Parse[A]) extends Handler[Result[Stream[(A, Double)]]](
-  (r, h) => h.multibulk(r).map(_.grouped(2).collect { case Seq(Some(k), Some(v)) => (parse(k), new String(v).toDouble) }.toStream))
-
-case class MultiBulkAsFlat[A](implicit parse: Parse[A]) extends Handler[Result[Stream[A]]](
-  (r, h) => h.multibulk(r).map(_.flatMap(_.map(x => parse(x)))))
-
-class BaseHandlers {
-
-  private val lazyResults = new collection.mutable.Queue[Function0[Unit]]
-
-  def forceLazyResults { while (!lazyResults.isEmpty) { try { lazyResults.dequeue().apply } catch { case e => e } } }
-
-  def verify(in: String, expect: String): Unit =
-    if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
-
-  def parse(marker: Char, r: RedisStreamReader): String = {
-    val reply = r.readReply
-    val m = reply(0).toChar
-    val result = new String(reply, 1, reply.size - 1)
-    if (m == marker) {
-      result
-    } else {
-      if (m == '-') {
-        throw new RedisErrorException(result)
-      } else {
-        throw new RedisProtocolException("Expected a '" + marker + "' reply, got " + m + result)
-      }
-    }
+*/
+case object NoHandler extends Handler[Unit] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    future foreach (_.completeWithException( new Exception("Can't handle reply")))
+    Nil
   }
+}
 
-  def status(r: RedisStreamReader): String = parse('+', r)
-
-  def integer(r: RedisStreamReader): Long = parse(':', r).toLong
-
-  def bulk(r: RedisStreamReader): Result[Array[Byte]] = {
-    val res = Result{ parse('$', r).toInt match {
-      case -1 => throw new NoSuchElementException
-      case l => r.readBulk(l)
-    }}
-    lazyResults enqueue (() => res.force)
-    res
+case object Status extends Handler[String] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, string(data))
+    Nil
   }
+}
 
-  def multibulk(r: RedisStreamReader): Result[Stream[Option[Array[Byte]]]] = {
-    val res = Result{ parse('*', r).toInt match {
-      case -1 => throw new java.util.NoSuchElementException
-      case n => Stream.fill[Option[Array[Byte]]](n)(bulk(r).toOption)
-    }}
-    lazyResults enqueue (() => res.map(_.force).force)
-    res
+case object OkStatus extends Handler[Unit] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, verify(string(data), "OK"))
+    Nil
   }
+}
 
-  def multiexec(r: RedisStreamReader, handlers: Seq[Handler[_]]): Result[Stream[_]] = {
-    val res = Result{ parse('*', r).toInt match {
-      case -1 => throw new java.util.NoSuchElementException
-      case n => handlers.toStream.map{h => h(r, this)}
-    }}
-    lazyResults enqueue (() => res.map(_.force).force)
-    res
+case object QueuedStatus extends Handler[Unit] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, verify(string(data), "QUEUED"))
+    Nil
+  }
+}
+
+case object ShortInt extends Handler[Int] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, string(data).toInt)
+    Nil
+  }
+}
+
+case object LongInt extends Handler[Long] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, string(data).toLong)
+    Nil
+  }
+}
+
+case object IntAsBoolean extends Handler[Boolean] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, string(data).toInt >= 1)
+    Nil
+  }
+}
+
+case class Bulk[A](implicit parse: Parse[A]) extends Handler[Option[A]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    complete(future, Some(parse(data)))
+    Nil
+  }
+}
+
+case class MultiBulk[A](implicit parse: Parse[A]) extends Handler[Option[Stream[Option[A]]]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
+    complete(future, Some(futures.collect{case Some(f) => f.await.result}.collect{case Some(Result(v)) => v}))
+    futures.map(f => (Bulk[A](), f))
+  }
+}
+
+case class MultiBulkAsPairs[K, V](implicit parseK: Parse[K], parseV: Parse[V]) extends Handler[Option[Stream[(K, V)]]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
+    complete(future, Some(futures.collect{case Some(f) => f.await.result}.grouped(2).collect{case Seq(Some(Result(Some(k))), Some(Result(Some(v)))) => (k, v)}.toStream))
+    Stream.continually(Stream(Bulk[K](), Bulk[V]())).flatten.zip(futures).map{ case (h,f) => (h, f)}
+  }
+}
+
+case class MultiBulkWithScores[A](implicit parse: Parse[A]) extends Handler[Option[Stream[(A, Double)]]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
+    complete(future, Some(futures.collect{case Some(f) => f.await.result}.grouped(2).collect{case Seq(Some(Result(Some(k))), Some(Result(Some(v)))) => (k, v)}.toStream))
+    Stream.continually(Stream(Bulk[A](), Bulk[Double]())).flatten.zip(futures).map{ case (h,f) => (h, f)}
+  }
+}
+
+case class MultiBulkAsFlat[A](implicit parse: Parse[A]) extends Handler[Option[Stream[A]]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
+    complete(future, Some(futures.collect{case Some(f) => f.await.result}.collect{case Some(Result(Some(v))) => v}))
+    futures.map(f => (Bulk[A](), f))
   }
 }

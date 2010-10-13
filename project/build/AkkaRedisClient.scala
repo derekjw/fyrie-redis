@@ -1,9 +1,12 @@
 import sbt._
 import sbt.CompileOrder._
 
-class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with AkkaBaseProject
+class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with AkkaBaseProject with Boilerplate
 {
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
+
+  override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala
+  override def compileAction = super.compileAction dependsOn(generateSortTuple)
 
   val akkaActor = "se.scalablesolutions.akka" % "akka-actor_2.8.0"  % "1.0-SNAPSHOT"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"

@@ -1,6 +1,5 @@
 package net.fyrie
 package redis
-package akka
 package messages
 
 import handlers.{Handler}
