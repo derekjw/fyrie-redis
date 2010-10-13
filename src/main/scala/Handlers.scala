@@ -11,7 +11,6 @@ abstract class Handler[A] {
 
   def verify(in: String, expect: String): Unit =
     if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
-//    if (in != expect) throw new RedisProtocolException(in)
 
   def string(in: Array[Byte]): String = new String(in, "UTF-8")
 
