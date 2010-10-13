@@ -10,8 +10,8 @@ abstract class Handler[A] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]): Seq[(Handler[_], Option[CompletableFuture[Any]])]
 
   def verify(in: String, expect: String): Unit =
-    if (in != expect) throw new RedisProtocolException(in)
-//    if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
+    if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
+//    if (in != expect) throw new RedisProtocolException(in)
 
   def string(in: Array[Byte]): String = new String(in, "UTF-8")
 
