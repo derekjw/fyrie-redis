@@ -86,7 +86,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
         case count: Int =>
           log.debug("IO: read "+count)
           readBuf.flip
-          readHandler.apply
+          while (readHandler.apply) ()
       }
   }
 
@@ -132,13 +132,13 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
   }
 
   abstract class ReadHandler {
-    def apply: Unit
+    def apply: Boolean
   }
 
   var readHandler: ReadHandler = Idle
 
   object Idle extends ReadHandler {
-    def apply {
+    def apply = {
       if (readBuf.remaining > 0) {
         readHandler = readBuf.get.toChar match {
           case '+' => ReadString
@@ -148,8 +148,8 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
           case '*' => ReadMultiBulk
           case x => error("Invalid Byte: "+x.toByte)
         }
-        readHandler.apply
-      }
+        true
+      } else false
     }
   }
 
@@ -175,35 +175,35 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
   }
 
   object ReadString extends ReadHandler {
-    def apply {
-      readSingleLine foreach { (data) =>
+    def apply = {
+      readSingleLine map { (data) =>
         processResponse(data)
         readHandler = Idle
-        readHandler.apply
-      }
+        true
+      } getOrElse false
     }
   }
 
   object ReadError extends ReadHandler {
-    def apply {
-      readSingleLine foreach { (data) =>
+    def apply = {
+      readSingleLine map { (data) =>
         errorResponse(data)
         readHandler = Idle
-        readHandler.apply
-      }
+        true
+      } getOrElse false
     }
   }
 
   object ReadBulk extends ReadHandler {
-    def apply {
-      readSingleLine foreach { (data) =>
+    def apply = {
+      readSingleLine map { (data) =>
         val size = new String(data, "UTF-8").toInt
         readHandler = if (size > -1) (new ReadBulkData(size)) else {
           notFoundResponse
           Idle
         }
-        readHandler.apply
-      }
+        true
+      } getOrElse false
     }
   }
 
@@ -221,7 +221,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
       readBuf = buf
     }
     
-    def apply {
+    def apply = {
       if (size <= readBuf.remaining) {
         val data = if (tempBuffer) {
           log.debug("IO: Releasing temporary buffer")
@@ -235,30 +235,30 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
         }
         processResponse(data)
         readHandler = ReadEOL
-        readHandler.apply
-      }
+        true
+      } else false
     }
   }
 
   object ReadEOL extends ReadHandler {
-    def apply {
+    def apply = {
       if (readBuf.remaining >= 2) {
         if (readBuf.get(readBuf.position) == EOL(0) && readBuf.get(readBuf.position + 1) == EOL(1)) {
           readBuf.position(readBuf.position + 2)
           readHandler = Idle
-          readHandler.apply
-        }
-      }
+          true
+        } else false
+      } else false
     }
   }
 
   object ReadMultiBulk extends ReadHandler {
-    def apply {
-      readSingleLine foreach { (data) =>
+    def apply = {
+      readSingleLine map { (data) =>
         processResponse(data)
         readHandler = Idle
-        readHandler.apply
-      }
+        true
+      } getOrElse false
     }
   }
 
