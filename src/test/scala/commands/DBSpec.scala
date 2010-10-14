@@ -96,10 +96,10 @@ class OperationsSpec extends Spec
       r send expire("anshin-3", 1000) should equal(false)
     }
   }
-/*
+
   describe("Multi exec commands") {
     it("should work with single commands") {
-      r send multiexec(Seq(set("testkey1", "testvalue1"))) should be(Result(List(())))
+      r send multiexec(Seq(set("testkey1", "testvalue1"))) should be(Some(List(Result(()))))
     }
     it("should work with several commands") {
       r send multiexec(Seq(
@@ -107,16 +107,16 @@ class OperationsSpec extends Spec
         dbsize,
         set("testkey2", "testvalue2"),
         dbsize,
-        mget(Seq("testkey1", "testkey2")))) should be(Result(List((), 1, (), 2, Result(List(Some("testvalue1"), Some("testvalue2"))))))
+        mget(Seq("testkey1", "testkey2")))) should be(Some(List(Result(()), Result(1), Result(()), Result(2), Result(Some(List(Some("testvalue1"), Some("testvalue2")))))))
     }
     it("should survive an error") {
       r send multiexec(Seq(
         set("a", "abc"),
         lpop("a"),
-        get("a"))) should be(Result(List((), Error(new RedisErrorException("ERR Operation against a key holding the wrong kind of value")), Result("abc"))))
+        get("a"))) should be(Some(List(Result(()), Error(new RedisErrorException("ERR Operation against a key holding the wrong kind of value")), Result(Some("abc")))))
     }
   }
-*/
+
   describe("sort") {
     it("should do a simple sort") {
       List(6, 3, 5, 47, 1, 1, 4, 9) foreach (r send lpush("sortlist", _))

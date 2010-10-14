@@ -24,15 +24,22 @@ abstract class Handler[A] {
     }
 }
 
-/*
-case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Option[Stream[_]]]({ (r, h) =>
-  OkStatus(r, h)
-  // Need some kind of protection against protocol exceptions, like the following, but need a way of testing:
-  // handlers.filter{x => try{QueuedStatus(r); true} catch {case e: RedisProtocolException => false}}
-  handlers.foreach(x => QueuedStatus(r, h))
-  h.multiexec(r, handlers)
-})
-*/
+
+case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Option[Stream[_]]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    OkStatus(data, None)
+    val futures = Stream.fill[Option[CompletableFuture[Any]]](handlers.length)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
+    complete(future, Some(futures.collect{case Some(f) => f.await.result}.collect{case Some(v) => v}))
+    Stream.fill(handlers.length)(QueuedStatus).foldLeft(Stream[(Handler[_], Option[CompletableFuture[Any]])]((MultiExecResult(handlers.toStream zip futures), future))){ case (s, h) => (h, None) #:: s }
+  }
+}
+
+case class MultiExecResult(hfs: Seq[(Handler[_], Option[CompletableFuture[Any]])]) extends Handler[Option[Stream[_]]] {
+  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
+    hfs
+  }
+}
+
 case object NoHandler extends Handler[Unit] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     future foreach (_.completeWithException( new Exception("Can't handle reply")))

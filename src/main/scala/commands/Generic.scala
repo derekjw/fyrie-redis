@@ -233,7 +233,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/MultiExecCommand">Redis Command Reference</a>
    */
-/*  case class multiexec(commands: Seq[Command[_]]) extends Command(MultiExec(commands.map(_.handler))) {
+  case class multiexec(commands: Seq[Command[_]]) extends Command(MultiExec(commands.map(_.handler))) {
     override def toBytes = {
       val b = new ArrayBuilder.ofByte
       b ++= create(Seq("MULTI".getBytes))
@@ -241,7 +241,7 @@ trait GenericCommands {
       b ++= create(Seq("EXEC".getBytes))
       b.result
     }
-  }*/
+  }
 }
 
 trait SortTupled {
