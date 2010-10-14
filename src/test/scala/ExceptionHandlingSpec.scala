@@ -10,7 +10,7 @@ class ExceptionHandlingSpec extends Specification {
 
   val empty = new Context {
     before {
-      r = new RedisClient("localhost", 16379)
+      r = new RedisClient
       r send flushdb
     }
     after {

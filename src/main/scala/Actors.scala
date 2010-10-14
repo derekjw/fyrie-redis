@@ -10,6 +10,7 @@ import se.scalablesolutions.akka.actor.{Actor, ActorRef, FSM}
 import Actor.{actorOf}
 import se.scalablesolutions.akka.config.{AllForOneStrategy}
 import se.scalablesolutions.akka.config.ScalaConfig.{LifeCycle, Permanent}
+import se.scalablesolutions.akka.config.Config._
 
 import se.scalablesolutions.akka.dispatch._
 
@@ -24,8 +25,13 @@ import java.net.InetSocketAddress
 import scala.collection.mutable
 import scala.collection.immutable
 
-class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSize: Int = 64*1024) extends Actor {
+class RedisClientSession(host: String, port: Int) extends Actor {
+
   self.dispatcher = Dispatchers.globalHawtDispatcher
+
+  val hawtPin = config.getBool("fyrie-redis.hawt-pin", false)
+  val bufferSize = config.getInt("fyrie-redis.buffer-size", 8192)
+  val bufferDirect = config.getBool("fyrie-redis.buffer-direct", false)
 
   var channel: SocketChannel = _
 
@@ -34,16 +40,23 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
 
   var closed = false
 
-  val writeQueue = new mutable.Queue[ByteBuffer]
+  var writeQueue = immutable.Queue.empty[ByteBuffer]
   val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
-  val sharedReadBuf = ByteBuffer.allocate(bufferSize)
-  sharedReadBuf.limit(0)
-  var readBuf = sharedReadBuf
-  val overflow = new mutable.Queue[Array[Byte]]
+
+  var readBufOverflowStream = Stream.continually{
+    val b = if (bufferDirect) ByteBuffer.allocateDirect(bufferSize) else ByteBuffer.allocate(bufferSize)
+    b.flip
+    b
+  }
+  var readBufStream = readBufOverflowStream
+  def readBuf = readBufStream.head
 
   override def preStart = {
     channel = SocketChannel.open()
+    if (hawtPin)
+      HawtDispatcher.pin(self)
     channel.configureBlocking(false)
+    log.debug("Connecting to host "+host+" on port " +port)
     channel.connect(new InetSocketAddress(host, port))
 
     writeSource = createSource(channel, SelectionKey.OP_WRITE, HawtDispatcher.queue(self))
@@ -55,6 +68,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
     readSource.setCancelHandler(^{ close })
 
     if (channel.isConnectionPending) channel.finishConnect
+    readSource.resume
   }
 
   override def postStop = {
@@ -78,10 +92,14 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
         case -1 => close
         case 0 if !readBuf.hasRemaining =>
           log.debug("IO: Buffer full")
-          readBuf.rewind
-          val ar = new Array[Byte](readBuf.remaining - 1)
-          readBuf.get(ar)
-          overflow += ar
+          val oldBuf = readBuf
+          readBufStream = readBufStream.tail
+          if (oldBuf.get(oldBuf.limit - 1) == EOL(0)) { // Don't separate an EOL
+            readBuf.compact
+            readBuf.put(EOL(0))
+            readBuf.flip
+            oldBuf.limit(oldBuf.limit - 1)
+          }
         case 0 => Unit
         case count: Int =>
           log.debug("IO: read "+count)
@@ -93,27 +111,30 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
   def write(): Unit = catchio {
     if (writeQueue.isEmpty) {
       writeSource.suspend
+      readSource.resume
     } else {
-      log.debug("IO: writing")
-      channel.write(writeQueue.toArray)
-      while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) (writeQueue.dequeue)
+      val count = channel.write(writeQueue.take(20).toArray)
+      log.debug("IO: wrote "+count)
+      writeQueue = writeQueue.dropWhile(!_.hasRemaining)
     }
   }
 
   def close() = {
     if( !closed ) {
       closed = true
-      println("CLOSED")
+      log.debug("CLOSED")
     }
   }
 
   def receive = {
     case Request(bytes, handler) =>
-      writeQueue += ByteBuffer.wrap(bytes)
+      writeQueue = writeQueue enqueue ByteBuffer.wrap(bytes)
       handlerQueue += ((handler, self.senderFuture))
-      readSource.resume
-      writeSource.resume
-      write
+      if (writeSource.isSuspended) {
+        readSource.suspend
+        writeSource.resume
+        write
+      } else (if (writeQueue.length > 20) write)
   }
 
   def processResponse(data: Array[Byte]) {
@@ -160,13 +181,16 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
       (0 to (readBuf.remaining - 2)) find (n =>
         readBuf.get(readBuf.position + n) == EOL(0) &&
         readBuf.get(readBuf.position + n + 1) == EOL(1)) map { n =>
-          val ar = new Array[Byte](overflow.foldLeft(n)(_ + _.length))
+          val overflow = readBufOverflowStream.takeWhile(!_.hasRemaining)
+          if (!overflow.isEmpty) log.debug("IO: Draining "+ overflow.length +" overflow buffers")
+          val ar = new Array[Byte](overflow.foldLeft(n)(_ + _.limit))
           var pos = 0
-          while (!overflow.isEmpty) {
-            val o = overflow.dequeue
-            Array.copy(o, 0, ar, pos, o.length)
-            pos += o.length
+          overflow foreach { o =>
+            o.flip
+            o.get(ar, pos, o.limit)
+            pos += o.limit
           }
+          readBufOverflowStream = readBufStream
           if (ar.length - pos > 0)
             readBuf.get(ar, pos, ar.length - pos)
           readBuf.position(readBuf.position + 2) // skip EOL
@@ -218,7 +242,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
       buf.limit(readBuf.remaining)
       readBuf.get(ar, 0, readBuf.remaining)
       readBuf.limit(0)
-      readBuf = buf
+      readBufStream = buf +: readBufStream
     }
     
     def apply = {
@@ -226,7 +250,7 @@ class RedisClientSession(host: String = "localhost", port: Int = 6379, bufferSiz
         val data = if (tempBuffer) {
           log.debug("IO: Releasing temporary buffer")
           val ar = readBuf.array
-          readBuf = sharedReadBuf
+          readBufStream = readBufStream.tail
           ar
         } else {
           val ar = new Array[Byte](size)

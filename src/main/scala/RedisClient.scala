@@ -8,9 +8,11 @@ import se.scalablesolutions.akka.dispatch.{Future, FutureTimeoutException}
 import se.scalablesolutions.akka.actor.{Actor,ActorRef}
 import Actor.{actorOf}
 import se.scalablesolutions.akka.dispatch._
+import se.scalablesolutions.akka.config.Config._
 
-class RedisClient(address: String = "localhost", port: Int = 6379) {
-  val actor = actorOf(new RedisClientSession(address, port)).start
+class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost"),
+                  port: Int = config.getInt("fyrie-redis.port", 6379)) {
+  val actor = actorOf(new RedisClientSession(host, port)).start
 
   def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None): Unit =
     actor ! Request(command.toBytes, command.handler)
