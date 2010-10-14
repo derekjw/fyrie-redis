@@ -27,7 +27,7 @@ trait Boilerplate {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          """|case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Result[Stream[(%s)]]] {
+          """|case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Option[Stream[(%s)]]] {
              |  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
              |    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
              |    complete(future, Some(futures.collect{case Some(f) => f.await.result}.grouped(%d).collect{case Seq(%s) => (%s)}.toStream))
