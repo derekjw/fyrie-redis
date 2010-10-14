@@ -133,7 +133,6 @@ class RedisClientSession(host: String, port: Int) extends Actor {
       if (writeSource.isSuspended) {
         readSource.suspend
         writeSource.resume
-        write
       } else (if (writeQueue.length > 20) write)
   }
 
