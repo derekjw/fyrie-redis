@@ -9,6 +9,10 @@ import se.scalablesolutions.akka.actor.{Actor,ActorRef}
 import Actor.{actorOf}
 import se.scalablesolutions.akka.dispatch._
 
+case class RedisErrorException(message: String) extends RuntimeException(message)
+case class RedisProtocolException(message: String) extends RuntimeException(message)
+case class RedisConnectionException(message: String) extends RuntimeException(message)
+
 class RedisClient(address: String = "localhost", port: Int = 6379) {
   val actor = actorOf(new RedisClientSession(address, port)).start
 
