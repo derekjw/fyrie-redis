@@ -2,7 +2,7 @@
 
 ## Key features of the library
 
-- All commands are pipelined.
+- All commands are pipelined asynchronously.
 - User defined formatting of commands and parsing of replies, defaulting to Strings.
 - Uses nonblocking IO and actors for increased throughput and responsiveness while minimizing the use of threads and sockets.
 
