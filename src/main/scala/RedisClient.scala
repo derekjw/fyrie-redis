@@ -2,7 +2,7 @@ package net.fyrie
 package redis
 
 import actors.{RedisClientSession}
-import messages.{Request, Stats}
+import messages.{Request}
 
 import se.scalablesolutions.akka.dispatch.{Future, FutureTimeoutException}
 import se.scalablesolutions.akka.actor.{Actor,ActorRef}
@@ -37,8 +37,6 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
     if (future.exception.isDefined) throw future.exception.get
     else future.result.get.get
   }
-
-  def stats(reset: Boolean = false): Option[Map[Symbol, (Long, Long, Long, Long)]] = (actor !!! Stats(reset)).await.result
 
   def stop = actor.stop
 
