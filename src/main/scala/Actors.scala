@@ -41,7 +41,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   var closed = false
 
   var writeQueue = immutable.Queue.empty[ByteBuffer]
-  var handlerQueue = immutable.Queue.empty[(Handler[_], Option[CompletableFuture[Any]])]
+  val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
 
   var readBufOverflowStream = Stream.continually{
     val b = if (bufferDirect) ByteBuffer.allocateDirect(bufferSize) else ByteBuffer.allocate(bufferSize)
@@ -129,7 +129,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   def receive = {
     case Request(bytes, handler) =>
       writeQueue = writeQueue enqueue ByteBuffer.wrap(bytes)
-      handlerQueue = handlerQueue enqueue ((handler, self.senderFuture))
+      handlerQueue += ((handler, self.senderFuture))
       if (writeSource.isSuspended) {
         readSource.suspend
         writeSource.resume
@@ -137,19 +137,17 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   }
 
   def processResponse(data: Array[Byte]) {
-    val ((handler, future), newQ) = handlerQueue.dequeue
-    handlerQueue = handler(data, future).reverse.foldLeft(newQ){ case (q,h) => h +: q}
+    val (handler, future) = handlerQueue.dequeue
+    handler(data, future).reverse.foreach( _ +=: handlerQueue)
   }
 
   def notFoundResponse {
-    val ((handler, future), newQ) = handlerQueue.dequeue
-    handlerQueue = newQ
+    val (handler, future) = handlerQueue.dequeue
     future foreach (_.completeWithResult(Result(None)))
   }
 
   def errorResponse(data: Array[Byte]) {
-    val ((handler, future), newQ) = handlerQueue.dequeue
-    handlerQueue = newQ
+    val (handler, future) = handlerQueue.dequeue
     future foreach (_.completeWithResult(Error(new RedisErrorException(new String(data, "UTF-8")))))
   }
 
