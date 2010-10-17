@@ -32,6 +32,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   val hawtPin = config.getBool("fyrie-redis.hawt-pin", false)
   val bufferSize = config.getInt("fyrie-redis.buffer-size", 8192)
   val bufferDirect = config.getBool("fyrie-redis.buffer-direct", false)
+  val logStats = config.getBool("fyrie-redis.log-stats", false)
 
   var channel: SocketChannel = _
 
@@ -50,6 +51,18 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   }
   var readBufStream = readBufOverflowStream
   def readBuf = readBufStream.head
+
+  def logTime[T](counter: Symbol)(f: => T): T = {
+    if (logStats) {
+      val startTime = System.nanoTime
+      val result = f
+      val endTime = System.nanoTime
+      logTimes.getOrElseUpdate(counter, new mutable.Queue).enqueue((startTime -> endTime))
+      result
+    } else f
+  }
+
+  val logTimes = mutable.Map.empty[Symbol, mutable.Queue[(Long, Long)]]
 
   override def preStart = {
     channel = SocketChannel.open()
@@ -88,7 +101,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
 
   def read(): Unit = catchio {
       readBuf.compact
-      channel.read(readBuf) match {
+      logTime('Read)(channel.read(readBuf)) match {
         case -1 => close
         case 0 if !readBuf.hasRemaining =>
           log.debug("IO: Buffer full")
@@ -104,18 +117,19 @@ class RedisClientSession(host: String, port: Int) extends Actor {
         case count: Int =>
           log.debug("IO: read "+count)
           readBuf.flip
-          while (readHandler.apply) ()
+          while (logTime('ReadHandler)(readHandler.apply)) ()
       }
   }
 
   def write(): Unit = catchio {
     if (writeQueue.isEmpty) {
       writeSource.suspend
-      readSource.resume
     } else {
-      val count = channel.write(writeQueue.take(20).toArray)
-      log.debug("IO: wrote "+count)
-      while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) writeQueue.dequeue
+      logTime('Write){
+        val count = channel.write(writeQueue.take(20).toArray)
+        log.debug("IO: wrote "+count)
+        while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) writeQueue.dequeue
+      }
     }
   }
 
@@ -128,17 +142,33 @@ class RedisClientSession(host: String, port: Int) extends Actor {
 
   def receive = {
     case Request(bytes, handler) =>
+      logTime('Receive){
       writeQueue += ByteBuffer.wrap(bytes)
       handlerQueue += ((handler, self.senderFuture))
       if (writeSource.isSuspended) {
-        readSource.suspend
         writeSource.resume
       } else (if (writeQueue.length > 20) write)
+      }
+
+    case Stats(reset) =>
+      val results = (logTimes.foldLeft(Map.empty[Symbol, (Long, Long, Long, Long)]){ case (stats, (k, v)) =>
+        val length = v.length
+        val durations = v.map{case (s, e) => (e - s).toDouble / 1000}
+        val total = durations.reduceLeft( _ + _ )
+        val avg = total / length
+        val stdev = math.sqrt(durations.map{d => math.pow(avg - d, 2)}.sum / (length - 1))
+        log.debug("Event: %12s Count: %8d Total: %8d Avg: %8d Stdev: %8d" format (k, length, total.toLong, avg.toLong, stdev.toLong))
+        stats + (k -> (length, total.toLong, avg.toLong, stdev.toLong))
+      })
+      self reply_? results
+      if (reset) logTimes.clear
   }
 
   def processResponse(data: Array[Byte]) {
-    val (handler, future) = handlerQueue.dequeue
-    handler(data, future).reverse.foreach( _ +=: handlerQueue)
+    logTime('ProcessResponse){
+      val (handler, future) = handlerQueue.dequeue
+      handler(data, future).reverse.foreach( _ +=: handlerQueue)
+    }
   }
 
   def notFoundResponse {
@@ -176,6 +206,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   val EOL = Array(13.toByte, 10.toByte)
 
   def readSingleLine: Option[Array[Byte]] = {
+    logTime('ReadSingleLine){
     if (readBuf.remaining < 2) None else
       (0 to (readBuf.remaining - 2)) find (n =>
         readBuf.get(readBuf.position + n) == EOL(0) &&
@@ -195,6 +226,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
           readBuf.position(readBuf.position + 2) // skip EOL
           ar
         }
+    }
   }
 
   object ReadString extends ReadHandler {
