@@ -40,7 +40,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
 
   var closed = false
 
-  var writeQueue = immutable.Queue.empty[ByteBuffer]
+  val writeQueue = new mutable.Queue[ByteBuffer]
   val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
 
   var readBufOverflowStream = Stream.continually{
@@ -115,7 +115,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
     } else {
       val count = channel.write(writeQueue.take(20).toArray)
       log.debug("IO: wrote "+count)
-      writeQueue = writeQueue.dropWhile(!_.hasRemaining)
+      while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) writeQueue.dequeue
     }
   }
 
@@ -128,7 +128,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
 
   def receive = {
     case Request(bytes, handler) =>
-      writeQueue = writeQueue enqueue ByteBuffer.wrap(bytes)
+      writeQueue += ByteBuffer.wrap(bytes)
       handlerQueue += ((handler, self.senderFuture))
       if (writeSource.isSuspended) {
         readSource.suspend
