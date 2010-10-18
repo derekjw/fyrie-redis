@@ -56,7 +56,7 @@ class StringOperationsSpec extends Spec
       r send set("anshin-2", "debasish")
       try {
         r send incr("anshin-2")
-      } catch { case ex => ex.getMessage should equal("ERR value is not an integer") }
+      } catch { case ex => ex.getMessage should startWith("ERR value is not an integer") }
     }
     it("should increment by 5 for a key that contains a number") {
       r send set("anshin-3", "10")
@@ -66,7 +66,7 @@ class StringOperationsSpec extends Spec
       r send set("anshin-4", "debasish")
       try {
         r send incrby("anshin-4", 5)
-      } catch { case ex => ex.getMessage should equal("ERR value is not an integer") }
+      } catch { case ex => ex.getMessage should startWith("ERR value is not an integer") }
     }
   }
 
@@ -79,7 +79,7 @@ class StringOperationsSpec extends Spec
       r send set("anshin-2", "debasish")
       try {
         r send decr("anshin-2")
-      } catch { case ex => ex.getMessage should equal("ERR value is not an integer") }
+      } catch { case ex => ex.getMessage should startWith("ERR value is not an integer") }
     }
     it("should decrement by 5 for a key that contains a number") {
       r send set("anshin-3", "10")
@@ -89,7 +89,7 @@ class StringOperationsSpec extends Spec
       r send set("anshin-4", "debasish")
       try {
         r send decrby("anshin-4", 5)
-      } catch { case ex => ex.getMessage should equal("ERR value is not an integer") }
+      } catch { case ex => ex.getMessage should startWith("ERR value is not an integer") }
     }
   }
 
