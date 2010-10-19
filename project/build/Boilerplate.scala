@@ -31,7 +31,7 @@ trait Boilerplate {
              |  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
              |    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
              |    complete(future, Some(futures.collect{case Some(f) => f.await.result}.grouped(%d).collect{case Seq(%s) => (%s)}.toStream))
-             |    Stream.continually(Stream(%s)).flatten.zip(futures).map{ case (h,f) => (h, f)}
+             |    Stream.continually(Stream(%s)).flatten.zip(futures)
              |  }
              |}
              |""".stripMargin.format(arity,

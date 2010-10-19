@@ -14,7 +14,7 @@ abstract class Handler[A] {
 
   def string(in: Array[Byte]): String = new String(in, "UTF-8")
 
-  def complete[A](future: Option[CompletableFuture[Any]], value: => A) =
+  def complete(future: Option[CompletableFuture[Any]], value: => Any) =
     future foreach { f =>
       try {
         f.completeWithResult(Result(value))
@@ -25,7 +25,7 @@ abstract class Handler[A] {
 }
 
 
-case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Option[Stream[_]]] {
+final case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Option[Stream[_]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     OkStatus(data, None)
     val futures = Stream.fill[Option[CompletableFuture[Any]]](handlers.length)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
@@ -34,7 +34,7 @@ case class MultiExec(handlers: Seq[Handler[_]]) extends Handler[Option[Stream[_]
   }
 }
 
-case class MultiExecResult(hfs: Seq[(Handler[_], Option[CompletableFuture[Any]])]) extends Handler[Option[Stream[_]]] {
+final case class MultiExecResult(hfs: Seq[(Handler[_], Option[CompletableFuture[Any]])]) extends Handler[Option[Stream[_]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     hfs
   }
@@ -89,38 +89,38 @@ case object IntAsBoolean extends Handler[Boolean] {
   }
 }
 
-case class Bulk[A](implicit parse: Parse[A]) extends Handler[Option[A]] {
+final case class Bulk[A](implicit parse: Parse[A]) extends Handler[Option[A]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     complete(future, Some(parse(data)))
     Nil
   }
 }
 
-case class MultiBulk[A](implicit parse: Parse[A]) extends Handler[Option[Stream[Option[A]]]] {
+final case class MultiBulk[A](implicit parse: Parse[A]) extends Handler[Option[Stream[Option[A]]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
-    complete(future, Some(futures.collect{case Some(f) => f.await.result}.collect{case Some(Result(v)) => v}))
+    complete(future, Some(futures.flatMap(_.flatMap(_.await.result)).flatMap{case Result(v) => Some(v); case _ => None}))
     futures.map(f => (Bulk[A](), f))
   }
 }
 
-case class MultiBulkAsPairs[K, V](implicit parseK: Parse[K], parseV: Parse[V]) extends Handler[Option[Stream[(K, V)]]] {
+final case class MultiBulkAsPairs[K, V](implicit parseK: Parse[K], parseV: Parse[V]) extends Handler[Option[Stream[(K, V)]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
     complete(future, Some(futures.collect{case Some(f) => f.await.result}.grouped(2).collect{case Seq(Some(Result(Some(k))), Some(Result(Some(v)))) => (k, v)}.toStream))
-    Stream.continually(Stream(Bulk[K](), Bulk[V]())).flatten.zip(futures).map{ case (h,f) => (h, f)}
+    Stream.continually(Stream(Bulk[K](), Bulk[V]())).flatten.zip(futures)
   }
 }
 
-case class MultiBulkWithScores[A](implicit parse: Parse[A]) extends Handler[Option[Stream[(A, Double)]]] {
+final case class MultiBulkWithScores[A](implicit parse: Parse[A]) extends Handler[Option[Stream[(A, Double)]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
     complete(future, Some(futures.collect{case Some(f) => f.await.result}.grouped(2).collect{case Seq(Some(Result(Some(k))), Some(Result(Some(v)))) => (k, v)}.toStream))
-    Stream.continually(Stream(Bulk[A](), Bulk[Double]())).flatten.zip(futures).map{ case (h,f) => (h, f)}
+    Stream.continually(Stream(Bulk[A](), Bulk[Double]())).flatten.zip(futures)
   }
 }
 
-case class MultiBulkAsFlat[A](implicit parse: Parse[A]) extends Handler[Option[Stream[A]]] {
+final case class MultiBulkAsFlat[A](implicit parse: Parse[A]) extends Handler[Option[Stream[A]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
     complete(future, Some(futures.collect{case Some(f) => f.await.result}.collect{case Some(Result(Some(v))) => v}))

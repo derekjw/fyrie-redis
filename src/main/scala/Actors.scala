@@ -4,12 +4,12 @@ package actors
 
 import messages._
 
-import handlers.{Handler}
+import handlers.{ Handler }
 
-import se.scalablesolutions.akka.actor.{Actor, ActorRef, FSM}
-import Actor.{actorOf}
-import se.scalablesolutions.akka.config.{AllForOneStrategy}
-import se.scalablesolutions.akka.config.ScalaConfig.{LifeCycle, Permanent}
+import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
+import Actor.{ actorOf }
+import se.scalablesolutions.akka.config.{ AllForOneStrategy }
+import se.scalablesolutions.akka.config.ScalaConfig.{ LifeCycle, Permanent }
 import se.scalablesolutions.akka.config.Config._
 
 import se.scalablesolutions.akka.dispatch._
@@ -17,7 +17,7 @@ import se.scalablesolutions.akka.dispatch._
 import org.fusesource.hawtdispatch._
 import org.fusesource.hawtdispatch.ScalaDispatch._
 
-import java.nio.channels.{SocketChannel, SelectionKey}
+import java.nio.channels.{ SocketChannel, SelectionKey }
 import java.nio.ByteBuffer
 import java.io.IOException
 import java.net.InetSocketAddress
@@ -25,7 +25,7 @@ import java.net.InetSocketAddress
 import scala.collection.mutable
 import scala.collection.immutable
 
-class RedisClientSession(host: String, port: Int) extends Actor {
+final class RedisClientSession(host: String, port: Int) extends Actor {
 
   self.dispatcher = Dispatchers.globalHawtDispatcher
 
@@ -43,7 +43,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   val writeQueue = new mutable.Queue[ByteBuffer]
   val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
 
-  var readBufOverflowStream = Stream.continually{
+  var readBufOverflowStream = Stream.continually {
     val b = if (bufferDirect) ByteBuffer.allocateDirect(bufferSize) else ByteBuffer.allocate(bufferSize)
     b.flip
     b
@@ -51,21 +51,23 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   var readBufStream = readBufOverflowStream
   def readBuf = readBufStream.head
 
+  var statLog: StatLog = NoStatLog
+
   override def preStart = {
     channel = SocketChannel.open()
     if (hawtPin)
       HawtDispatcher.pin(self)
     channel.configureBlocking(false)
-    log.debug("Connecting to host "+host+" on port " +port)
+    log.debug("Connecting to host " + host + " on port " + port)
     channel.connect(new InetSocketAddress(host, port))
 
     writeSource = createSource(channel, SelectionKey.OP_WRITE, HawtDispatcher.queue(self))
-    writeSource.setEventHandler(^{ write })
-    writeSource.setCancelHandler(^{ close })
+    writeSource.setEventHandler(^ { write })
+    writeSource.setCancelHandler(^ { close })
 
     readSource = createSource(channel, SelectionKey.OP_READ, HawtDispatcher.queue(self))
-    readSource.setEventHandler(^{ read })
-    readSource.setCancelHandler(^{ close })
+    readSource.setEventHandler(^ { read })
+    readSource.setCancelHandler(^ { close })
 
     if (channel.isConnectionPending) channel.finishConnect
     readSource.resume
@@ -87,39 +89,39 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   }
 
   def read(): Unit = catchio {
-      readBuf.compact
-      channel.read(readBuf) match {
-        case -1 => close
-        case 0 if !readBuf.hasRemaining =>
-          log.debug("IO: Buffer full")
-          val oldBuf = readBuf
-          readBufStream = readBufStream.tail
-          if (oldBuf.get(oldBuf.limit - 1) == EOL(0)) { // Don't separate an EOL
-            readBuf.compact
-            readBuf.put(EOL(0))
-            readBuf.flip
-            oldBuf.limit(oldBuf.limit - 1)
-          }
-        case 0 => Unit
-        case count: Int =>
-          log.debug("IO: read "+count)
+    statLog.log("buffer-compact")(readBuf.compact)
+    statLog.log("read")(channel.read(readBuf)) match {
+      case -1 => close
+      case 0 if !readBuf.hasRemaining =>
+        log.debug("IO: Buffer full")
+        val oldBuf = readBuf
+        readBufStream = readBufStream.tail
+        if (oldBuf.get(oldBuf.limit - 1) == EOL(0)) { // Don't separate an EOL
+          readBuf.compact
+          readBuf.put(EOL(0))
           readBuf.flip
-          while (readHandler.apply) ()
-      }
+          oldBuf.limit(oldBuf.limit - 1)
+        }
+      case 0 => Unit
+      case count: Int =>
+        log.debug("IO: read " + count)
+        readBuf.flip
+        while (readHandler.apply) ()
+    }
   }
 
   def write(): Unit = catchio {
     if (writeQueue.isEmpty) {
       writeSource.suspend
     } else {
-      val count = channel.write(writeQueue.take(20).toArray)
-      log.debug("IO: wrote "+count)
+      val count = statLog.log("write")(channel.write(writeQueue.take(20).toArray))
+      log.debug("IO: wrote " + count)
       while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) writeQueue.dequeue
     }
   }
 
   def close() = {
-    if( !closed ) {
+    if (!closed) {
       closed = true
       log.debug("CLOSED")
     }
@@ -132,11 +134,13 @@ class RedisClientSession(host: String, port: Int) extends Actor {
       if (writeSource.isSuspended) {
         writeSource.resume
       } else (if (writeQueue.length > 20) write)
+    case newStatLog: StatLog =>
+      statLog = newStatLog
   }
 
   def processResponse(data: Array[Byte]) {
     val (handler, future) = handlerQueue.dequeue
-    handler(data, future).reverse.foreach( _ +=: handlerQueue)
+    handler(data, future).reverse.foreach(_ +=: handlerQueue)
   }
 
   def notFoundResponse {
@@ -158,13 +162,15 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   object Idle extends ReadHandler {
     def apply = {
       if (readBuf.remaining > 0) {
-        readHandler = readBuf.get.toChar match {
-          case '+' => ReadString
-          case '-' => ReadError
-          case ':' => ReadString
-          case '$' => ReadBulk
-          case '*' => ReadMultiBulk
-          case x => error("Invalid Byte: "+x.toByte)
+        statLog.log("read-reply-marker") {
+          readHandler = readBuf.get.toChar match {
+            case '+' => ReadString
+            case '-' => ReadError
+            case ':' => ReadString
+            case '$' => ReadBulk
+            case '*' => ReadMultiBulk
+            case x => error("Invalid Byte: " + x.toByte)
+          }
         }
         true
       } else false
@@ -174,12 +180,13 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   val EOL = Array(13.toByte, 10.toByte)
 
   def readSingleLine: Option[Array[Byte]] = {
-    if (readBuf.remaining < 2) None else
-      (0 to (readBuf.remaining - 2)) find (n =>
-        readBuf.get(readBuf.position + n) == EOL(0) &&
-        readBuf.get(readBuf.position + n + 1) == EOL(1)) map { n =>
+    statLog.log("read-single-line") {
+      if (readBuf.remaining < 2) None else
+        (0 to (readBuf.remaining - 2)) find (n =>
+          readBuf.get(readBuf.position + n) == EOL(0) &&
+            readBuf.get(readBuf.position + n + 1) == EOL(1)) map { n =>
           val overflow = readBufOverflowStream.takeWhile(!_.hasRemaining)
-          if (!overflow.isEmpty) log.debug("IO: Draining "+ overflow.length +" overflow buffers")
+          if (!overflow.isEmpty) log.debug("IO: Draining " + overflow.length + " overflow buffers")
           val ar = new Array[Byte](overflow.foldLeft(n)(_ + _.limit))
           var pos = 0
           overflow foreach { o =>
@@ -193,12 +200,13 @@ class RedisClientSession(host: String, port: Int) extends Actor {
           readBuf.position(readBuf.position + 2) // skip EOL
           ar
         }
+    }
   }
 
   object ReadString extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        processResponse(data)
+        statLog.log("process-string")(processResponse(data))
         readHandler = Idle
         true
       } getOrElse false
@@ -231,7 +239,7 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   class ReadBulkData(val size: Int) extends ReadHandler {
 
     val tempBuffer = size > readBuf.capacity
-    
+
     if (tempBuffer) {
       log.debug("IO: Buffer too small, creating a temporary buffer for data")
       val buf = ByteBuffer.allocate(size)
@@ -241,20 +249,22 @@ class RedisClientSession(host: String, port: Int) extends Actor {
       readBuf.limit(0)
       readBufStream = buf +: readBufStream
     }
-    
+
     def apply = {
       if (size <= readBuf.remaining) {
-        val data = if (tempBuffer) {
-          log.debug("IO: Releasing temporary buffer")
-          val ar = readBuf.array
-          readBufStream = readBufStream.tail
-          ar
-        } else {
-          val ar = new Array[Byte](size)
-          readBuf.get(ar)
-          ar
+        statLog.log("process-bulk") {
+          val data = if (tempBuffer) {
+            log.debug("IO: Releasing temporary buffer")
+            val ar = readBuf.array
+            readBufStream = readBufStream.tail
+            ar
+          } else {
+            val ar = new Array[Byte](size)
+            readBuf.get(ar)
+            ar
+          }
+          processResponse(data)
         }
-        processResponse(data)
         readHandler = ReadEOL
         true
       } else false
@@ -276,11 +286,45 @@ class RedisClientSession(host: String, port: Int) extends Actor {
   object ReadMultiBulk extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        processResponse(data)
+        statLog.log("process-multibulk")(processResponse(data))
         readHandler = Idle
         true
       } getOrElse false
     }
   }
 
+}
+
+trait StatLog {
+  def log[T](name: String)(f: => T): T
+}
+
+object NoStatLog extends StatLog {
+  def log[T](name: String)(f: => T): T = f
+}
+
+class StatLogToActor(actor: ActorRef) extends StatLog {
+  def log[T](name: String)(f: => T): T = {
+    val startTime = System.nanoTime
+    val result = f
+    val endTime = System.nanoTime
+    actor ! (name, startTime, endTime)
+    result
+  }
+}
+
+class StatLogActor extends Actor {
+  self.dispatcher = Dispatchers.globalHawtDispatcher
+
+  var timeSplit = Map.empty[String, Double].withDefaultValue(0.0)
+
+  def receive = {
+    case (name: String, startTime: Long, endTime: Long) =>
+      timeSplit += name -> (timeSplit(name) + ((endTime - startTime).toDouble / 1000000.0))
+    case 'printTimeSplit =>
+      val total = timeSplit.values.sum
+      println(timeSplit.map { case (k, v) => (k, (100 * v / total).toInt) })
+    case 'resetStats =>
+      timeSplit = timeSplit.empty
+  }
 }
