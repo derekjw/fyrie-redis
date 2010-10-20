@@ -8,8 +8,6 @@ import handlers.{ Handler }
 
 import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
 import Actor.{ actorOf }
-import se.scalablesolutions.akka.config.{ AllForOneStrategy }
-import se.scalablesolutions.akka.config.ScalaConfig.{ LifeCycle, Permanent }
 import se.scalablesolutions.akka.config.Config._
 
 import se.scalablesolutions.akka.dispatch._
@@ -41,7 +39,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   var closed = false
 
   val writeQueue = new mutable.Queue[ByteBuffer]
-  val handlerQueue = new mutable.Queue[(Handler[_], Option[CompletableFuture[Any]])]
+  val handlerQueue = new mutable.Queue[(Handler[_,_], Option[CompletableFuture[Any]])]
 
   var readBufOverflowStream = Stream.continually {
     val b = if (bufferDirect) ByteBuffer.allocateDirect(bufferSize) else ByteBuffer.allocate(bufferSize)
@@ -145,12 +143,12 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
 
   def notFoundResponse {
     val (handler, future) = handlerQueue.dequeue
-    future foreach (_.completeWithResult(Result(None)))
+    future foreach (_.completeWithResult(None))
   }
 
   def errorResponse(data: Array[Byte]) {
     val (handler, future) = handlerQueue.dequeue
-    future foreach (_.completeWithResult(Error(new RedisErrorException(new String(data, "UTF-8")))))
+    future foreach (_.completeWithException(new RedisErrorException(new String(data, "UTF-8"))))
   }
 
   abstract class ReadHandler {

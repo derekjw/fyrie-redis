@@ -43,22 +43,22 @@ class RedisSet[A](name: String)(implicit conn: RedisClient, format: Format, pars
   def saddCmd(elem: A) = Commands.sadd(rediskey, elem)
   def sadd(elem: A): Boolean = conn send saddCmd(elem)
   def saddFast(elem: A): Unit = conn ! saddCmd(elem)
-  def saddFuture(elem: A): Future[Result[Boolean]] = conn !!! saddCmd(elem)
+  def saddFuture(elem: A): Future[Boolean] = conn !!! saddCmd(elem)
 
   def sremCmd(elem: A) = Commands.srem(rediskey, elem)
   def srem(elem: A): Boolean = conn send sremCmd(elem)
   def sremFast(elem: A): Unit = conn ! sremCmd(elem)
-  def sremFuture(elem: A): Future[Result[Boolean]] = conn !!! sremCmd(elem)
+  def sremFuture(elem: A): Future[Boolean] = conn !!! sremCmd(elem)
 
   def spopCmd = Commands.spop(rediskey)
   def spop: Option[A] = conn send spopCmd
   def spopFast: Unit = conn ! spopCmd
-  def spopFuture: Future[Result[Option[A]]] = conn !!! spopCmd
+  def spopFuture: Future[Option[A]] = conn !!! spopCmd
 
   def smoveCmd(dest: String, elem: A) = Commands.smove(rediskey, dest, elem)
   def smove(dest: String, elem: A): Boolean = conn send smoveCmd(dest, elem)
   def smoveFast(dest: String, elem: A): Unit = conn ! smoveCmd(dest, elem)
-  def smoveFuture(dest: String, elem: A): Future[Result[Boolean]] = conn !!! smoveCmd(dest, elem)
+  def smoveFuture(dest: String, elem: A): Future[Boolean] = conn !!! smoveCmd(dest, elem)
 
   def scardCmd = Commands.scard(rediskey)
   def scard: Long = conn send scardCmd

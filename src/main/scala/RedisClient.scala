@@ -34,10 +34,10 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
     actor ! NoStatLog
   }
 
-  def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None): Unit =
+  def !(command: Command[_,_])(implicit sender: Option[ActorRef] = None): Unit =
     actor ! Request(command.toBytes, command.handler)
 
-  def !![A](command: Command[A]): Option[Result[A]] = {
+  def !![A,B](command: Command[A,B]): Option[B] = {
     val future = this !!! command
     try {
       future.await
@@ -48,14 +48,14 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
     else future.result
   }
 
-  def !!![A](command: Command[A]): Future[Result[A]] =
-    actor !!! Request(command.toBytes, command.handler)
+  def !!![A,B](command: Command[A,B]): Future[B] =
+    (actor !!! Request(command.toBytes, command.handler)).map(command.handler.parseResult)
 
-  def send[A](command: Command[A]): A = {
+  def send[A,B](command: Command[A,B]): B = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get
-    else future.result.get.get
+    else future.result.get
   }
 
   def stop = {

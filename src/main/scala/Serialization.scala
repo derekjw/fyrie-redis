@@ -35,7 +35,7 @@ package serialization {
     implicit val parseDefault = Parse[String](new String(_, "UTF-8"))
   }
 
-  class Parse[A](val fromBinary: (Array[Byte]) => A) {
+  class Parse[A](val fromBinary: (Array[Byte]) => A) extends Function1[Array[Byte], A] {
     def apply(in: Array[Byte]): A = fromBinary(in)
   }
 

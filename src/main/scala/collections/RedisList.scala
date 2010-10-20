@@ -48,9 +48,9 @@ class RedisList[A](name: String)(implicit conn: RedisClient, format: Format, par
 
   def rpop: A = conn send Commands.rpop(key) getOrElse (throw new NoSuchElementException)
 
-  def lpopFuture: Future[Result[Option[A]]] = conn !!! Commands.lpop(key)
+  def lpopFuture: Future[Option[A]] = conn !!! Commands.lpop(key)
 
-  def rpopFuture: Future[Result[Option[A]]] = conn !!! Commands.rpop(key)
+  def rpopFuture: Future[Option[A]] = conn !!! Commands.rpop(key)
 
   override def toString: String = "RedisList("+name+")"
 
