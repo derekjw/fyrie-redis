@@ -49,8 +49,6 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   var readBufStream = readBufOverflowStream
   def readBuf = readBufStream.head
 
-  var statLog: StatLog = NoStatLog
-
   override def preStart = {
     channel = SocketChannel.open()
     if (hawtPin)
@@ -87,8 +85,8 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   }
 
   def read(): Unit = catchio {
-    statLog.log("buffer-compact")(readBuf.compact)
-    statLog.log("read")(channel.read(readBuf)) match {
+    readBuf.compact
+    channel.read(readBuf) match {
       case -1 => close
       case 0 if !readBuf.hasRemaining =>
         log.debug("IO: Buffer full")
@@ -112,7 +110,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     if (writeQueue.isEmpty) {
       writeSource.suspend
     } else {
-      val count = statLog.log("write")(channel.write(writeQueue.take(20).toArray))
+      val count = channel.write(writeQueue.take(10).toArray)
       log.debug("IO: wrote " + count)
       while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) writeQueue.dequeue
     }
@@ -131,9 +129,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
       handlerQueue += ((handler, self.senderFuture))
       if (writeSource.isSuspended) {
         writeSource.resume
-      } else (if (writeQueue.length > 20) write)
-    case newStatLog: StatLog =>
-      statLog = newStatLog
+      }
   }
 
   def processResponse(data: Array[Byte]) {
@@ -160,7 +156,6 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   object Idle extends ReadHandler {
     def apply = {
       if (readBuf.remaining > 0) {
-        statLog.log("read-reply-marker") {
           readHandler = readBuf.get.toChar match {
             case '+' => ReadString
             case '-' => ReadError
@@ -169,7 +164,6 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
             case '*' => ReadMultiBulk
             case x => error("Invalid Byte: " + x.toByte)
           }
-        }
         true
       } else false
     }
@@ -178,7 +172,6 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   val EOL = Array(13.toByte, 10.toByte)
 
   def readSingleLine: Option[Array[Byte]] = {
-    statLog.log("read-single-line") {
       if (readBuf.remaining < 2) None else
         (0 to (readBuf.remaining - 2)) find (n =>
           readBuf.get(readBuf.position + n) == EOL(0) &&
@@ -198,13 +191,12 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
           readBuf.position(readBuf.position + 2) // skip EOL
           ar
         }
-    }
   }
 
   object ReadString extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        statLog.log("process-string")(processResponse(data))
+        processResponse(data)
         readHandler = Idle
         true
       } getOrElse false
@@ -250,19 +242,17 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
 
     def apply = {
       if (size <= readBuf.remaining) {
-        statLog.log("process-bulk") {
-          val data = if (tempBuffer) {
-            log.debug("IO: Releasing temporary buffer")
-            val ar = readBuf.array
-            readBufStream = readBufStream.tail
-            ar
-          } else {
-            val ar = new Array[Byte](size)
-            readBuf.get(ar)
-            ar
-          }
-          processResponse(data)
+        val data = if (tempBuffer) {
+          log.debug("IO: Releasing temporary buffer")
+          val ar = readBuf.array
+          readBufStream = readBufStream.tail
+          ar
+        } else {
+          val ar = new Array[Byte](size)
+          readBuf.get(ar)
+          ar
         }
+        processResponse(data)
         readHandler = ReadEOL
         true
       } else false
@@ -284,45 +274,11 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   object ReadMultiBulk extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        statLog.log("process-multibulk")(processResponse(data))
+        processResponse(data)
         readHandler = Idle
         true
       } getOrElse false
     }
   }
 
-}
-
-trait StatLog {
-  def log[T](name: String)(f: => T): T
-}
-
-object NoStatLog extends StatLog {
-  def log[T](name: String)(f: => T): T = f
-}
-
-class StatLogToActor(actor: ActorRef) extends StatLog {
-  def log[T](name: String)(f: => T): T = {
-    val startTime = System.nanoTime
-    val result = f
-    val endTime = System.nanoTime
-    actor ! (name, startTime, endTime)
-    result
-  }
-}
-
-class StatLogActor extends Actor {
-  self.dispatcher = Dispatchers.globalHawtDispatcher
-
-  var timeSplit = Map.empty[String, Double].withDefaultValue(0.0)
-
-  def receive = {
-    case (name: String, startTime: Long, endTime: Long) =>
-      timeSplit += name -> (timeSplit(name) + ((endTime - startTime).toDouble / 1000000.0))
-    case 'printTimeSplit =>
-      val total = timeSplit.values.sum
-      println(timeSplit.map { case (k, v) => (k, (100 * v / total).toInt) })
-    case 'resetStats =>
-      timeSplit = timeSplit.empty
-  }
 }

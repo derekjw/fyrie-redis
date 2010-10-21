@@ -14,26 +14,6 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
                   port: Int = config.getInt("fyrie-redis.port", 6379)) {
   val actor = actorOf(new RedisClientSession(host, port)).start
 
-  val statLogActor = actorOf[StatLogActor].start
-
-  val statLog = new StatLogToActor(statLogActor)
-
-  def printStats() {
-    statLogActor ! 'printTimeSplit
-  }
-
-  def resetStats() {
-    statLogActor ! 'resetStats
-  }
-
-  def startStats() {
-    actor ! statLog
-  }
-
-  def stopStats() {
-    actor ! NoStatLog
-  }
-
   def !(command: Command[_,_])(implicit sender: Option[ActorRef] = None): Unit =
     actor ! Request(command.toBytes, command.handler)
 
@@ -60,7 +40,6 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
 
   def stop = {
     actor.stop
-    statLogActor.stop
   }
 
   def disconnect = stop
