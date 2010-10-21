@@ -4,11 +4,10 @@ import sbt.CompileOrder._
 class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with AkkaBaseProject with Boilerplate
 {
   override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
-
   override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala
   override def compileAction = super.compileAction dependsOn(generateSortTuple)
 
-  val akkaActor = "se.scalablesolutions.akka" % "akka-actor_2.8.0"  % "1.0-SNAPSHOT"
+  val akkaActor = "se.scalablesolutions.akka" % "akka-actor_2.8.0"  % "1.0-M1"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
   val junit = "junit" % "junit" % "4.8.1" % "test"
@@ -26,4 +25,5 @@ class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with Akk
   val fyrieReleases           = "Fyrie releases" at "http://repo.fyrie.net/releases"
   val fyrieSnapshots          = "Fyrie snapshots" at "http://repo.fyrie.net/snapshots"
   val scalaToolsSnapshots     = ScalaToolsSnapshots
+  val akkaModuleConfig        = ModuleConfiguration("se.scalablesolutions.akka", AkkaRepositories.AkkaRepo)
 }
