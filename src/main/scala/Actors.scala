@@ -28,8 +28,10 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   self.dispatcher = Dispatchers.globalHawtDispatcher
 
   val hawtPin = config.getBool("fyrie-redis.hawt-pin", false)
-  val bufferSize = config.getInt("fyrie-redis.buffer-size", 8192)
-  val bufferDirect = config.getBool("fyrie-redis.buffer-direct", false)
+  val readBufSize = config.getInt("fyrie-redis.read-buffer-size", 8192)
+  val readBufDirect = config.getBool("fyrie-redis.read-buffer-direct", false)
+  val writeBufSize = config.getInt("fyrie-redis.write-buffer-size", 8192)
+  val writeBufDirect = config.getBool("fyrie-redis.write-buffer-direct", false)
 
   var channel: SocketChannel = _
 
@@ -38,11 +40,16 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
 
   var closed = false
 
+  var writeBuf = (writeBufAllocate, writeBufAllocate)
+  writeBuf._2.flip
+
+  def writeBufAllocate: ByteBuffer = if (writeBufDirect) ByteBuffer.allocateDirect(writeBufSize) else ByteBuffer.allocate(writeBufSize)
+
   val writeQueue = new mutable.Queue[ByteBuffer]
-  val handlerQueue = new mutable.Queue[(Handler[_,_], Option[CompletableFuture[Any]])]
+  val handlerQueue = new mutable.Queue[(Handler[_, _], Option[CompletableFuture[Any]])]
 
   var readBufOverflowStream = Stream.continually {
-    val b = if (bufferDirect) ByteBuffer.allocateDirect(bufferSize) else ByteBuffer.allocate(bufferSize)
+    val b = if (readBufDirect) ByteBuffer.allocateDirect(readBufSize) else ByteBuffer.allocate(readBufSize)
     b.flip
     b
   }
@@ -107,12 +114,17 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   }
 
   def write(): Unit = catchio {
-    if (writeQueue.isEmpty) {
-      writeSource.suspend
+    if (!writeBuf._2.hasRemaining) {
+      writeBufFill()
+      writeBufFlip()
+      if (writeBuf._2.hasRemaining) {
+        write()
+      } else {
+        writeSource.suspend
+      }
     } else {
-      val count = channel.write(writeQueue.take(10).toArray)
+      val count = channel.write(writeBuf._2)
       log.debug("IO: wrote " + count)
-      while (!(writeQueue.isEmpty || writeQueue.front.hasRemaining)) writeQueue.dequeue
     }
   }
 
@@ -125,11 +137,32 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
 
   def receive = {
     case Request(bytes, handler) =>
-      writeQueue += ByteBuffer.wrap(bytes)
       handlerQueue += ((handler, self.senderFuture))
+      writeQueue += ByteBuffer.wrap(bytes)
+      writeBufFill()
       if (writeSource.isSuspended) {
         writeSource.resume
       }
+  }
+
+  def writeBufFill() {
+    while (writeBuf._1.hasRemaining && !writeQueue.isEmpty) {
+      val bb = writeQueue.dequeue
+      if (writeBuf._1.remaining >= bb.remaining) {
+        writeBuf._1.put(bb)
+      } else {
+        bb.limit(bb.position + writeBuf._1.remaining)
+        writeBuf._1.put(bb)
+        bb.limit(bb.capacity)
+        bb +=: writeQueue
+      }
+    }
+  }
+
+  def writeBufFlip() {
+    writeBuf = writeBuf.swap
+    writeBuf._1.clear
+    writeBuf._2.flip
   }
 
   def processResponse(data: Array[Byte]) {
@@ -156,14 +189,14 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   object Idle extends ReadHandler {
     def apply = {
       if (readBuf.remaining > 0) {
-          readHandler = readBuf.get.toChar match {
-            case '+' => ReadString
-            case '-' => ReadError
-            case ':' => ReadString
-            case '$' => ReadBulk
-            case '*' => ReadMultiBulk
-            case x => error("Invalid Byte: " + x.toByte)
-          }
+        readHandler = readBuf.get.toChar match {
+          case '+' => ReadString
+          case '-' => ReadError
+          case ':' => ReadString
+          case '$' => ReadBulk
+          case '*' => ReadMultiBulk
+          case x => error("Invalid Byte: " + x.toByte)
+        }
         true
       } else false
     }
@@ -172,25 +205,25 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   val EOL = Array(13.toByte, 10.toByte)
 
   def readSingleLine: Option[Array[Byte]] = {
-      if (readBuf.remaining < 2) None else
-        (0 to (readBuf.remaining - 2)) find (n =>
-          readBuf.get(readBuf.position + n) == EOL(0) &&
-            readBuf.get(readBuf.position + n + 1) == EOL(1)) map { n =>
-          val overflow = readBufOverflowStream.takeWhile(!_.hasRemaining)
-          if (!overflow.isEmpty) log.debug("IO: Draining " + overflow.length + " overflow buffers")
-          val ar = new Array[Byte](overflow.foldLeft(n)(_ + _.limit))
-          var pos = 0
-          overflow foreach { o =>
-            o.flip
-            o.get(ar, pos, o.limit)
-            pos += o.limit
-          }
-          readBufOverflowStream = readBufStream
-          if (ar.length - pos > 0)
-            readBuf.get(ar, pos, ar.length - pos)
-          readBuf.position(readBuf.position + 2) // skip EOL
-          ar
+    if (readBuf.remaining < 2) None else
+      (0 to (readBuf.remaining - 2)) find (n =>
+        readBuf.get(readBuf.position + n) == EOL(0) &&
+          readBuf.get(readBuf.position + n + 1) == EOL(1)) map { n =>
+        val overflow = readBufOverflowStream.takeWhile(!_.hasRemaining)
+        if (!overflow.isEmpty) log.debug("IO: Draining " + overflow.length + " overflow buffers")
+        val ar = new Array[Byte](overflow.foldLeft(n)(_ + _.limit))
+        var pos = 0
+        overflow foreach { o =>
+          o.flip
+          o.get(ar, pos, o.limit)
+          pos += o.limit
         }
+        readBufOverflowStream = readBufStream
+        if (ar.length - pos > 0)
+          readBuf.get(ar, pos, ar.length - pos)
+        readBuf.position(readBuf.position + 2) // skip EOL
+        ar
+      }
   }
 
   object ReadString extends ReadHandler {
