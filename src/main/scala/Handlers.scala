@@ -31,10 +31,6 @@ abstract class Handler[A,B] {
   def parseResult(in: A): B
 }
 
-case class FutureHandler[A,B](handler: Handler[A,B], future: Future[A]) {
-  def parseResult: Future[B] = future.map(handler.parseResult)
-}
-
 final case class MultiExec(handlers: Seq[Handler[_,_]]) extends Handler[Option[Stream[Future[_]]], Option[Stream[_]]] {
   def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
     OkStatus(data, None)
