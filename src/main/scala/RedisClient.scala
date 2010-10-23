@@ -10,6 +10,8 @@ import Actor.{actorOf}
 import se.scalablesolutions.akka.dispatch._
 import se.scalablesolutions.akka.config.Config._
 
+import org.fusesource.hawtdispatch.ScalaDispatch._
+
 class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost"),
                   port: Int = config.getInt("fyrie-redis.port", 6379)) {
   val actor = actorOf(new RedisClientSession(host, port)).start
@@ -43,6 +45,12 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
   }
 
   def disconnect = stop
+
+  def shutdown = {
+    Dispatchers.globalHawtDispatcher.shutdown
+    val gl = (globalQueue.asInstanceOf[org.fusesource.hawtdispatch.internal.GlobalDispatchQueue])
+    gl.shutdown()
+  }
 }
 
 case class RedisErrorException(message: String) extends RuntimeException(message)
