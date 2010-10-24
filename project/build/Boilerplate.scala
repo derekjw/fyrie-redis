@@ -10,7 +10,7 @@ trait Boilerplate {
   lazy val generateSortTuple = {
     val cleanSrcManaged = cleanTask(srcManagedScala) named ("clean src_managed")
     task {
-      val arities = 2 to 22
+      val arities = 2 to 10
 
       def writeFile(fileName: String, source: String): Unit = {
         val file = (srcManagedScala / fileName).asFile

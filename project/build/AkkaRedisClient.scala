@@ -3,7 +3,7 @@ import sbt.CompileOrder._
 
 class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with AkkaBaseProject with Boilerplate
 {
-  override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList
+  override def compileOptions = Optimize :: Unchecked :: super.compileOptions.toList /* ++ Seq( "-verbose", "-Ydebug" ).map(CompileOption(_)) */
   override def mainSourceRoots = super.mainSourceRoots +++ srcManagedScala
   override def compileAction = super.compileAction dependsOn(generateSortTuple)
 
