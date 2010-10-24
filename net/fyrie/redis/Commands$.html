@@ -1,0 +1,1882 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>net.fyrie.redis.Commands</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value" onload="windowTitle();">
+
+      <p id="owner"><a href="../../package.html" class="extype" name="net">net</a>.<a href="../package.html" class="extype" name="net.fyrie">fyrie</a>.<a href="package.html" class="extype" name="net.fyrie.redis">redis</a></p>
+
+      <div id="definition">
+        <img src="../../../lib/object_big.png" />
+        <h1>Commands</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Commands</span>
+        
+        
+        <span class="result"> extends <a href="commands/StringCommands.html" class="extype" name="net.fyrie.redis.commands.StringCommands">StringCommands</a> with <a href="commands/ListCommands.html" class="extype" name="net.fyrie.redis.commands.ListCommands">ListCommands</a> with <a href="commands/SetCommands.html" class="extype" name="net.fyrie.redis.commands.SetCommands">SetCommands</a> with <a href="commands/SortedSetCommands.html" class="extype" name="net.fyrie.redis.commands.SortedSetCommands">SortedSetCommands</a> with <a href="commands/HashCommands.html" class="extype" name="net.fyrie.redis.commands.HashCommands">HashCommands</a> with <a href="commands/GenericCommands.html" class="extype" name="net.fyrie.redis.commands.GenericCommands">GenericCommands</a> with <a href="commands/NodeCommands.html" class="extype" name="net.fyrie.redis.commands.NodeCommands">NodeCommands</a> with <a href="commands/SortTupleCommands.html" class="extype" name="net.fyrie.redis.commands.SortTupleCommands">SortTupleCommands</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"><div class="block">
+            linear super types: <a href="commands/SortTupleCommands.html" class="extype" name="net.fyrie.redis.commands.SortTupleCommands">SortTupleCommands</a>, <a href="commands/NodeCommands.html" class="extype" name="net.fyrie.redis.commands.NodeCommands">NodeCommands</a>, <a href="commands/GenericCommands.html" class="extype" name="net.fyrie.redis.commands.GenericCommands">GenericCommands</a>, <a href="commands/HashCommands.html" class="extype" name="net.fyrie.redis.commands.HashCommands">HashCommands</a>, <a href="commands/SortedSetCommands.html" class="extype" name="net.fyrie.redis.commands.SortedSetCommands">SortedSetCommands</a>, <a href="commands/SetCommands.html" class="extype" name="net.fyrie.redis.commands.SetCommands">SetCommands</a>, <a href="commands/ListCommands.html" class="extype" name="net.fyrie.redis.commands.ListCommands">ListCommands</a>, <a href="commands/StringCommands.html" class="extype" name="net.fyrie.redis.commands.StringCommands">StringCommands</a>, AnyRef, <span class="extype" name="scala.Any">Any</span>
+          </div></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          <div id="order">
+                <span class="filtertype">Ordering</span>
+                <ol><li class="alpha in">Alphabetic</li><li class="inherit out">By inheritance</li></ol>
+              </div>
+          <div id="ancestors">
+                <span class="filtertype">Inherited</span>
+                <ol><li class="hideall">Hide All</li><li class="showall">Show all</li></ol>
+                <ol id="linearization"><li class="in" name="net.fyrie.redis.Commands">Commands</li><li class="in" name="net.fyrie.redis.commands.SortTupleCommands">SortTupleCommands</li><li class="in" name="net.fyrie.redis.commands.NodeCommands">NodeCommands</li><li class="in" name="net.fyrie.redis.commands.GenericCommands">GenericCommands</li><li class="in" name="net.fyrie.redis.commands.HashCommands">HashCommands</li><li class="in" name="net.fyrie.redis.commands.SortedSetCommands">SortedSetCommands</li><li class="in" name="net.fyrie.redis.commands.SetCommands">SetCommands</li><li class="in" name="net.fyrie.redis.commands.ListCommands">ListCommands</li><li class="in" name="net.fyrie.redis.commands.StringCommands">StringCommands</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
+              </div>
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.auth">
+      <a id="auth:auth"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$auth.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">auth</span>
+        
+        <span class="params">(<span name="secret">secret: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Supply a password if required to send commands.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.blpop">
+      <a id="blpop:blpop[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$blpop.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">blpop</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="values">values: Iterable[Any]</span>, <span name="timeoutInSeconds">timeoutInSeconds: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.brpop">
+      <a id="brpop:brpop[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$brpop.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">brpop</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="values">values: Iterable[Any]</span>, <span name="timeoutInSeconds">timeoutInSeconds: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.decr">
+      <a id="decr:decr"></a>
+      <h4 class="signature"><a href="commands/StringCommands$decr.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">decr</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Long] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.decrby">
+      <a id="decrby:decrby"></a>
+      <h4 class="signature"><a href="commands/StringCommands$decrby.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">decrby</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="increment">increment: Long</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Long] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.del">
+      <a id="del:del"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$del.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">del</span>
+        
+        <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Delete each key in <code>keys</code>.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.exists">
+      <a id="exists:exists"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$exists.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">exists</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Tests if <code>key</code> exists.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.expire">
+      <a id="expire:expire"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$expire.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">expire</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="seconds">seconds: Int</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Set a timeout of the specified key.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.expireat">
+      <a id="expireat:expireat"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$expireat.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">expireat</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="unixtime">unixtime: Int</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Set a timeout of the specified key.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.get">
+      <a id="get:get[A]"></a>
+      <h4 class="signature"><a href="commands/StringCommands$get.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">get</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.getType">
+      <a id="getType:getType"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$getType.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">getType</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, String] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Requests the type of the value stored at <code>key</code>.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.getset">
+      <a id="getset:getset[A]"></a>
+      <h4 class="signature"><a href="commands/StringCommands$getset.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">getset</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hdel">
+      <a id="hdel:hdel"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hdel.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hdel</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hexists">
+      <a id="hexists:hexists"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hexists.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hexists</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hget">
+      <a id="hget:hget[A]"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hget.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hget</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hgetall">
+      <a id="hgetall:hgetall[K, V]"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hgetall.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hgetall</span>
+        <span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parseK">parseK: Parse[K]</span>, <span name="parseV">parseV: Parse[V]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(K, V)]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hincrby">
+      <a id="hincrby:hincrby"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hincrby.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hincrby</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="value">value: Long</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Long] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hkeys">
+      <a id="hkeys:hkeys[A]"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hkeys.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hkeys</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hlen">
+      <a id="hlen:hlen"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hlen.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hlen</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Long] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hmget">
+      <a id="hmget:hmget[A]"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hmget.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hmget</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="fields">fields: Seq[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hmset">
+      <a id="hmset:hmset"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hmset.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hmset</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="fvs">fvs: Iterable[Product2[Any, Any]]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hset">
+      <a id="hset:hset"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hset.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hset</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hsetnx">
+      <a id="hsetnx:hsetnx"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hsetnx.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hsetnx</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.HashCommands.hvals">
+      <a id="hvals:hvals[A]"></a>
+      <h4 class="signature"><a href="commands/HashCommands$hvals.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">hvals</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.incr">
+      <a id="incr:incr"></a>
+      <h4 class="signature"><a href="commands/StringCommands$incr.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">incr</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Long] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.incrby">
+      <a id="incrby:incrby"></a>
+      <h4 class="signature"><a href="commands/StringCommands$incrby.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">incrby</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="increment">increment: Long</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Long] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.info">
+      <a id="info:info[A]"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$info.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">info</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.keys">
+      <a id="keys:keys[A]"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$keys.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">keys</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="pattern">pattern: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Request keys matching <code>pattern</code>.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.lindex">
+      <a id="lindex:lindex[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$lindex.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">lindex</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="index">index: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.llen">
+      <a id="llen:llen"></a>
+      <h4 class="signature"><a href="commands/ListCommands$llen.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">llen</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.lpop">
+      <a id="lpop:lpop[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$lpop.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">lpop</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.lpush">
+      <a id="lpush:lpush"></a>
+      <h4 class="signature"><a href="commands/ListCommands$lpush.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">lpush</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.lrange">
+      <a id="lrange:lrange[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$lrange.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">lrange</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.lrem">
+      <a id="lrem:lrem"></a>
+      <h4 class="signature"><a href="commands/ListCommands$lrem.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">lrem</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="count">count: Int</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.lset">
+      <a id="lset:lset"></a>
+      <h4 class="signature"><a href="commands/ListCommands$lset.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">lset</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="index">index: Int</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.ltrim">
+      <a id="ltrim:ltrim"></a>
+      <h4 class="signature"><a href="commands/ListCommands$ltrim.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">ltrim</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.mget">
+      <a id="mget:mget[A]"></a>
+      <h4 class="signature"><a href="commands/StringCommands$mget.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">mget</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.move">
+      <a id="move:move"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$move.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">move</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="db">db: Int</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Move <code>key</code> from the currently selected database to the database at index <code>db</code>.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.mset">
+      <a id="mset:mset"></a>
+      <h4 class="signature"><a href="commands/StringCommands$mset.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">mset</span>
+        
+        <span class="params">(<span name="kvs">kvs: Iterable[Product2[Any, Any]]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.msetnx">
+      <a id="msetnx:msetnx"></a>
+      <h4 class="signature"><a href="commands/StringCommands$msetnx.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">msetnx</span>
+        
+        <span class="params">(<span name="kvs">kvs: Iterable[Product2[Any, Any]]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.multiexec">
+      <a id="multiexec:multiexec"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$multiexec.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">multiexec</span>
+        
+        <span class="params">(<span name="commands">commands: Seq[net.fyrie.redis.Command[_, _]]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[se.scalablesolutions.akka.dispatch.Future[_]]], Option[Stream[_]]] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Executes a list of commands atomically.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.randomkey">
+      <a id="randomkey:randomkey[A]"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$randomkey.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">randomkey</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Request a random key.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.rename">
+      <a id="rename:rename"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$rename.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">rename</span>
+        
+        <span class="params">(<span name="oldkey">oldkey: Any</span>, <span name="newkey">newkey: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Rename a key.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.renamenx">
+      <a id="renamenx:renamenx"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$renamenx.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">renamenx</span>
+        
+        <span class="params">(<span name="oldkey">oldkey: Any</span>, <span name="newkey">newkey: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Rename a key if <code>newkey</code> does not already exist.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.rpop">
+      <a id="rpop:rpop[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$rpop.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">rpop</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.rpoplpush">
+      <a id="rpoplpush:rpoplpush[A]"></a>
+      <h4 class="signature"><a href="commands/ListCommands$rpoplpush.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">rpoplpush</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="srcKey">srcKey: Any</span>, <span name="dstKey">dstKey: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.ListCommands.rpush">
+      <a id="rpush:rpush"></a>
+      <h4 class="signature"><a href="commands/ListCommands$rpush.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">rpush</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sadd">
+      <a id="sadd:sadd"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sadd.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sadd</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.scard">
+      <a id="scard:scard"></a>
+      <h4 class="signature"><a href="commands/SetCommands$scard.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">scard</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sdiff">
+      <a id="sdiff:sdiff[A]"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sdiff.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sdiff</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sdiffstore">
+      <a id="sdiffstore:sdiffstore"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sdiffstore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sdiffstore</span>
+        
+        <span class="params">(<span name="dstkey">dstkey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.select">
+      <a id="select:select"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$select.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">select</span>
+        
+        <span class="params">(<span name="index">index: Int</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Select a DB with the supplied zero-based index.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.set">
+      <a id="set:set"></a>
+      <h4 class="signature"><a href="commands/StringCommands$set.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">set</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.StringCommands.setnx">
+      <a id="setnx:setnx"></a>
+      <h4 class="signature"><a href="commands/StringCommands$setnx.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">setnx</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sinter">
+      <a id="sinter:sinter[A]"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sinter.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sinter</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sinterstore">
+      <a id="sinterstore:sinterstore"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sinterstore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sinterstore</span>
+        
+        <span class="params">(<span name="dstkey">dstkey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sismember">
+      <a id="sismember:sismember"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sismember.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sismember</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.slaveof">
+      <a id="slaveof:slaveof"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$slaveof.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">slaveof</span>
+        
+        <span class="params">(<span name="hostPort">hostPort: Option[(String, Int)]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.smembers">
+      <a id="smembers:smembers[A]"></a>
+      <h4 class="signature"><a href="commands/SetCommands$smembers.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">smembers</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.smove">
+      <a id="smove:smove"></a>
+      <h4 class="signature"><a href="commands/SetCommands$smove.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">smove</span>
+        
+        <span class="params">(<span name="sourceKey">sourceKey: Any</span>, <span name="destKey">destKey: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.sort">
+      <a id="sort:sort[A]"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$sort.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Seq[Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Sorts the elements contained in a List, Set, or Sorted Set value at <code>key</code>.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort10">
+      <a id="sort10:sort10[P1, P2, P3, P4, P5, P6, P7, P8, P9, P10]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort10.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort10</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>, <span name="P10">P10</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>, <span name="p10">p10: Parse[P10]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9], Option[P10])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort2">
+      <a id="sort2:sort2[P1, P2]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort2.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort2</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product2[Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort3">
+      <a id="sort3:sort3[P1, P2, P3]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort3.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort3</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product3[Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort4">
+      <a id="sort4:sort4[P1, P2, P3, P4]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort4.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort4</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product4[Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort5">
+      <a id="sort5:sort5[P1, P2, P3, P4, P5]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort5.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort5</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product5[Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort6">
+      <a id="sort6:sort6[P1, P2, P3, P4, P5, P6]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort6.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort6</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product6[Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort7">
+      <a id="sort7:sort7[P1, P2, P3, P4, P5, P6, P7]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort7.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort7</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product7[Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort8">
+      <a id="sort8:sort8[P1, P2, P3, P4, P5, P6, P7, P8]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort8.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort8</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product8[Any, Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortTupleCommands.sort9">
+      <a id="sort9:sort9[P1, P2, P3, P4, P5, P6, P7, P8, P9]"></a>
+      <h4 class="signature"><a href="commands/SortTupleCommands$sort9.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sort9</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product9[Any, Any, Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9])]]] with SortTupled with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.spop">
+      <a id="spop:spop[A]"></a>
+      <h4 class="signature"><a href="commands/SetCommands$spop.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">spop</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.srandmember">
+      <a id="srandmember:srandmember[A]"></a>
+      <h4 class="signature"><a href="commands/SetCommands$srandmember.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">srandmember</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.srem">
+      <a id="srem:srem"></a>
+      <h4 class="signature"><a href="commands/SetCommands$srem.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">srem</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sunion">
+      <a id="sunion:sunion[A]"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sunion.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sunion</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SetCommands.sunionstore">
+      <a id="sunionstore:sunionstore"></a>
+      <h4 class="signature"><a href="commands/SetCommands$sunionstore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">sunionstore</span>
+        
+        <span class="params">(<span name="dstkey">dstkey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zadd">
+      <a id="zadd:zadd"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zadd.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zadd</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="score">score: Double</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Boolean] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zcard">
+      <a id="zcard:zcard"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zcard.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zcard</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zcount">
+      <a id="zcount:zcount"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zcount.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zcount</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="min">min: Double</span>, <span name="minInclusive">minInclusive: Boolean</span>, <span name="max">max: Double</span>, <span name="maxInclusive">maxInclusive: Boolean</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zincrby">
+      <a id="zincrby:zincrby[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zincrby.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zincrby</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="incr">incr: Double</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrange">
+      <a id="zrange:zrange[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrange.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrange</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrangeWithScores">
+      <a id="zrangeWithScores:zrangeWithScores[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrangeWithScores.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrangeWithScores</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrangebyscore">
+      <a id="zrangebyscore:zrangebyscore[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrangebyscore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrangebyscore</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="min">min: Double</span>, <span name="minInclusive">minInclusive: Boolean</span>, <span name="max">max: Double</span>, <span name="maxInclusive">maxInclusive: Boolean</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrangebyscoreWithScores">
+      <a id="zrangebyscoreWithScores:zrangebyscoreWithScores[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrangebyscoreWithScores.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrangebyscoreWithScores</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="min">min: Double</span>, <span name="minInclusive">minInclusive: Boolean</span>, <span name="max">max: Double</span>, <span name="maxInclusive">maxInclusive: Boolean</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrank">
+      <a id="zrank:zrank"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrank.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrank</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrem">
+      <a id="zrem:zrem"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrem.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrem</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zremrangebyrank">
+      <a id="zremrangebyrank:zremrangebyrank"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zremrangebyrank.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zremrangebyrank</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zremrangebyscore">
+      <a id="zremrangebyscore:zremrangebyscore"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zremrangebyscore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zremrangebyscore</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Double</span>, <span name="end">end: Double</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrevrange">
+      <a id="zrevrange:zrevrange[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrevrange.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrevrange</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrevrangeWithScores">
+      <a id="zrevrangeWithScores:zrevrangeWithScores[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrevrangeWithScores.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrevrangeWithScores</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zrevrank">
+      <a id="zrevrank:zrevrank"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zrevrank.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zrevrank</span>
+        
+        <span class="params">(<span name="key">key: Any</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zscore">
+      <a id="zscore:zscore[A]"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zscore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zscore</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: Any</span>, <span name="element">element: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zunionstore">
+      <a id="zunionstore:zunionstore"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zunionstore.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zunionstore</span>
+        
+        <span class="params">(<span name="dstKey">dstKey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="aggregate">aggregate: Option[AggregateScore]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.SortedSetCommands.zunionstoreWeighted">
+      <a id="zunionstoreWeighted:zunionstoreWeighted"></a>
+      <h4 class="signature"><a href="commands/SortedSetCommands$zunionstoreWeighted.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">zunionstoreWeighted</span>
+        
+        <span class="params">(<span name="dstKey">dstKey: Any</span>, <span name="kws">kws: Iterable[Product2[Any, Double]]</span>, <span name="aggregate">aggregate: Option[AggregateScore]</span>, <span name="format">format: Format</span>)</span>
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="scala.AnyRef#!=">
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#!=">
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">!=</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the receiver object is equivalent to the argument; <code>true</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef###">
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">##</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef → Any
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$asInstanceOf">
+      <a id="$asInstanceOf[T0]():T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">$asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">()</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$isInstanceOf">
+      <a id="$isInstanceOf[T0]():Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">$isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#==">
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#==">
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">==</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to cast the receiver object to be of type <code>T0</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to cast the receiver object to be of type <code>T0</code>.</p><p>Note that the success of a cast at runtime is modulo Scala's erasure semantics.  Therefore the expression<code>1.asInstanceOf[String]</code> will throw a <code>ClassCastException</code> at runtime, while the expression<code>List(1).asInstanceOf[List[String]]</code> will not.  In the latter example, because the type argument is erased as
+part of compilation it is not possible to check whether the contents of the list are of the requested typed.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the receiver object.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.bgsave">
+      <a id="bgsave:bgsave"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$bgsave$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">bgsave</span>
+        
+        
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.bgwriteaof">
+      <a id="bgwriteaof:bgwriteaof"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$bgwriteaof$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">bgwriteaof</span>
+        
+        
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">clone</span>
+        
+        <span class="params">()</span>
+        <span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method creates and returns a copy of the receiver object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method creates and returns a copy of the receiver object.</p><p>The default implementation of the <code>clone</code> method is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a copy of the receiver object.</p></dd></dl><div class="block">
+          attributes: protected 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.config">
+      <a id="config:config"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$config$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">config</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize">
+      <a id="dbsize:dbsize"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$dbsize$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">dbsize</span>
+        
+        
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Request the number of keys in the current database.</p>
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#eq">
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">eq</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to test whether the argument (<code>arg0</code>) is a reference to the
+receiver object (<code>this</code>).</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the argument (<code>arg0</code>) is a reference to the
+receiver object (<code>this</code>).</p><p>The <code>eq</code> method implements an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence relation] on
+non-null instances of <code>AnyRef</code>:
+ * It is reflexive: for any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(x)</code> returns <code>true</code>.
+ * It is symmetric: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, <code>x.eq(y)</code> returns <code>true</code> if and
+   only if <code>y.eq(x)</code> returns <code>true</code>.
+ * It is transitive: for any non-null instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.eq(y)</code> returns <code>true</code>   and <code>y.eq(z)</code> returns <code>true</code>, then <code>x.eq(z)</code> returns <code>true</code>.</p><p>Additionally, the <code>eq</code> method has three other properties.
+ * It is consistent: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, multiple invocations of
+   <code>x.eq(y)</code> consistently returns <code>true</code> or consistently returns <code>false</code>.
+ * For any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(null)</code> and <code>null.eq(x)</code> returns <code>false</code>.
+ * <code>null.eq(null)</code> returns <code>true</code>.</p><p>When overriding the <code>equals</code> or <code>hashCode</code> methods, it is important to ensure that their behavior is
+consistent with reference equality.  Therefore, if two objects are references to each other (<code>o1 eq o2</code>), they
+should be equal to each other (<code>o1 == o2</code>) and they should hash to the same value (<code>o1.hashCode == o2.hashCode</code>).
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the argument is a reference to the receiver object; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#equals">
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">equals</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p><p>The default implementations of this method is an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence
+relation]:
+ * It is reflexive: for any instance <code>x</code> of type <code>Any</code>, <code>x.equals(x)</code> should return <code>true</code>.
+ * It is symmetric: for any instances <code>x</code> and <code>y</code> of type <code>Any</code>, <code>x.equals(y)</code> should return <code>true</code> if and
+   only if <code>y.equals(x)</code> returns <code>true</code>.
+ * It is transitive: for any instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.equals(y)</code> returns <code>true</code> and
+   <code>y.equals(z)</code> returns <code>true</code>, then <code>x.equals(z)</code> should return <code>true</code>.</p><p>If you override this method, you should verify that your implementation remains an equivalence relation.
+Additionally, when overriding this method it is often necessary to override <code>hashCode</code> to ensure that objects
+that are &quot;equal&quot; (<code>o1.equals(o2)</code> returns <code>true</code>) hash to the same 
+scala.Int
+(<code>o1.hashCode.equals(o2.hashCode)</code>).
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#finalize">
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">finalize</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is called by the garbage collector on the receiver object when garbage collection determines that
+there are no more references to the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is called by the garbage collector on the receiver object when garbage collection determines that
+there are no more references to the object.</p><p>The details of when and if the <code>finalize</code> method are invoked, as well as the interaction between <code>finalize</code>and non-local returns and exceptions, are all platform dependent.</p></div><div class="block">
+          attributes: protected 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.flushall">
+      <a id="flushall:flushall"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$flushall$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">flushall</span>
+        
+        
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Delete all keys in all databases.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.flushdb">
+      <a id="flushdb:flushdb"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$flushdb$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">flushdb</span>
+        
+        
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Delete all keys in the currently selected database.</p>
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#getClass">
+      <a id="getClass():java.lang.Class[_]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">getClass</span>
+        
+        <span class="params">()</span>
+        <span class="result">: java.lang.Class[_]</span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a representation that corresponds to the dynamic class of the receiver object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a representation that corresponds to the dynamic class of the receiver object.</p><p>The nature of the representation is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a representation that corresponds to the dynamic class of the receiver object.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#hashCode">
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">hashCode</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a hash code value for the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a hash code value for the object.</p><p>The default hashing algorithm is platform dependent.</p><p>Note that it is allowed for two objects to have identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>) yet
+not be equal (<code>o1.equals(o2)</code> returns <code>false</code>).  A degenerate implementation could always return <code>0</code>.
+However, it is required that if two objects are equal (<code>o1.equals(o2)</code> returns <code>true</code>) that they have
+identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>).  Therefore, when overriding this method, be sure
+to verify that the behavior is consistent with the <code>equals</code> method.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the hash code value for the object.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.Any#isInstanceOf">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p><p>Note that the test result of the test is modulo Scala's erasure semantics.  Therefore the expression<code>1.isInstanceOf[String]</code> will return <code>false</code>, while the expression <code>List(1).isInstanceOf[List[String]]</code> will
+return <code>true</code>.  In the latter example, because the type argument is erased as part of compilation it is not
+possible to check whether the contents of the list are of the requested typed.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is an instance of erasure of type <code>T0</code>; <code>false</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.lastsave">
+      <a id="lastsave:lastsave"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$lastsave$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">lastsave</span>
+        
+        
+        <span class="result"> extends Command[String, Int] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.monitor">
+      <a id="monitor:monitor"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$monitor$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">monitor</span>
+        
+        
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">ne</span>
+        
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt"><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.</p>
+            <div class="fullcomment"><div class="comment cmt"><p><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.
+</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the argument is not a reference to the receiver object; <code>true</code> otherwise.</p></dd></dl><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notify">
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">notify</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Wakes up a single thread that is waiting on the receiver object's monitor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Wakes up a single thread that is waiting on the receiver object's monitor.</p></div><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notifyAll">
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">notifyAll</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Wakes up all threads that are waiting on the receiver object's monitor.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Wakes up all threads that are waiting on the receiver object's monitor.</p></div><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.quit">
+      <a id="quit:quit"></a>
+      <h4 class="signature"><a href="commands/GenericCommands$quit$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">quit</span>
+        
+        
+        <span class="result"> extends Command[Unit, Unit] with Product</span>
+      </span>
+      </a></h4>
+      <p class="comment cmt">Asks the server to close the connection.</p>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.save">
+      <a id="save:save"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$save$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">save</span>
+        
+        
+        <span class="result"> extends Command[String, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.NodeCommands.shutdown">
+      <a id="shutdown:shutdown"></a>
+      <h4 class="signature"><a href="commands/NodeCommands$shutdown$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">shutdown</span>
+        
+        
+        <span class="result"> extends Command[Unit, Unit] with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
+      <a id="synchronized[T0](T0):T0"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">synchronized</span>
+        <span class="tparams">[<span name="T0">T0</span>]</span>
+        <span class="params">(<span name="arg0">arg0: T0</span>)</span>
+        <span class="result">: T0</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#toString">
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">toString</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      
+            <p class="shortcomment cmt">Returns a string representation of the object.</p>
+            <div class="fullcomment"><div class="comment cmt"><p>Returns a string representation of the object.</p><p>The default representation is platform dependent.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a string representation of the object.</p></dd></dl><div class="block">
+          definition classes: AnyRef → Any
+        </div>
+            
+            
+            
+          </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">()</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">wait</span>
+        
+        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span>
+        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div><div class="block">
+          definition classes: AnyRef
+        </div></div>
+          
+    </li></ol>
+            </div>
+
+        <div class="parent" name="net.fyrie.redis.commands.SortTupleCommands">
+              <h3>Inherited from <a href="commands/SortTupleCommands.html" class="extype" name="net.fyrie.redis.commands.SortTupleCommands">SortTupleCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.NodeCommands">
+              <h3>Inherited from <a href="commands/NodeCommands.html" class="extype" name="net.fyrie.redis.commands.NodeCommands">NodeCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.GenericCommands">
+              <h3>Inherited from <a href="commands/GenericCommands.html" class="extype" name="net.fyrie.redis.commands.GenericCommands">GenericCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.HashCommands">
+              <h3>Inherited from <a href="commands/HashCommands.html" class="extype" name="net.fyrie.redis.commands.HashCommands">HashCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.SortedSetCommands">
+              <h3>Inherited from <a href="commands/SortedSetCommands.html" class="extype" name="net.fyrie.redis.commands.SortedSetCommands">SortedSetCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.SetCommands">
+              <h3>Inherited from <a href="commands/SetCommands.html" class="extype" name="net.fyrie.redis.commands.SetCommands">SetCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.ListCommands">
+              <h3>Inherited from <a href="commands/ListCommands.html" class="extype" name="net.fyrie.redis.commands.ListCommands">ListCommands</a></h3>
+            </div><div class="parent" name="net.fyrie.redis.commands.StringCommands">
+              <h3>Inherited from <a href="commands/StringCommands.html" class="extype" name="net.fyrie.redis.commands.StringCommands">StringCommands</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from AnyRef</h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>

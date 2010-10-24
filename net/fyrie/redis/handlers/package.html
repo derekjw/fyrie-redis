@@ -1,0 +1,438 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>net.fyrie.redis.handlers</title>
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <script type="text/javascript" src="../../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
+    
+        </head>
+        <body class="value" onload="windowTitle();">
+
+      <p id="owner"><a href="../../../package.html" class="extype" name="net">net</a>.<a href="../../package.html" class="extype" name="net.fyrie">fyrie</a>.<a href="../package.html" class="extype" name="net.fyrie.redis">redis</a></p>
+
+      <div id="definition">
+        <img src="../../../../lib/package_big.png" />
+        <h1>handlers</h1>
+      </div>
+
+      <h4 class="signature" id="signature">
+      <span class="kind">package</span>
+      <span class="symbol">
+        <span class="name">handlers</span>
+        
+        
+        
+      </span>
+      </h4>
+      <div class="fullcomment" id="comment"></div>
+
+      <div id="template">
+
+        <div id="mbrsel">
+          <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
+          
+          
+          <div id="visbl">
+              <span class="filtertype">Visibility</span>
+              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
+            </div>
+          <div id="impl">
+              <span class="filtertype">Impl.</span>
+              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+            </div>
+        </div>
+
+        
+
+        <div class="types members" id="types">
+              <h3>Type Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Bulk">
+      <a id="Bulk:Bulk[A]"></a>
+      <h4 class="signature"><a href="Bulk.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">Bulk</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Handler[Option[Array[Byte]], Option[A]] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.handlers.Handler">
+      <a id="Handler:Handler[A, B]"></a>
+      <h4 class="signature"><a href="Handler.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">Handler</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: abstract 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulk">
+      <a id="MultiBulk:MultiBulk[A]"></a>
+      <h4 class="signature"><a href="MultiBulk.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulk</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat">
+      <a id="MultiBulkAsFlat:MultiBulkAsFlat[A]"></a>
+      <h4 class="signature"><a href="MultiBulkAsFlat.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsFlat</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsPairs">
+      <a id="MultiBulkAsPairs:MultiBulkAsPairs[K, V]"></a>
+      <h4 class="signature"><a href="MultiBulkAsPairs.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsPairs</span>
+        <span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span>
+        <span class="params">(<span name="parseK">parseK: Parse[K]</span>, <span name="parseV">parseV: Parse[V]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(K, V)]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple10">
+      <a id="MultiBulkAsTuple10:MultiBulkAsTuple10[P1, P2, P3, P4, P5, P6, P7, P8, P9, P10]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple10.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple10</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>, <span name="P10">P10</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>, <span name="p10">p10: Parse[P10]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9], Option[P10])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple2">
+      <a id="MultiBulkAsTuple2:MultiBulkAsTuple2[P1, P2]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple2.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple2</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple3">
+      <a id="MultiBulkAsTuple3:MultiBulkAsTuple3[P1, P2, P3]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple3.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple3</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple4">
+      <a id="MultiBulkAsTuple4:MultiBulkAsTuple4[P1, P2, P3, P4]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple4.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple4</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple5">
+      <a id="MultiBulkAsTuple5:MultiBulkAsTuple5[P1, P2, P3, P4, P5]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple5.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple5</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple6">
+      <a id="MultiBulkAsTuple6:MultiBulkAsTuple6[P1, P2, P3, P4, P5, P6]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple6.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple6</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple7">
+      <a id="MultiBulkAsTuple7:MultiBulkAsTuple7[P1, P2, P3, P4, P5, P6, P7]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple7.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple7</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple8">
+      <a id="MultiBulkAsTuple8:MultiBulkAsTuple8[P1, P2, P3, P4, P5, P6, P7, P8]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple8.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple8</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsTuple9">
+      <a id="MultiBulkAsTuple9:MultiBulkAsTuple9[P1, P2, P3, P4, P5, P6, P7, P8, P9]"></a>
+      <h4 class="signature"><a href="MultiBulkAsTuple9.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkAsTuple9</span>
+        <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>]</span>
+        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9])]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkWithScores">
+      <a id="MultiBulkWithScores:MultiBulkWithScores[A]"></a>
+      <h4 class="signature"><a href="MultiBulkWithScores.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiBulkWithScores</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiExec">
+      <a id="MultiExec:MultiExec"></a>
+      <h4 class="signature"><a href="MultiExec.html">
+      <span class="kind">case class</span>
+      <span class="symbol">
+        <span class="name">MultiExec</span>
+        
+        <span class="params">(<span name="handlers">handlers: Seq[net.fyrie.redis.handlers.Handler[_, _]]</span>)</span>
+        <span class="result"> extends Handler[Option[Stream[se.scalablesolutions.akka.dispatch.Future[_]]], Option[Stream[_]]] with Product</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: final 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.handlers.SingleHandler">
+      <a id="SingleHandler:SingleHandler"></a>
+      <h4 class="signature"><a href="SingleHandler.html">
+      <span class="kind">trait</span>
+      <span class="symbol">
+        <span class="name">SingleHandler</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
+    </li></ol>
+            </div>
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.IntAsBoolean">
+      <a id="IntAsBoolean:IntAsBoolean"></a>
+      <h4 class="signature"><a href="IntAsBoolean$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">IntAsBoolean</span>
+        
+        
+        <span class="result"> extends Handler[String, Boolean] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.LongInt">
+      <a id="LongInt:LongInt"></a>
+      <h4 class="signature"><a href="LongInt$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">LongInt</span>
+        
+        
+        <span class="result"> extends Handler[String, Long] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.NoHandler">
+      <a id="NoHandler:NoHandler"></a>
+      <h4 class="signature"><a href="NoHandler$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">NoHandler</span>
+        
+        
+        <span class="result"> extends Handler[Unit, Unit] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.OkStatus">
+      <a id="OkStatus:OkStatus"></a>
+      <h4 class="signature"><a href="OkStatus$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">OkStatus</span>
+        
+        
+        <span class="result"> extends Handler[String, Unit] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.QueuedStatus">
+      <a id="QueuedStatus:QueuedStatus"></a>
+      <h4 class="signature"><a href="QueuedStatus$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">QueuedStatus</span>
+        
+        
+        <span class="result"> extends Handler[String, Unit] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.ShortInt">
+      <a id="ShortInt:ShortInt"></a>
+      <h4 class="signature"><a href="ShortInt$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">ShortInt</span>
+        
+        
+        <span class="result"> extends Handler[String, Int] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Status">
+      <a id="Status:Status"></a>
+      <h4 class="signature"><a href="Status$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">Status</span>
+        
+        
+        <span class="result"> extends Handler[String, String] with SingleHandler with Product</span>
+      </span>
+      </a></h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+      </div>
+      
+      <div id="tooltip"></div>
+      
+    </body>
+      </html>
