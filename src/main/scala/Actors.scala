@@ -73,6 +73,8 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     readSource.setCancelHandler(^ { close })
 
     if (channel.isConnectionPending) channel.finishConnect
+    log.debug("Socket Receive Buffer: " + channel.socket.getReceiveBufferSize)
+    log.debug("Socket Send Buffer: " + channel.socket.getSendBufferSize)
     readSource.resume
   }
 
@@ -96,7 +98,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     channel.read(readBuf) match {
       case -1 => close
       case 0 if !readBuf.hasRemaining =>
-        log.debug("IO: Buffer full")
+        log.debug("IO: Read buffer full")
         val oldBuf = readBuf
         readBufStream = readBufStream.tail
         if (oldBuf.get(oldBuf.limit - 1) == EOL(0)) { // Don't separate an EOL
@@ -153,6 +155,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
         writeBuf._1.put(bb)
         bb.limit(bb.capacity)
         bb +=: writeQueue
+        log.debug("IO: Filled waiting write buffer")
       }
     }
   }
