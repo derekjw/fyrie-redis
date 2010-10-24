@@ -4,7 +4,7 @@ package actors
 
 import messages._
 
-import handlers.{ Handler }
+import handlers._
 
 import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
 import Actor.{ actorOf }
@@ -46,7 +46,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   def writeBufAllocate: ByteBuffer = if (writeBufDirect) ByteBuffer.allocateDirect(writeBufSize) else ByteBuffer.allocate(writeBufSize)
 
   val writeQueue = new mutable.Queue[ByteBuffer]
-  val handlerQueue = new mutable.Queue[(Handler[_, _], Option[Responder])]
+  val responseQueue = new mutable.Queue[Responder]
 
   var readBufOverflowStream = Stream.continually {
     val b = if (readBufDirect) ByteBuffer.allocateDirect(readBufSize) else ByteBuffer.allocate(readBufSize)
@@ -137,7 +137,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
 
   def receive = {
     case Request(bytes, handler) =>
-      handlerQueue += ((handler, Responder(self.sender, self.senderFuture)))
+      responseQueue += Responder(handler, self.sender, self.senderFuture)
       writeQueue += ByteBuffer.wrap(bytes)
       if (writeSource.isSuspended) writeSource.resume
       writeBufFill()
@@ -163,32 +163,8 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     writeBuf._2.flip
   }
 
-  def processResponse(data: Array[Byte]) {
-    handlerQueue.dequeue match {
-      case (handler, Some(ActorResponder(actorRef))) => error("Not Implemented")
-      case (handler, Some(FutureResponder(future))) =>
-        handler(data, Some(future)) reverseMap {case (h,fo) => (h, fo.map(Responder(_)))} foreach (_ +=: handlerQueue)
-      case (handler, None) =>
-        handler(data, None).reverseMap(_._1).foreach((_, None) +=: handlerQueue)
-    }
-  }
-
-  def notFoundResponse {
-    handlerQueue.dequeue match {
-      case (handler, Some(ActorResponder(actorRef))) => error("Not Implemented")
-      case (handler, Some(FutureResponder(future))) =>
-        future.completeWithResult(None)
-      case (handler, None) =>
-    }
-  }
-
-  def errorResponse(data: Array[Byte]) {
-    handlerQueue.dequeue match {
-      case (handler, Some(ActorResponder(actorRef))) => error("Not Implemented")
-      case (handler, Some(FutureResponder(future))) =>
-        future.completeWithException(new RedisErrorException(new String(data, "UTF-8")))
-      case (handler, None) =>
-    }
+  def respond[T](data: RedisType[T]) {
+    responseQueue.dequeue.apply(data).reverse.foreach(_ +=: responseQueue)
   }
 
   abstract class ReadHandler {
@@ -240,7 +216,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   object ReadString extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        processResponse(data)
+        respond(RedisString(data))
         readHandler = Idle
         true
       } getOrElse false
@@ -250,7 +226,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   object ReadError extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        errorResponse(data)
+        respond(RedisError(data))
         readHandler = Idle
         true
       } getOrElse false
@@ -262,7 +238,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
       readSingleLine map { (data) =>
         val size = new String(data, "UTF-8").toInt
         readHandler = if (size > -1) (new ReadBulkData(size)) else {
-          notFoundResponse
+          respond(RedisBulk(None))
           Idle
         }
         true
@@ -296,7 +272,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
           readBuf.get(ar)
           ar
         }
-        processResponse(data)
+        respond(RedisBulk(Some(data)))
         readHandler = ReadEOL
         true
       } else false
@@ -318,7 +294,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
   object ReadMultiBulk extends ReadHandler {
     def apply = {
       readSingleLine map { (data) =>
-        processResponse(data)
+        respond(RedisMulti(data))
         readHandler = Idle
         true
       } getOrElse false
@@ -327,14 +303,3 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
 
 }
 
-trait Responder
-
-object Responder {
-  def apply(in: ActorRef): Responder = ActorResponder(in)
-  def apply(in: CompletableFuture[Any]): Responder = FutureResponder(in)
-  def apply(target: Option[ActorRef], future: Option[CompletableFuture[Any]]): Option[Responder] =
-    future.map(apply) orElse target.map(apply)
-}
-
-case class ActorResponder(target: ActorRef) extends Responder
-case class FutureResponder(future: CompletableFuture[Any]) extends Responder

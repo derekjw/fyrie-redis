@@ -10,7 +10,7 @@ trait Boilerplate {
   lazy val generateSortTuple = {
     val cleanSrcManaged = cleanTask(srcManagedScala) named ("clean src_managed")
     task {
-      val arities = 2 to 12
+      val arities = 2 to 22
 
       def writeFile(fileName: String, source: String): Unit = {
         val file = (srcManagedScala / fileName).asFile
@@ -28,11 +28,8 @@ trait Boilerplate {
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
           """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(%s)]]] {
-             |  def apply(data: Array[Byte], future: Option[CompletableFuture[Any]]) = {
-             |    val futures = Stream.fill[Option[CompletableFuture[Any]]](string(data).toInt)(if (future.isDefined) Some(new DefaultCompletableFuture[Any](5000)) else None)
-             |    complete(future, Some(futures.flatten))
-             |    Stream.continually(Stream(%s)).flatten.zip(futures)
-             |  }
+             |
+             |  def childHandlers = Stream.continually(Stream(%s)).flatten
              |
              |  def parseResult(in: Option[Stream[Future[Option[Array[Byte]]]]]): Option[Stream[(%s)]] =
              |    in.map(_.map(_.await.result.get).grouped(%d).toStream.flatMap{
