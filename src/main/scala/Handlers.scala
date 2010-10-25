@@ -28,19 +28,17 @@ abstract class Handler[A,B] {
 
   def parseResult(in: A): B
 
-  def childHandlers: Seq[Handler[_,_]]
+  def handlers: Seq[Handler[_,_]]
 }
 
 trait SingleHandler {
-  def childHandlers: Seq[Handler[_,_]] = Nil
+  def handlers: Seq[Handler[_,_]] = Nil
 }
 
 final case class MultiExec(handlers: Seq[Handler[_,_]]) extends Handler[Option[Stream[Future[_]]], Option[Stream[_]]] {
   // This should throw an exception if a future contains one
   def parseResult(in: Option[Stream[Future[_]]]): Option[Stream[_]] =
     in.map(_.flatMap(_.await.result))
-
-  def childHandlers: Seq[Handler[_,_]] = handlers
 }
 
 case object NoHandler extends Handler[Unit,Unit] with SingleHandler {
@@ -79,7 +77,7 @@ final case class MultiBulk[A](implicit parse: Parse[A]) extends Handler[Option[S
   def parseResult(in: Option[Stream[Future[Option[Array[Byte]]]]]): Option[Stream[Option[A]]] =
     in.map(_.map(_.await.result.flatMap(_.map(parse))))
 
-  def childHandlers = Stream.continually(Bulk[A]())
+  def handlers = Stream.continually(Bulk[A]())
 }
 
 final case class MultiBulkAsPairs[K, V](implicit parseK: Parse[K], parseV: Parse[V]) extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(K, V)]]] {
@@ -89,7 +87,7 @@ final case class MultiBulkAsPairs[K, V](implicit parseK: Parse[K], parseV: Parse
       case _ => None
     })
 
-  def childHandlers = Stream.continually(Stream(Bulk[K](), Bulk[V]())).flatten
+  def handlers = Stream.continually(Stream(Bulk[K](), Bulk[V]())).flatten
 }
 
 final case class MultiBulkWithScores[A](implicit parse: Parse[A]) extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] {
@@ -99,12 +97,12 @@ final case class MultiBulkWithScores[A](implicit parse: Parse[A]) extends Handle
       case _ => None
     })
 
-  def childHandlers = Stream.continually(Stream(Bulk[A](), Bulk[Double]())).flatten
+  def handlers = Stream.continually(Stream(Bulk[A](), Bulk[Double]())).flatten
 }
 
 final case class MultiBulkAsFlat[A](implicit parse: Parse[A]) extends Handler[Option[Stream[Future[Option[Array[Byte]]]]],Option[Stream[A]]] {
   def parseResult(in: Option[Stream[Future[Option[Array[Byte]]]]]): Option[Stream[A]] =
     in.map(_.flatMap(_.await.result.get).map(parse))
 
-  def childHandlers = Stream.continually(Bulk[A]())
+  def handlers = Stream.continually(Bulk[A]())
 }

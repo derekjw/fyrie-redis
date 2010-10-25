@@ -31,13 +31,13 @@ final case class FutureResponder(handler: Handler[_, _], future: CompletableFutu
     case RedisMulti(Some(length)) =>
       handler match {
         case MultiExec(handlers) =>
-          val futures = handler.childHandlers.toStream take length map (h => (h, h.mkFuturePair))
+          val futures = handler.handlers.toStream take length map (h => (h, h.mkFuturePair))
           future.completeWithResult(Some(futures.map(_._2._2)))
           futures.map(hf => FutureResponder(hf._1, hf._2._1))
         case _ => 
           val futures = Stream.continually(new DefaultCompletableFuture[Any](5000)).take(length)
           future.completeWithResult(Some(futures))
-          handler.childHandlers zip futures map (hf => FutureResponder(hf._1, hf._2))
+          handler.handlers zip futures map (hf => FutureResponder(hf._1, hf._2))
       }
     case RedisMulti(None) =>
       future.completeWithResult(None)
@@ -56,7 +56,7 @@ final case class FutureResponder(handler: Handler[_, _], future: CompletableFutu
 final case class NoResponder(handler: Handler[_, _]) extends Responder {
   def apply[T](in: RedisType[T]): Seq[Responder] = in match {
     case RedisMulti(Some(length)) =>
-      handler.childHandlers.take(length).map(NoResponder(_))
+      handler.handlers.take(length).map(NoResponder(_))
     case RedisMulti(None) => Nil
     case RedisType(_) =>
       handler match {

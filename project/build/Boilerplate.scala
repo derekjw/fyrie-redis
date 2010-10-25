@@ -29,7 +29,7 @@ trait Boilerplate {
 
           """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(%s)]]] {
              |
-             |  def childHandlers = Stream.continually(Stream(%s)).flatten
+             |  def handlers = Stream.continually(Stream(%s)).flatten
              |
              |  def parseResult(in: Option[Stream[Future[Option[Array[Byte]]]]]): Option[Stream[(%s)]] =
              |    in.map(_.map(_.await.result.get).grouped(%d).toStream.flatMap{
