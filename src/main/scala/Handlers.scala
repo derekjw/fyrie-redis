@@ -10,17 +10,6 @@ abstract class Handler[A,B] {
   def verify(in: String, expect: String): Unit =
     if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
 
-  def string(in: Array[Byte]): String = new String(in, "UTF-8")
-
-  def complete(future: Option[CompletableFuture[Any]], value: => Any) =
-    future foreach { f =>
-      try {
-        f.completeWithResult(value)
-      } catch {
-        case e: Exception => f.completeWithException(e)
-      }
-    }
-
   def mkFuturePair: (CompletableFuture[Any], Future[B]) = {
     val f = new DefaultCompletableFuture[A](5000)
     (f.asInstanceOf[CompletableFuture[Any]], f.map(parseResult))
