@@ -166,7 +166,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     writeBuf._2.flip
   }
 
-  def respond[T](data: RedisType[T]) {
+  def respond(data: RedisType) {
     responseQueue.dequeue.apply(data).reverse.foreach(_ +=: responseQueue)
   }
 
@@ -182,7 +182,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
         readHandler = readBuf.get.toChar match {
           case '+' => ReadString
           case '-' => ReadError
-          case ':' => ReadString
+          case ':' => ReadInteger
           case '$' => ReadBulk
           case '*' => ReadMultiBulk
           case x => error("Invalid Byte: " + x.toByte)
@@ -220,6 +220,16 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     def apply = {
       readSingleLine map { (data) =>
         respond(RedisString(data))
+        readHandler = Idle
+        true
+      } getOrElse false
+    }
+  }
+
+  object ReadInteger extends ReadHandler {
+    def apply = {
+      readSingleLine map { (data) =>
+        respond(RedisInteger(data))
         readHandler = Idle
         true
       } getOrElse false

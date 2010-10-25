@@ -27,11 +27,11 @@ trait Boilerplate {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(%s)]]] {
+          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Option[Stream[Future[RedisBulk]]], Option[Stream[(%s)]]] {
              |
              |  def handlers = Stream.continually(Stream(%s)).flatten
              |
-             |  def parseResult(in: Option[Stream[Future[Option[Array[Byte]]]]]): Option[Stream[(%s)]] =
+             |  def parseResult(in: Option[Stream[Future[RedisBulk]]]): Option[Stream[(%s)]] =
              |    in.map(_.map(_.await.result.get).grouped(%d).toStream.flatMap{
              |      case Stream(%s) => Some((%s))
              |      case _ => None
@@ -44,7 +44,7 @@ trait Boilerplate {
                                      mapMkString { n => "Bulk[%s]()".format(n.alpha) },
                                      mapMkString { n => "Option[%s]".format(n.alpha) },
                                      arity,
-                                     mapMkString { n => n.seqElem },
+                                     mapMkString { n => "RedisBulk(%s)" format n.seqElem },
                                      mapMkString { n => "%s.map(x => %s(x))".format(n.seqElem,n.element) })
       }
 

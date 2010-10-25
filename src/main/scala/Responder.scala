@@ -8,7 +8,7 @@ import se.scalablesolutions.akka.dispatch._
 sealed trait Responder {
   val handler: Handler[_, _]
 
-  def apply[T](in: RedisType[T]): Seq[Responder]
+  def apply(in: RedisType): Seq[Responder]
 }
 
 object Responder {
@@ -20,11 +20,11 @@ object Responder {
 }
 
 final case class ActorResponder(handler: Handler[_, _], target: ActorRef) extends Responder {
-  def apply[T](in: RedisType[T]): Seq[Responder] = error("not implmented")
+  def apply(in: RedisType): Seq[Responder] = error("not implmented")
 }
 
 final case class FutureResponder(handler: Handler[_, _], future: CompletableFuture[Any]) extends Responder {
-  def apply[T](in: RedisType[T]): Seq[Responder] = in match {
+  def apply(in: RedisType): Seq[Responder] = in match {
     case RedisError(err) =>
       future.completeWithException(err)
       Nil
@@ -42,23 +42,23 @@ final case class FutureResponder(handler: Handler[_, _], future: CompletableFutu
     case RedisMulti(None) =>
       future.completeWithResult(None)
       Nil
-    case RedisType(value) =>
+    case x =>
       handler match {
         case MultiExec(handlers) =>
           Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
         case _ => 
-          future.completeWithResult(value)
+          future.completeWithResult(x)
           Nil
       }
   }
 }
 
 final case class NoResponder(handler: Handler[_, _]) extends Responder {
-  def apply[T](in: RedisType[T]): Seq[Responder] = in match {
+  def apply(in: RedisType): Seq[Responder] = in match {
     case RedisMulti(Some(length)) =>
       handler.handlers.take(length).map(NoResponder(_))
     case RedisMulti(None) => Nil
-    case RedisType(_) =>
+    case x =>
       handler match {
         case MultiExec(handlers) =>
           Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
