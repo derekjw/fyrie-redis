@@ -27,7 +27,7 @@ trait Boilerplate {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends MultiHandler[Option[Stream[(%s)]]] {
+          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends MultiHandler[(%s)] {
              |
              |  def handlers = Stream.continually(Stream(%s)).flatten
              |
