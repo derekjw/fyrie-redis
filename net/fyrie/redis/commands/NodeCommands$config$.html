@@ -69,7 +69,7 @@
         <span class="name">get</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="param">param: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       
@@ -81,7 +81,7 @@
         <span class="name">set</span>
         
         <span class="params">(<span name="param">param: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       

@@ -26,7 +26,7 @@
       <span class="symbol">
         <span class="name">Error</span>
         
-        <span class="params">(<span name="exception">exception: Exception</span>)</span>
+        <span class="params">(<span name="exception">exception: Throwable</span>)</span>
         <span class="result"> extends <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>] with <span class="extype" name="scala.Product">Product</span></span>
       </span>
       </h4>
@@ -70,7 +70,7 @@
       <span class="symbol">
         <span class="name">Error</span>
         
-        <span class="params">(<span name="exception">exception: Exception</span>)</span>
+        <span class="params">(<span name="exception">exception: Throwable</span>)</span>
         
       </span>
       </h4>
@@ -366,14 +366,14 @@ scala.Int
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error#exception">
-      <a id="exception:Exception"></a>
+      <a id="exception:Throwable"></a>
       <h4 class="signature">
       <span class="kind">val</span>
       <span class="symbol">
         <span class="name">exception</span>
         
         
-        <span class="result">: Exception</span>
+        <span class="result">: Throwable</span>
       </span>
       </h4>
       
@@ -401,6 +401,23 @@ there are no more references to the object.</p><p>The details of when and if the
             
             
           </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error#fold">
+      <a id="fold[X]((Nothing) ⇒ X,(Throwable) ⇒ X):X"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">fold</span>
+        <span class="tparams">[<span name="X">X</span>]</span>
+        <span class="params">(<span name="ifResult">ifResult: (<span class="extype" name="scala.Nothing">Nothing</span>) ⇒ X</span>, <span name="ifError">ifError: (Throwable) ⇒ X</span>)</span>
+        <span class="result">: X</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.Error">Error</a> → <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>
+        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#foreach">
       <a id="foreach[U]((Nothing) ⇒ U):Unit"></a>
@@ -757,14 +774,14 @@ possible to check whether the contents of the list are of the requested typed.
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#toEither">
-      <a id="toEither:Either[Exception, Nothing]"></a>
+      <a id="toEither:Either[Throwable, Nothing]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">toEither</span>
         
         
-        <span class="result">: <span class="extype" name="scala.Either">Either</span>[Exception, <span class="extype" name="scala.Nothing">Nothing</span>]</span>
+        <span class="result">: <span class="extype" name="scala.Either">Either</span>[Throwable, <span class="extype" name="scala.Nothing">Nothing</span>]</span>
       </span>
       </h4>
       

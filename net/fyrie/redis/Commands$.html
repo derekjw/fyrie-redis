@@ -69,7 +69,7 @@
         <span class="name">auth</span>
         
         <span class="params">(<span name="secret">secret: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Supply a password if required to send commands.</p>
@@ -81,7 +81,7 @@
         <span class="name">blpop</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="values">values: Iterable[Any]</span>, <span name="timeoutInSeconds">timeoutInSeconds: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       
@@ -93,7 +93,7 @@
         <span class="name">brpop</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="values">values: Iterable[Any]</span>, <span name="timeoutInSeconds">timeoutInSeconds: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       
@@ -105,7 +105,7 @@
         <span class="name">decr</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Long] with Product</span>
+        <span class="result"> extends Command[Long] with Product</span>
       </span>
       </a></h4>
       
@@ -117,7 +117,7 @@
         <span class="name">decrby</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="increment">increment: Long</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Long] with Product</span>
+        <span class="result"> extends Command[Long] with Product</span>
       </span>
       </a></h4>
       
@@ -129,7 +129,7 @@
         <span class="name">del</span>
         
         <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Delete each key in <code>keys</code>.</p>
@@ -141,7 +141,7 @@
         <span class="name">exists</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Tests if <code>key</code> exists.</p>
@@ -153,7 +153,7 @@
         <span class="name">expire</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="seconds">seconds: Int</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Set a timeout of the specified key.</p>
@@ -165,7 +165,7 @@
         <span class="name">expireat</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="unixtime">unixtime: Int</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Set a timeout of the specified key.</p>
@@ -177,7 +177,7 @@
         <span class="name">get</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -189,7 +189,7 @@
         <span class="name">getType</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, String] with Product</span>
+        <span class="result"> extends Command[String] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Requests the type of the value stored at <code>key</code>.</p>
@@ -201,7 +201,7 @@
         <span class="name">getset</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -213,7 +213,7 @@
         <span class="name">hdel</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -225,7 +225,7 @@
         <span class="name">hexists</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -237,7 +237,7 @@
         <span class="name">hget</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -249,7 +249,7 @@
         <span class="name">hgetall</span>
         <span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parseK">parseK: Parse[K]</span>, <span name="parseV">parseV: Parse[V]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(K, V)]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[(K, V)]]] with Product</span>
       </span>
       </a></h4>
       
@@ -261,7 +261,7 @@
         <span class="name">hincrby</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="value">value: Long</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Long] with Product</span>
+        <span class="result"> extends Command[Long] with Product</span>
       </span>
       </a></h4>
       
@@ -273,7 +273,7 @@
         <span class="name">hkeys</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -285,7 +285,7 @@
         <span class="name">hlen</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Long] with Product</span>
+        <span class="result"> extends Command[Long] with Product</span>
       </span>
       </a></h4>
       
@@ -297,7 +297,7 @@
         <span class="name">hmget</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="fields">fields: Seq[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       
@@ -309,7 +309,7 @@
         <span class="name">hmset</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="fvs">fvs: Iterable[Product2[Any, Any]]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -321,7 +321,7 @@
         <span class="name">hset</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -333,7 +333,7 @@
         <span class="name">hsetnx</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="field">field: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -345,7 +345,7 @@
         <span class="name">hvals</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -357,7 +357,7 @@
         <span class="name">incr</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Long] with Product</span>
+        <span class="result"> extends Command[Long] with Product</span>
       </span>
       </a></h4>
       
@@ -369,7 +369,7 @@
         <span class="name">incrby</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="increment">increment: Long</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Long] with Product</span>
+        <span class="result"> extends Command[Long] with Product</span>
       </span>
       </a></h4>
       
@@ -381,7 +381,7 @@
         <span class="name">info</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -393,7 +393,7 @@
         <span class="name">keys</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="pattern">pattern: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Request keys matching <code>pattern</code>.</p>
@@ -405,7 +405,7 @@
         <span class="name">lindex</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="index">index: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -417,7 +417,7 @@
         <span class="name">llen</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -429,7 +429,7 @@
         <span class="name">lpop</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -441,7 +441,7 @@
         <span class="name">lpush</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -453,7 +453,7 @@
         <span class="name">lrange</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -465,7 +465,7 @@
         <span class="name">lrem</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="count">count: Int</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -477,7 +477,7 @@
         <span class="name">lset</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="index">index: Int</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -489,7 +489,7 @@
         <span class="name">ltrim</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -501,7 +501,7 @@
         <span class="name">mget</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       
@@ -513,7 +513,7 @@
         <span class="name">move</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="db">db: Int</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Move <code>key</code> from the currently selected database to the database at index <code>db</code>.</p>
@@ -525,7 +525,7 @@
         <span class="name">mset</span>
         
         <span class="params">(<span name="kvs">kvs: Iterable[Product2[Any, Any]]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -537,7 +537,7 @@
         <span class="name">msetnx</span>
         
         <span class="params">(<span name="kvs">kvs: Iterable[Product2[Any, Any]]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -548,8 +548,8 @@
       <span class="symbol">
         <span class="name">multiexec</span>
         
-        <span class="params">(<span name="commands">commands: Seq[net.fyrie.redis.Command[_, _]]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[se.scalablesolutions.akka.dispatch.Future[_]]], Option[Stream[_]]] with Product</span>
+        <span class="params">(<span name="commands">commands: Seq[net.fyrie.redis.Command[_]]</span>)</span>
+        <span class="result"> extends Command[Option[Stream[Any]]] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Executes a list of commands atomically.</p>
@@ -561,7 +561,7 @@
         <span class="name">randomkey</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span class="implicit">implicit </span><span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Request a random key.</p>
@@ -573,7 +573,7 @@
         <span class="name">rename</span>
         
         <span class="params">(<span name="oldkey">oldkey: Any</span>, <span name="newkey">newkey: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Rename a key.</p>
@@ -585,7 +585,7 @@
         <span class="name">renamenx</span>
         
         <span class="params">(<span name="oldkey">oldkey: Any</span>, <span name="newkey">newkey: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Rename a key if <code>newkey</code> does not already exist.</p>
@@ -597,7 +597,7 @@
         <span class="name">rpop</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -609,7 +609,7 @@
         <span class="name">rpoplpush</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="srcKey">srcKey: Any</span>, <span name="dstKey">dstKey: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -621,7 +621,7 @@
         <span class="name">rpush</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -633,7 +633,7 @@
         <span class="name">sadd</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -645,7 +645,7 @@
         <span class="name">scard</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -657,7 +657,7 @@
         <span class="name">sdiff</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -669,7 +669,7 @@
         <span class="name">sdiffstore</span>
         
         <span class="params">(<span name="dstkey">dstkey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -681,7 +681,7 @@
         <span class="name">select</span>
         
         <span class="params">(<span name="index">index: Int</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Select a DB with the supplied zero-based index.</p>
@@ -693,7 +693,7 @@
         <span class="name">set</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -705,7 +705,7 @@
         <span class="name">setnx</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -717,7 +717,7 @@
         <span class="name">sinter</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -729,7 +729,7 @@
         <span class="name">sinterstore</span>
         
         <span class="params">(<span name="dstkey">dstkey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -741,7 +741,7 @@
         <span class="name">sismember</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -753,7 +753,7 @@
         <span class="name">slaveof</span>
         
         <span class="params">(<span name="hostPort">hostPort: Option[(String, Int)]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -765,7 +765,7 @@
         <span class="name">smembers</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -777,7 +777,7 @@
         <span class="name">smove</span>
         
         <span class="params">(<span name="sourceKey">sourceKey: Any</span>, <span name="destKey">destKey: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -789,7 +789,7 @@
         <span class="name">sort</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Seq[Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Sorts the elements contained in a List, Set, or Sorted Set value at <code>key</code>.</p>
@@ -801,7 +801,7 @@
         <span class="name">sort10</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>, <span name="P10">P10</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>, <span name="p10">p10: Parse[P10]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9], Option[P10])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9], Option[P10])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -813,7 +813,7 @@
         <span class="name">sort2</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product2[Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -825,7 +825,7 @@
         <span class="name">sort3</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product3[Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -837,7 +837,7 @@
         <span class="name">sort4</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product4[Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -849,7 +849,7 @@
         <span class="name">sort5</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product5[Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -861,7 +861,7 @@
         <span class="name">sort6</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product6[Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -873,7 +873,7 @@
         <span class="name">sort7</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product7[Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -885,7 +885,7 @@
         <span class="name">sort8</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product8[Any, Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -897,7 +897,7 @@
         <span class="name">sort9</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="by">by: Option[Any]</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="get">get: Product9[Any, Any, Any, Any, Any, Any, Any, Any, Any]</span>, <span name="order">order: Option[SortOrder]</span>, <span name="alpha">alpha: Boolean</span>, <span name="format">format: Format</span>, <span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9])]]] with SortTupled with Product</span>
+        <span class="result"> extends Command[Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9])]]] with SortTupled with Product</span>
       </span>
       </a></h4>
       
@@ -909,7 +909,7 @@
         <span class="name">spop</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -921,7 +921,7 @@
         <span class="name">srandmember</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -933,7 +933,7 @@
         <span class="name">srem</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="value">value: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -945,7 +945,7 @@
         <span class="name">sunion</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -957,7 +957,7 @@
         <span class="name">sunionstore</span>
         
         <span class="params">(<span name="dstkey">dstkey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -969,7 +969,7 @@
         <span class="name">zadd</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="score">score: Double</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Boolean] with Product</span>
+        <span class="result"> extends Command[Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -981,7 +981,7 @@
         <span class="name">zcard</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -993,7 +993,7 @@
         <span class="name">zcount</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="min">min: Double</span>, <span name="minInclusive">minInclusive: Boolean</span>, <span name="max">max: Double</span>, <span name="maxInclusive">maxInclusive: Boolean</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1005,7 +1005,7 @@
         <span class="name">zincrby</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="incr">incr: Double</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -1017,7 +1017,7 @@
         <span class="name">zrange</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -1029,7 +1029,7 @@
         <span class="name">zrangeWithScores</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[(A, Double)]]] with Product</span>
       </span>
       </a></h4>
       
@@ -1041,7 +1041,7 @@
         <span class="name">zrangebyscore</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="min">min: Double</span>, <span name="minInclusive">minInclusive: Boolean</span>, <span name="max">max: Double</span>, <span name="maxInclusive">maxInclusive: Boolean</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[Option[A]]]] with Product</span>
       </span>
       </a></h4>
       
@@ -1053,7 +1053,7 @@
         <span class="name">zrangebyscoreWithScores</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="min">min: Double</span>, <span name="minInclusive">minInclusive: Boolean</span>, <span name="max">max: Double</span>, <span name="maxInclusive">maxInclusive: Boolean</span>, <span name="limit">limit: Option[(Int, Int)]</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[(A, Double)]]] with Product</span>
       </span>
       </a></h4>
       
@@ -1065,7 +1065,7 @@
         <span class="name">zrank</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1077,7 +1077,7 @@
         <span class="name">zrem</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1089,7 +1089,7 @@
         <span class="name">zremrangebyrank</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1101,7 +1101,7 @@
         <span class="name">zremrangebyscore</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Double</span>, <span name="end">end: Double</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1113,7 +1113,7 @@
         <span class="name">zrevrange</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[A]]] with Product</span>
       </span>
       </a></h4>
       
@@ -1125,7 +1125,7 @@
         <span class="name">zrevrangeWithScores</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="start">start: Int</span>, <span name="end">end: Int</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+        <span class="result"> extends Command[Option[Stream[(A, Double)]]] with Product</span>
       </span>
       </a></h4>
       
@@ -1137,7 +1137,7 @@
         <span class="name">zrevrank</span>
         
         <span class="params">(<span name="key">key: Any</span>, <span name="member">member: Any</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1149,7 +1149,7 @@
         <span class="name">zscore</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="key">key: Any</span>, <span name="element">element: Any</span>, <span name="format">format: Format</span>, <span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -1161,7 +1161,7 @@
         <span class="name">zunionstore</span>
         
         <span class="params">(<span name="dstKey">dstKey: Any</span>, <span name="keys">keys: Iterable[Any]</span>, <span name="aggregate">aggregate: Option[AggregateScore]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1173,7 +1173,7 @@
         <span class="name">zunionstoreWeighted</span>
         
         <span class="params">(<span name="dstKey">dstKey: Any</span>, <span name="kws">kws: Iterable[Product2[Any, Double]]</span>, <span name="aggregate">aggregate: Option[AggregateScore]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1363,7 +1363,7 @@ part of compilation it is not possible to check whether the contents of the list
         <span class="name">bgsave</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -1375,7 +1375,7 @@ part of compilation it is not possible to check whether the contents of the list
         <span class="name">bgwriteaof</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -1423,7 +1423,7 @@ part of compilation it is not possible to check whether the contents of the list
         <span class="name">dbsize</span>
         
         
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Request the number of keys in the current database.</p>
@@ -1529,7 +1529,7 @@ there are no more references to the object.</p><p>The details of when and if the
         <span class="name">flushall</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Delete all keys in all databases.</p>
@@ -1541,7 +1541,7 @@ there are no more references to the object.</p><p>The details of when and if the
         <span class="name">flushdb</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Delete all keys in the currently selected database.</p>
@@ -1629,7 +1629,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">lastsave</span>
         
         
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -1641,7 +1641,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">monitor</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -1723,7 +1723,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">quit</span>
         
         
-        <span class="result"> extends Command[Unit, Unit] with Product</span>
+        <span class="result"> extends Command[Response[Nothing]] with Product</span>
       </span>
       </a></h4>
       <p class="comment cmt">Asks the server to close the connection.</p>
@@ -1735,7 +1735,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">save</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -1747,7 +1747,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">shutdown</span>
         
         
-        <span class="result"> extends Command[Unit, Unit] with Product</span>
+        <span class="result"> extends Command[Response[Nothing]] with Product</span>
       </span>
       </a></h4>
       

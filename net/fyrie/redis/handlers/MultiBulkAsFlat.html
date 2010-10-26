@@ -26,8 +26,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsFlat</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="parse">parse: <a href="../serialization/Parse.html" class="extype" name="net.fyrie.redis.serialization.Parse">Parse</a>[A]</span>)</span>
-        <span class="result"> extends <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Option">Option</span>[Stream[<span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]]]], <span class="extype" name="scala.Option">Option</span>[Stream[A]]] with <span class="extype" name="scala.Product">Product</span></span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$15">evidence$15: <a href="../serialization/Parse.html" class="extype" name="net.fyrie.redis.serialization.Parse">Parse</a>[A]</span>, <span name="evidence$16">evidence$16: Manifest[A]</span>)</span>
+        <span class="result"> extends <a href="MultiHandler.html" class="extype" name="net.fyrie.redis.handlers.MultiHandler">MultiHandler</a>[A] with <span class="extype" name="scala.Product">Product</span></span>
       </span>
       </h4>
       <div class="fullcomment" id="comment"><div class="block">
@@ -35,7 +35,7 @@
         </div><div class="block">
             go to: <a href="MultiBulkAsFlat$.html">companion</a>
           </div><div class="block">
-            linear super types: <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Option">Option</span>[Stream[<span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]]]], <span class="extype" name="scala.Option">Option</span>[Stream[A]]], AnyRef, <span class="extype" name="scala.Any">Any</span>
+            linear super types: <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="MultiHandler.html" class="extype" name="net.fyrie.redis.handlers.MultiHandler">MultiHandler</a>[A], <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Option">Option</span>[Stream[A]]], AnyRef, <span class="extype" name="scala.Any">Any</span>
           </div></div>
 
       <div id="template">
@@ -49,7 +49,7 @@
           <div id="ancestors">
                 <span class="filtertype">Inherited</span>
                 <ol><li class="hideall">Hide All</li><li class="showall">Show all</li></ol>
-                <ol id="linearization"><li class="in" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</li><li class="in" name="scala.Product">Product</li><li class="in" name="scala.Equals">Equals</li><li class="in" name="net.fyrie.redis.handlers.Handler">Handler</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
+                <ol id="linearization"><li class="in" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</li><li class="in" name="scala.Product">Product</li><li class="in" name="scala.Equals">Equals</li><li class="in" name="net.fyrie.redis.handlers.MultiHandler">MultiHandler</li><li class="in" name="net.fyrie.redis.handlers.Handler">Handler</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
               </div>
           <div id="visbl">
               <span class="filtertype">Visibility</span>
@@ -70,7 +70,7 @@
       <span class="symbol">
         <span class="name">MultiBulkAsFlat</span>
         
-        <span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="parse">parse: <a href="../serialization/Parse.html" class="extype" name="net.fyrie.redis.serialization.Parse">Parse</a>[A]</span>)</span>
+        <span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../serialization/Parse.html" class="extype" name="net.fyrie.redis.serialization.Parse">Parse</a>[A]</span>, <span name="arg1">arg1: Manifest[A]</span>)</span>
         
       </span>
       </h4>
@@ -272,23 +272,6 @@ part of compilation it is not possible to check whether the contents of the list
           definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</a> → Equals
         </div></div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat#childHandlers">
-      <a id="childHandlers:Stream[Bulk[A]]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">childHandlers</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.collection.immutable.Stream">Stream</span>[<a href="Bulk.html" class="extype" name="net.fyrie.redis.handlers.Bulk">Bulk</a>[A]]</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</a> → <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
-        </div></div>
-          
     </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
       <a id="clone():AnyRef"></a>
       <h4 class="signature">
@@ -312,23 +295,6 @@ part of compilation it is not possible to check whether the contents of the list
             
             
           </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#complete">
-      <a id="complete(Option[CompletableFuture[Any]],⇒ Any):Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">complete</span>
-        
-        <span class="params">(<span name="future">future: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="se.scalablesolutions.akka.dispatch.CompletableFuture">CompletableFuture</span>[<span class="extype" name="scala.Any">Any</span>]]</span>, <span name="value">value: ⇒ <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
-        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#eq">
       <a id="eq(AnyRef):Boolean"></a>
@@ -448,6 +414,23 @@ there are no more references to the object.</p><p>The details of when and if the
             
           </div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat#handlers">
+      <a id="handlers:Stream[Bulk[A]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">handlers</span>
+        
+        
+        <span class="result">: <span class="extype" name="scala.collection.immutable.Stream">Stream</span>[<a href="Bulk.html" class="extype" name="net.fyrie.redis.handlers.Bulk">Bulk</a>[A]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</a> → <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
+        </div></div>
+          
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat#hashCode">
       <a id="hashCode():Int"></a>
       <h4 class="signature">
@@ -499,23 +482,6 @@ possible to check whether the contents of the list are of the requested typed.
             
             
           </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#mkFuturePair">
-      <a id="mkFuturePair:(CompletableFuture[Any], Future[Option[Stream[A]]])"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">mkFuturePair</span>
-        
-        
-        <span class="result">: (<span class="extype" name="se.scalablesolutions.akka.dispatch.CompletableFuture">CompletableFuture</span>[<span class="extype" name="scala.Any">Any</span>], <span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[Stream[A]]])</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
-        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
       <a id="ne(AnyRef):Boolean"></a>
@@ -588,37 +554,20 @@ possible to check whether the contents of the list are of the requested typed.
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat#parse">
-      <a id="parse:Parse[A]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit val</span>
-      <span class="symbol">
-        <span class="name">parse</span>
-        
-        
-        <span class="result">: <a href="../serialization/Parse.html" class="extype" name="net.fyrie.redis.serialization.Parse">Parse</a>[A]</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: implicit 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat#parseResult">
-      <a id="parseResult(Option[Stream[Future[Option[Array[Byte]]]]]):Option[Stream[A]]"></a>
+      <a id="parse(Option[Stream[Response[Any]]]):Option[Stream[A]]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
-        <span class="name">parseResult</span>
+        <span class="name">parse</span>
         
-        <span class="params">(<span name="in">in: <span class="extype" name="scala.Option">Option</span>[Stream[<span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]]]]</span>)</span>
+        <span class="params">(<span name="in">in: <span class="extype" name="scala.Option">Option</span>[Stream[<a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Any">Any</span>]]]</span>)</span>
         <span class="result">: <span class="extype" name="scala.Option">Option</span>[Stream[A]]</span>
       </span>
       </h4>
       
             
             <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</a> → <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</a> → <a href="MultiHandler.html" class="extype" name="net.fyrie.redis.handlers.MultiHandler">MultiHandler</a>
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.MultiBulkAsFlat#productArity">
@@ -706,23 +655,6 @@ possible to check whether the contents of the list are of the requested typed.
             
             <div class="fullcomment"><div class="block">
           definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.MultiBulkAsFlat">MultiBulkAsFlat</a> → Product
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#string">
-      <a id="string(Array[Byte]):String"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">string</span>
-        
-        <span class="params">(<span name="in">in: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span>
-        <span class="result">: String</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
@@ -847,8 +779,10 @@ possible to check whether the contents of the list are of the requested typed.
               <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="net.fyrie.redis.handlers.MultiHandler">
+              <h3>Inherited from <a href="MultiHandler.html" class="extype" name="net.fyrie.redis.handlers.MultiHandler">MultiHandler</a>[A]</h3>
             </div><div class="parent" name="net.fyrie.redis.handlers.Handler">
-              <h3>Inherited from <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Option">Option</span>[Stream[<span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]]]], <span class="extype" name="scala.Option">Option</span>[Stream[A]]]</h3>
+              <h3>Inherited from <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Option">Option</span>[Stream[A]]]</h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from AnyRef</h3>
             </div><div class="parent" name="scala.Any">

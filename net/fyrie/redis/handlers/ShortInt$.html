@@ -27,11 +27,11 @@
         <span class="name">ShortInt</span>
         
         
-        <span class="result"> extends <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[String, <span class="extype" name="scala.Int">Int</span>] with <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a> with <span class="extype" name="scala.Product">Product</span></span>
+        <span class="result"> extends <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<a href="../RedisInteger.html" class="extype" name="net.fyrie.redis.RedisInteger">RedisInteger</a>, <span class="extype" name="scala.Int">Int</span>] with <span class="extype" name="scala.Product">Product</span></span>
       </span>
       </h4>
       <div class="fullcomment" id="comment"><div class="block">
-            linear super types: <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>, <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[String, <span class="extype" name="scala.Int">Int</span>], AnyRef, <span class="extype" name="scala.Any">Any</span>
+            linear super types: <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<a href="../RedisInteger.html" class="extype" name="net.fyrie.redis.RedisInteger">RedisInteger</a>, <span class="extype" name="scala.Int">Int</span>], <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Int">Int</span>], AnyRef, <span class="extype" name="scala.Any">Any</span>
           </div></div>
 
       <div id="template">
@@ -253,23 +253,6 @@ part of compilation it is not possible to check whether the contents of the list
           definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.ShortInt">ShortInt</a> → Equals
         </div></div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.SingleHandler#childHandlers">
-      <a id="childHandlers:Seq[net.fyrie.redis.handlers.Handler[_, _]]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">childHandlers</span>
-        
-        
-        <span class="result">: Seq[net.fyrie.redis.handlers.Handler[_, _]]</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>
-        </div></div>
-          
     </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
       <a id="clone():AnyRef"></a>
       <h4 class="signature">
@@ -293,23 +276,6 @@ part of compilation it is not possible to check whether the contents of the list
             
             
           </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#complete">
-      <a id="complete(Option[CompletableFuture[Any]],⇒ Any):Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">complete</span>
-        
-        <span class="params">(<span name="future">future: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="se.scalablesolutions.akka.dispatch.CompletableFuture">CompletableFuture</span>[<span class="extype" name="scala.Any">Any</span>]]</span>, <span name="value">value: ⇒ <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
-        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#eq">
       <a id="eq(AnyRef):Boolean"></a>
@@ -429,6 +395,23 @@ there are no more references to the object.</p><p>The details of when and if the
             
           </div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.SingleHandler#handlers">
+      <a id="handlers:Seq[net.fyrie.redis.handlers.Handler[_]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">handlers</span>
+        
+        
+        <span class="result">: Seq[net.fyrie.redis.handlers.Handler[_]]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a> → <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
+        </div></div>
+          
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#hashCode">
       <a id="hashCode():Int"></a>
       <h4 class="signature">
@@ -455,6 +438,25 @@ to verify that the behavior is consistent with the <code>equals</code> method.
             
           </div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.SingleHandler#inputManifest">
+      <a id="inputManifest:Manifest[RedisInteger]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit val</span>
+      <span class="symbol">
+        <span class="name">inputManifest</span>
+        
+        
+        <span class="result">: Manifest[<a href="../RedisInteger.html" class="extype" name="net.fyrie.redis.RedisInteger">RedisInteger</a>]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>
+        </div></div>
+          
     </li><li visbl="pub" data-isabs="false" name="scala.Any#isInstanceOf">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <h4 class="signature">
@@ -480,23 +482,6 @@ possible to check whether the contents of the list are of the requested typed.
             
             
           </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#mkFuturePair">
-      <a id="mkFuturePair:(CompletableFuture[Any], Future[Int])"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">mkFuturePair</span>
-        
-        
-        <span class="result">: (<span class="extype" name="se.scalablesolutions.akka.dispatch.CompletableFuture">CompletableFuture</span>[<span class="extype" name="scala.Any">Any</span>], <span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[<span class="extype" name="scala.Int">Int</span>])</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
-        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
       <a id="ne(AnyRef):Boolean"></a>
@@ -568,21 +553,21 @@ possible to check whether the contents of the list are of the requested typed.
             
           </div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.ShortInt#parseResult">
-      <a id="parseResult(String):Int"></a>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.ShortInt#parse">
+      <a id="parse(RedisInteger):Response[Int]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
-        <span class="name">parseResult</span>
+        <span class="name">parse</span>
         
-        <span class="params">(<span name="in">in: String</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="params">(<span name="in">in: <a href="../RedisInteger.html" class="extype" name="net.fyrie.redis.RedisInteger">RedisInteger</a></span>)</span>
+        <span class="result">: <a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Int">Int</span>]</span>
       </span>
       </h4>
       
             
             <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.ShortInt">ShortInt</a> → <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.handlers.ShortInt">ShortInt</a> → <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.ShortInt#productArity">
@@ -687,23 +672,6 @@ possible to check whether the contents of the list are of the requested typed.
             
             <div class="fullcomment"><div class="block">
           attributes: protected 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#string">
-      <a id="string(Array[Byte]):String"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">string</span>
-        
-        <span class="params">(<span name="in">in: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span>
-        <span class="result">: String</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
@@ -831,9 +799,9 @@ possible to check whether the contents of the list are of the requested typed.
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
             </div><div class="parent" name="net.fyrie.redis.handlers.SingleHandler">
-              <h3>Inherited from <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a></h3>
+              <h3>Inherited from <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<a href="../RedisInteger.html" class="extype" name="net.fyrie.redis.RedisInteger">RedisInteger</a>, <span class="extype" name="scala.Int">Int</span>]</h3>
             </div><div class="parent" name="net.fyrie.redis.handlers.Handler">
-              <h3>Inherited from <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[String, <span class="extype" name="scala.Int">Int</span>]</h3>
+              <h3>Inherited from <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Int">Int</span>]</h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from AnyRef</h3>
             </div><div class="parent" name="scala.Any">

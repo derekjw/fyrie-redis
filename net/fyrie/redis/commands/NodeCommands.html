@@ -71,7 +71,7 @@
         <span class="name">info</span>
         <span class="tparams">[<span name="A">A</span>]</span>
         <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Command[Option[Array[Byte]], Option[A]] with Product</span>
+        <span class="result"> extends Command[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -83,7 +83,7 @@
         <span class="name">slaveof</span>
         
         <span class="params">(<span name="hostPort">hostPort: Option[(String, Int)]</span>, <span name="format">format: Format</span>)</span>
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -273,7 +273,7 @@ part of compilation it is not possible to check whether the contents of the list
         <span class="name">bgsave</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -285,7 +285,7 @@ part of compilation it is not possible to check whether the contents of the list
         <span class="name">bgwriteaof</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -503,7 +503,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">lastsave</span>
         
         
-        <span class="result"> extends Command[String, Int] with Product</span>
+        <span class="result"> extends Command[Int] with Product</span>
       </span>
       </a></h4>
       
@@ -515,7 +515,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">monitor</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -597,7 +597,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">save</span>
         
         
-        <span class="result"> extends Command[String, Unit] with Product</span>
+        <span class="result"> extends Command[Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -609,7 +609,7 @@ possible to check whether the contents of the list are of the requested typed.
         <span class="name">shutdown</span>
         
         
-        <span class="result"> extends Command[Unit, Unit] with Product</span>
+        <span class="result"> extends Command[Response[Nothing]] with Product</span>
       </span>
       </a></h4>
       

@@ -59,8 +59,8 @@
       <span class="symbol">
         <span class="name">Bulk</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Handler[Option[Array[Byte]], Option[A]] with SingleHandler with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$5">evidence$5: Parse[A]</span>, <span name="evidence$6">evidence$6: Manifest[A]</span>)</span>
+        <span class="result"> extends SingleHandler[RedisBulk, Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -70,12 +70,12 @@
         </div></div>
           
     </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.handlers.Handler">
-      <a id="Handler:Handler[A, B]"></a>
+      <a id="Handler:Handler[A]"></a>
       <h4 class="signature"><a href="Handler.html">
       <span class="kind">class</span>
       <span class="symbol">
         <span class="name">Handler</span>
-        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
         
         <span class="result"> extends AnyRef</span>
       </span>
@@ -93,8 +93,8 @@
       <span class="symbol">
         <span class="name">MultiBulk</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[Option[A]]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$7">evidence$7: Parse[A]</span>, <span name="evidence$8">evidence$8: Manifest[A]</span>)</span>
+        <span class="result"> extends MultiHandler[Option[A]] with Product</span>
       </span>
       </a></h4>
       
@@ -110,8 +110,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsFlat</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[A]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$15">evidence$15: Parse[A]</span>, <span name="evidence$16">evidence$16: Manifest[A]</span>)</span>
+        <span class="result"> extends MultiHandler[A] with Product</span>
       </span>
       </a></h4>
       
@@ -127,8 +127,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsPairs</span>
         <span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span>
-        <span class="params">(<span name="parseK">parseK: Parse[K]</span>, <span name="parseV">parseV: Parse[V]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(K, V)]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$9">evidence$9: Parse[K]</span>, <span name="evidence$10">evidence$10: Manifest[K]</span>, <span name="evidence$11">evidence$11: Parse[V]</span>, <span name="evidence$12">evidence$12: Manifest[V]</span>)</span>
+        <span class="result"> extends MultiHandler[(K, V)] with Product</span>
       </span>
       </a></h4>
       
@@ -144,8 +144,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple10</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>, <span name="P10">P10</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>, <span name="p10">p10: Parse[P10]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9], Option[P10])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$89">evidence$89: Parse[P1]</span>, <span name="evidence$90">evidence$90: Manifest[P1]</span>, <span name="evidence$91">evidence$91: Parse[P2]</span>, <span name="evidence$92">evidence$92: Manifest[P2]</span>, <span name="evidence$93">evidence$93: Parse[P3]</span>, <span name="evidence$94">evidence$94: Manifest[P3]</span>, <span name="evidence$95">evidence$95: Parse[P4]</span>, <span name="evidence$96">evidence$96: Manifest[P4]</span>, <span name="evidence$97">evidence$97: Parse[P5]</span>, <span name="evidence$98">evidence$98: Manifest[P5]</span>, <span name="evidence$99">evidence$99: Parse[P6]</span>, <span name="evidence$100">evidence$100: Manifest[P6]</span>, <span name="evidence$101">evidence$101: Parse[P7]</span>, <span name="evidence$102">evidence$102: Manifest[P7]</span>, <span name="evidence$103">evidence$103: Parse[P8]</span>, <span name="evidence$104">evidence$104: Manifest[P8]</span>, <span name="evidence$105">evidence$105: Parse[P9]</span>, <span name="evidence$106">evidence$106: Manifest[P9]</span>, <span name="evidence$107">evidence$107: Parse[P10]</span>, <span name="evidence$108">evidence$108: Manifest[P10]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9], Option[P10])] with Product</span>
       </span>
       </a></h4>
       
@@ -161,8 +161,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple2</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$1">evidence$1: Parse[P1]</span>, <span name="evidence$2">evidence$2: Manifest[P1]</span>, <span name="evidence$3">evidence$3: Parse[P2]</span>, <span name="evidence$4">evidence$4: Manifest[P2]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2])] with Product</span>
       </span>
       </a></h4>
       
@@ -178,8 +178,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple3</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$5">evidence$5: Parse[P1]</span>, <span name="evidence$6">evidence$6: Manifest[P1]</span>, <span name="evidence$7">evidence$7: Parse[P2]</span>, <span name="evidence$8">evidence$8: Manifest[P2]</span>, <span name="evidence$9">evidence$9: Parse[P3]</span>, <span name="evidence$10">evidence$10: Manifest[P3]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3])] with Product</span>
       </span>
       </a></h4>
       
@@ -195,8 +195,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple4</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$11">evidence$11: Parse[P1]</span>, <span name="evidence$12">evidence$12: Manifest[P1]</span>, <span name="evidence$13">evidence$13: Parse[P2]</span>, <span name="evidence$14">evidence$14: Manifest[P2]</span>, <span name="evidence$15">evidence$15: Parse[P3]</span>, <span name="evidence$16">evidence$16: Manifest[P3]</span>, <span name="evidence$17">evidence$17: Parse[P4]</span>, <span name="evidence$18">evidence$18: Manifest[P4]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4])] with Product</span>
       </span>
       </a></h4>
       
@@ -212,8 +212,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple5</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$19">evidence$19: Parse[P1]</span>, <span name="evidence$20">evidence$20: Manifest[P1]</span>, <span name="evidence$21">evidence$21: Parse[P2]</span>, <span name="evidence$22">evidence$22: Manifest[P2]</span>, <span name="evidence$23">evidence$23: Parse[P3]</span>, <span name="evidence$24">evidence$24: Manifest[P3]</span>, <span name="evidence$25">evidence$25: Parse[P4]</span>, <span name="evidence$26">evidence$26: Manifest[P4]</span>, <span name="evidence$27">evidence$27: Parse[P5]</span>, <span name="evidence$28">evidence$28: Manifest[P5]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5])] with Product</span>
       </span>
       </a></h4>
       
@@ -229,8 +229,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple6</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$29">evidence$29: Parse[P1]</span>, <span name="evidence$30">evidence$30: Manifest[P1]</span>, <span name="evidence$31">evidence$31: Parse[P2]</span>, <span name="evidence$32">evidence$32: Manifest[P2]</span>, <span name="evidence$33">evidence$33: Parse[P3]</span>, <span name="evidence$34">evidence$34: Manifest[P3]</span>, <span name="evidence$35">evidence$35: Parse[P4]</span>, <span name="evidence$36">evidence$36: Manifest[P4]</span>, <span name="evidence$37">evidence$37: Parse[P5]</span>, <span name="evidence$38">evidence$38: Manifest[P5]</span>, <span name="evidence$39">evidence$39: Parse[P6]</span>, <span name="evidence$40">evidence$40: Manifest[P6]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6])] with Product</span>
       </span>
       </a></h4>
       
@@ -246,8 +246,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple7</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$41">evidence$41: Parse[P1]</span>, <span name="evidence$42">evidence$42: Manifest[P1]</span>, <span name="evidence$43">evidence$43: Parse[P2]</span>, <span name="evidence$44">evidence$44: Manifest[P2]</span>, <span name="evidence$45">evidence$45: Parse[P3]</span>, <span name="evidence$46">evidence$46: Manifest[P3]</span>, <span name="evidence$47">evidence$47: Parse[P4]</span>, <span name="evidence$48">evidence$48: Manifest[P4]</span>, <span name="evidence$49">evidence$49: Parse[P5]</span>, <span name="evidence$50">evidence$50: Manifest[P5]</span>, <span name="evidence$51">evidence$51: Parse[P6]</span>, <span name="evidence$52">evidence$52: Manifest[P6]</span>, <span name="evidence$53">evidence$53: Parse[P7]</span>, <span name="evidence$54">evidence$54: Manifest[P7]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7])] with Product</span>
       </span>
       </a></h4>
       
@@ -263,8 +263,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple8</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$55">evidence$55: Parse[P1]</span>, <span name="evidence$56">evidence$56: Manifest[P1]</span>, <span name="evidence$57">evidence$57: Parse[P2]</span>, <span name="evidence$58">evidence$58: Manifest[P2]</span>, <span name="evidence$59">evidence$59: Parse[P3]</span>, <span name="evidence$60">evidence$60: Manifest[P3]</span>, <span name="evidence$61">evidence$61: Parse[P4]</span>, <span name="evidence$62">evidence$62: Manifest[P4]</span>, <span name="evidence$63">evidence$63: Parse[P5]</span>, <span name="evidence$64">evidence$64: Manifest[P5]</span>, <span name="evidence$65">evidence$65: Parse[P6]</span>, <span name="evidence$66">evidence$66: Manifest[P6]</span>, <span name="evidence$67">evidence$67: Parse[P7]</span>, <span name="evidence$68">evidence$68: Manifest[P7]</span>, <span name="evidence$69">evidence$69: Parse[P8]</span>, <span name="evidence$70">evidence$70: Manifest[P8]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8])] with Product</span>
       </span>
       </a></h4>
       
@@ -280,8 +280,8 @@
       <span class="symbol">
         <span class="name">MultiBulkAsTuple9</span>
         <span class="tparams">[<span name="P1">P1</span>, <span name="P2">P2</span>, <span name="P3">P3</span>, <span name="P4">P4</span>, <span name="P5">P5</span>, <span name="P6">P6</span>, <span name="P7">P7</span>, <span name="P8">P8</span>, <span name="P9">P9</span>]</span>
-        <span class="params">(<span name="p1">p1: Parse[P1]</span>, <span name="p2">p2: Parse[P2]</span>, <span name="p3">p3: Parse[P3]</span>, <span name="p4">p4: Parse[P4]</span>, <span name="p5">p5: Parse[P5]</span>, <span name="p6">p6: Parse[P6]</span>, <span name="p7">p7: Parse[P7]</span>, <span name="p8">p8: Parse[P8]</span>, <span name="p9">p9: Parse[P9]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9])]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$71">evidence$71: Parse[P1]</span>, <span name="evidence$72">evidence$72: Manifest[P1]</span>, <span name="evidence$73">evidence$73: Parse[P2]</span>, <span name="evidence$74">evidence$74: Manifest[P2]</span>, <span name="evidence$75">evidence$75: Parse[P3]</span>, <span name="evidence$76">evidence$76: Manifest[P3]</span>, <span name="evidence$77">evidence$77: Parse[P4]</span>, <span name="evidence$78">evidence$78: Manifest[P4]</span>, <span name="evidence$79">evidence$79: Parse[P5]</span>, <span name="evidence$80">evidence$80: Manifest[P5]</span>, <span name="evidence$81">evidence$81: Parse[P6]</span>, <span name="evidence$82">evidence$82: Manifest[P6]</span>, <span name="evidence$83">evidence$83: Parse[P7]</span>, <span name="evidence$84">evidence$84: Manifest[P7]</span>, <span name="evidence$85">evidence$85: Parse[P8]</span>, <span name="evidence$86">evidence$86: Manifest[P8]</span>, <span name="evidence$87">evidence$87: Parse[P9]</span>, <span name="evidence$88">evidence$88: Manifest[P9]</span>)</span>
+        <span class="result"> extends MultiHandler[(Option[P1], Option[P2], Option[P3], Option[P4], Option[P5], Option[P6], Option[P7], Option[P8], Option[P9])] with Product</span>
       </span>
       </a></h4>
       
@@ -297,8 +297,8 @@
       <span class="symbol">
         <span class="name">MultiBulkWithScores</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="parse">parse: Parse[A]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[Future[Option[Array[Byte]]]]], Option[Stream[(A, Double)]]] with Product</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$13">evidence$13: Parse[A]</span>, <span name="evidence$14">evidence$14: Manifest[A]</span>)</span>
+        <span class="result"> extends MultiHandler[(A, Double)] with Product</span>
       </span>
       </a></h4>
       
@@ -314,8 +314,8 @@
       <span class="symbol">
         <span class="name">MultiExec</span>
         
-        <span class="params">(<span name="handlers">handlers: Seq[net.fyrie.redis.handlers.Handler[_, _]]</span>)</span>
-        <span class="result"> extends Handler[Option[Stream[se.scalablesolutions.akka.dispatch.Future[_]]], Option[Stream[_]]] with Product</span>
+        <span class="params">(<span name="handlers">handlers: Seq[net.fyrie.redis.handlers.Handler[_]]</span>)</span>
+        <span class="result"> extends MultiHandler[Any] with Product</span>
       </span>
       </a></h4>
       
@@ -324,18 +324,40 @@
           attributes: final 
         </div></div>
           
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.handlers.SingleHandler">
-      <a id="SingleHandler:SingleHandler"></a>
-      <h4 class="signature"><a href="SingleHandler.html">
-      <span class="kind">trait</span>
+    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.handlers.MultiHandler">
+      <a id="MultiHandler:MultiHandler[A]"></a>
+      <h4 class="signature"><a href="MultiHandler.html">
+      <span class="kind">class</span>
       <span class="symbol">
-        <span class="name">SingleHandler</span>
+        <span class="name">MultiHandler</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
         
-        
-        <span class="result"> extends AnyRef</span>
+        <span class="result"> extends Handler[Option[Stream[A]]]</span>
       </span>
       </a></h4>
       
+            
+            <div class="fullcomment"><div class="block">
+          attributes: abstract 
+        </div></div>
+          
+    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.handlers.SingleHandler">
+      <a id="SingleHandler:SingleHandler[A, B]"></a>
+      <h4 class="signature"><a href="SingleHandler.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">SingleHandler</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        
+        <span class="result"> extends Handler[B]</span>
+      </span>
+      </a></h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: abstract 
+        </div></div>
+          
     </li></ol>
             </div>
 
@@ -349,7 +371,7 @@
         <span class="name">IntAsBoolean</span>
         
         
-        <span class="result"> extends Handler[String, Boolean] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[RedisInteger, Boolean] with Product</span>
       </span>
       </a></h4>
       
@@ -361,7 +383,7 @@
         <span class="name">LongInt</span>
         
         
-        <span class="result"> extends Handler[String, Long] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[RedisInteger, Long] with Product</span>
       </span>
       </a></h4>
       
@@ -373,7 +395,7 @@
         <span class="name">NoHandler</span>
         
         
-        <span class="result"> extends Handler[Unit, Unit] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[Unit, Response[Nothing]] with Product</span>
       </span>
       </a></h4>
       
@@ -385,7 +407,7 @@
         <span class="name">OkStatus</span>
         
         
-        <span class="result"> extends Handler[String, Unit] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[RedisString, Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -397,7 +419,7 @@
         <span class="name">QueuedStatus</span>
         
         
-        <span class="result"> extends Handler[String, Unit] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[RedisString, Unit] with Product</span>
       </span>
       </a></h4>
       
@@ -409,7 +431,7 @@
         <span class="name">ShortInt</span>
         
         
-        <span class="result"> extends Handler[String, Int] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[RedisInteger, Int] with Product</span>
       </span>
       </a></h4>
       
@@ -421,7 +443,7 @@
         <span class="name">Status</span>
         
         
-        <span class="result"> extends Handler[String, String] with SingleHandler with Product</span>
+        <span class="result"> extends SingleHandler[RedisString, String] with Product</span>
       </span>
       </a></h4>
       

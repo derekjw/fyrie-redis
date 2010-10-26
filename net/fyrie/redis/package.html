@@ -59,7 +59,7 @@
       <span class="symbol">
         <span class="name">ActorResponder</span>
         
-        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_, _]</span>, <span name="target">target: ActorRef</span>)</span>
+        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_]</span>, <span name="target">target: ActorRef</span>)</span>
         <span class="result"> extends Responder with Product</span>
       </span>
       </a></h4>
@@ -82,12 +82,12 @@
       </a></h4>
       
     </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.Command">
-      <a id="Command:Command[A, B]"></a>
+      <a id="Command:Command[A]"></a>
       <h4 class="signature"><a href="Command.html">
       <span class="kind">class</span>
       <span class="symbol">
         <span class="name">Command</span>
-        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
         
         <span class="result"> extends Product</span>
       </span>
@@ -102,7 +102,7 @@ the server's response.</p>
       <span class="symbol">
         <span class="name">Error</span>
         
-        <span class="params">(<span name="exception">exception: Exception</span>)</span>
+        <span class="params">(<span name="exception">exception: Throwable</span>)</span>
         <span class="result"> extends Response[Nothing] with Product</span>
       </span>
       </a></h4>
@@ -119,7 +119,7 @@ the server's response.</p>
       <span class="symbol">
         <span class="name">FutureResponder</span>
         
-        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_, _]</span>, <span name="future">future: CompletableFuture[Any]</span>)</span>
+        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_]</span>, <span name="future">future: CompletableFuture[Any]</span>)</span>
         <span class="result"> extends Responder with Product</span>
       </span>
       </a></h4>
@@ -136,7 +136,7 @@ the server's response.</p>
       <span class="symbol">
         <span class="name">NoResponder</span>
         
-        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_, _]</span>)</span>
+        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_]</span>)</span>
         <span class="result"> extends Responder with Product</span>
       </span>
       </a></h4>
@@ -400,6 +400,18 @@ the server's response.</p>
       </span>
       </a></h4>
       
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.FutureResponder">
+      <a id="FutureResponder:FutureResponder"></a>
+      <h4 class="signature"><a href="FutureResponder$.html">
+      <span class="kind">object</span>
+      <span class="symbol">
+        <span class="name">FutureResponder</span>
+        
+        
+        <span class="result"> extends AnyRef</span>
+      </span>
+      </a></h4>
+      
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisBulk">
       <a id="RedisBulk:RedisBulk"></a>
       <h4 class="signature"><a href="RedisBulk$.html">
@@ -454,18 +466,6 @@ the server's response.</p>
       <span class="kind">object</span>
       <span class="symbol">
         <span class="name">RedisString</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisType">
-      <a id="RedisType:RedisType"></a>
-      <h4 class="signature"><a href="RedisType$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">RedisType</span>
         
         
         <span class="result"> extends AnyRef</span>

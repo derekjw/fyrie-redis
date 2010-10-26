@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
         <head>
-          <title>net.fyrie.redis.commands.GenericCommands.dbsize</title>
+          <title>net.fyrie.redis.actors.RedisClientSession.ReadInteger</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
@@ -14,31 +14,25 @@
         </head>
         <body class="value" onload="windowTitle();">
 
-      <p id="owner"><a href="../../../package.html" class="extype" name="net">net</a>.<a href="../../package.html" class="extype" name="net.fyrie">fyrie</a>.<a href="../package.html" class="extype" name="net.fyrie.redis">redis</a>.<a href="package.html" class="extype" name="net.fyrie.redis.commands">commands</a>.<a href="GenericCommands.html" class="extype" name="net.fyrie.redis.commands.GenericCommands">GenericCommands</a></p>
+      <p id="owner"><a href="../../../package.html" class="extype" name="net">net</a>.<a href="../../package.html" class="extype" name="net.fyrie">fyrie</a>.<a href="../package.html" class="extype" name="net.fyrie.redis">redis</a>.<a href="package.html" class="extype" name="net.fyrie.redis.actors">actors</a>.<a href="RedisClientSession.html" class="extype" name="net.fyrie.redis.actors.RedisClientSession">RedisClientSession</a></p>
 
       <div id="definition">
         <img src="../../../../lib/object_big.png" />
-        <h1>dbsize</h1>
+        <h1>ReadInteger</h1>
       </div>
 
       <h4 class="signature" id="signature">
       <span class="kind">object</span>
       <span class="symbol">
-        <span class="name">dbsize</span>
+        <span class="name">ReadInteger</span>
         
         
-        <span class="result"> extends <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[<span class="extype" name="scala.Int">Int</span>] with <span class="extype" name="scala.Product">Product</span></span>
+        <span class="result"> extends <a href="RedisClientSession$ReadHandler.html" class="extype" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">ReadHandler</a></span>
       </span>
       </h4>
-      <div class="fullcomment" id="comment"><div class="comment cmt"><p>Request the number of keys in the current database.</p><p>Returns: <code>Int</code></p></div><div class="block">
-            linear super types: <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[<span class="extype" name="scala.Int">Int</span>], <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, AnyRef, <span class="extype" name="scala.Any">Any</span>
-          </div>
-            
-            
-            <div class="block"><ol>see also:
-                  <li><p><a href="http://code.google.com/p/redis/wiki/DbsizeCommand">Redis Command Reference</a></p></li>
-                </ol></div>
-          </div>
+      <div class="fullcomment" id="comment"><div class="block">
+            linear super types: <a href="RedisClientSession$ReadHandler.html" class="extype" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">ReadHandler</a>, AnyRef, <span class="extype" name="scala.Any">Any</span>
+          </div></div>
 
       <div id="template">
 
@@ -51,7 +45,7 @@
           <div id="ancestors">
                 <span class="filtertype">Inherited</span>
                 <ol><li class="hideall">Hide All</li><li class="showall">Show all</li></ol>
-                <ol id="linearization"><li class="in" name="net.fyrie.redis.commands.GenericCommands.dbsize">dbsize</li><li class="in" name="net.fyrie.redis.Command">Command</li><li class="in" name="scala.Product">Product</li><li class="in" name="scala.Equals">Equals</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
+                <ol id="linearization"><li class="in" name="net.fyrie.redis.actors.RedisClientSession.ReadInteger">ReadInteger</li><li class="in" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">ReadHandler</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
               </div>
           <div id="visbl">
               <span class="filtertype">Visibility</span>
@@ -217,30 +211,22 @@
             
           </div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Command#args">
-      <a id="args:Iterator[Any]"></a>
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadInteger#apply">
+      <a id="apply:Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
-        <span class="name">args</span>
+        <span class="name">apply</span>
         
         
-        <span class="result">: Iterator[<span class="extype" name="scala.Any">Any</span>]</span>
+        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4>
       
-            <p class="shortcomment cmt">Takes the unformatted parameters of the implementing case class
-and returns an Iterator over them.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Takes the unformatted parameters of the implementing case class
-and returns an Iterator over them. Can handle simple cases, but
-will need to be overridden for others.
-</p></div><div class="block">
-          definition classes: <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>
-        </div>
             
-            
-            
-          </div>
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.actors.RedisClientSession.ReadInteger">ReadInteger</a> → <a href="RedisClientSession$ReadHandler.html" class="extype" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">ReadHandler</a>
+        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
       <a id="asInstanceOf[T0]:T0"></a>
@@ -266,23 +252,6 @@ part of compilation it is not possible to check whether the contents of the list
             
             
           </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize#canEqual">
-      <a id="canEqual(Any):Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">canEqual</span>
-        
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.commands.GenericCommands.dbsize">dbsize</a> → Equals
-        </div></div>
           
     </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
       <a id="clone():AnyRef"></a>
@@ -426,23 +395,6 @@ there are no more references to the object.</p><p>The details of when and if the
             
           </div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Command#handler">
-      <a id="handler:Handler[Int]"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">handler</span>
-        
-        
-        <span class="result">: <a href="../handlers/Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Int">Int</span>]</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>
-        </div></div>
-          
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#hashCode">
       <a id="hashCode():Int"></a>
       <h4 class="signature">
@@ -489,31 +441,6 @@ possible to check whether the contents of the list are of the requested typed.
           attributes: final 
         </div><div class="block">
           definition classes: Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Command#name">
-      <a id="name:String"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">name</span>
-        
-        
-        <span class="result">: String</span>
-      </span>
-      </h4>
-      
-            <p class="shortcomment cmt">Provides the name of the Redis command, formatted as upper case.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Provides the name of the Redis command, formatted as upper case.
-Uses the class name of the implementing class if it is a case
-class or case object. Override if the class name does not match
-the Redis command name.
-</p></div><div class="block">
-          definition classes: <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>
         </div>
             
             
@@ -590,110 +517,6 @@ the Redis command name.
             
           </div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize#productArity">
-      <a id="productArity:Int"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">productArity</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.commands.GenericCommands.dbsize">dbsize</a> → Product
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize#productElement">
-      <a id="productElement(Int):Any"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">productElement</span>
-        
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Int">Int</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Any">Any</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.commands.GenericCommands.dbsize">dbsize</a> → Product
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.Product#productElements">
-      <a id="productElements:Iterator[Any]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name deprecated">productElements</span>
-        
-        
-        <span class="result">: Iterator[<span class="extype" name="scala.Any">Any</span>]</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Product
-        </div><div class="block"><ol>deprecated:
-          <li><p>use productIterator instead</p></li>
-        </ol></div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.Product#productIterator">
-      <a id="productIterator:Iterator[Any]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">productIterator</span>
-        
-        
-        <span class="result">: Iterator[<span class="extype" name="scala.Any">Any</span>]</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Product
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize#productPrefix">
-      <a id="productPrefix:String"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">productPrefix</span>
-        
-        
-        <span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.commands.GenericCommands.dbsize">dbsize</a> → Product
-        </div></div>
-          
-    </li><li visbl="prt" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize#readResolve">
-      <a id="readResolve():AnyRef"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">readResolve</span>
-        
-        <span class="params">()</span>
-        <span class="result">: AnyRef</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: protected 
-        </div></div>
-          
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
       <a id="synchronized[T0](T0):T0"></a>
       <h4 class="signature">
@@ -713,33 +536,7 @@ the Redis command name.
           definition classes: AnyRef
         </div></div>
           
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Command#toBytes">
-      <a id="toBytes:Array[Byte]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">toBytes</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
-      </span>
-      </h4>
-      
-            <p class="shortcomment cmt">Applies the Format to each arg, prepends the name of the command
-and returns the command as an <code>Array[Byte]</code> to be sent to the
-Redis server.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Applies the Format to each arg, prepends the name of the command
-and returns the command as an <code>Array[Byte]</code> to be sent to the
-Redis server.
-</p></div><div class="block">
-          definition classes: <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands.GenericCommands.dbsize#toString">
+    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#toString">
       <a id="toString():String"></a>
       <h4 class="signature">
       <span class="kind">def</span>
@@ -754,9 +551,7 @@ Redis server.
             <p class="shortcomment cmt">Returns a string representation of the object.</p>
             <div class="fullcomment"><div class="comment cmt"><p>Returns a string representation of the object.</p><p>The default representation is platform dependent.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a string representation of the object.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.commands.GenericCommands.dbsize">dbsize</a> → AnyRef → Any
+          definition classes: AnyRef → Any
         </div>
             
             
@@ -823,12 +618,8 @@ Redis server.
     </li></ol>
             </div>
 
-        <div class="parent" name="net.fyrie.redis.Command">
-              <h3>Inherited from <a href="../Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[<span class="extype" name="scala.Int">Int</span>]</h3>
-            </div><div class="parent" name="scala.Product">
-              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
-            </div><div class="parent" name="scala.Equals">
-              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+        <div class="parent" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">
+              <h3>Inherited from <a href="RedisClientSession$ReadHandler.html" class="extype" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">ReadHandler</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from AnyRef</h3>
             </div><div class="parent" name="scala.Any">
