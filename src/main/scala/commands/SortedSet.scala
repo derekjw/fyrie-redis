@@ -16,7 +16,7 @@ trait SortedSetCommands {
 
   // ZINCRBY
   //
-  case class zincrby[A](key: Any, incr: Double, member: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A])
+  case class zincrby[A](key: Any, incr: Double, member: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   // ZCARD
   //
@@ -24,32 +24,32 @@ trait SortedSetCommands {
 
   // ZSCORE
   //
-  case class zscore[A](key: Any, element: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A])
+  case class zscore[A](key: Any, element: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   // ZRANGE
   //
 
-  case class zrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A])
+  case class zrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
 
-  case class zrangeWithScores[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]) {
+  case class zrangeWithScores[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]()(implicitly, parse.manifest)) {
     override def name = "ZRANGE"
     override def args = super.args ++ arg1("WITHSCORES")
   }
 
-  case class zrevrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A])
+  case class zrevrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
 
-  case class zrevrangeWithScores[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]) {
+  case class zrevrangeWithScores[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]()(implicitly, parse.manifest)) {
     override def name = "ZREVRANGE"
     override def args = super.args ++ arg1("WITHSCORES")
   }
 
   // ZRANGEBYSCORE
   //
-  case class zrangebyscore[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]) {
+  case class zrangebyscore[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
     override def args = Iterator(key, serializeDouble(min, minInclusive), serializeDouble(max, maxInclusive)) ++ argN2("LIMIT", limit)
   }
 
-  case class zrangebyscoreWithScores[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]) {
+  case class zrangebyscoreWithScores[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]()(implicitly, parse.manifest)) {
     override def name = "ZRANGEBYSCORE"
     override def args = Iterator(key, serializeDouble(min, minInclusive), serializeDouble(max, maxInclusive)) ++ argN2("LIMIT", limit) ++ arg1("WITHSCORES")
   }

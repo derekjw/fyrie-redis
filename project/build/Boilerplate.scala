@@ -27,49 +27,45 @@ trait Boilerplate {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends MultiHandler[(%s)] {
+          """|final case class MultiBulkAsTuple%d[%s]() extends MultiHandler[(%s)] {
              |
              |  def handlers = Stream.continually(Stream(%s)).flatten
              |
-             |  def parse[T[_]](in: Option[Stream[T[Any]]]): Option[Stream[Any]] =
-             |    in.map(_.map{
-             |      case f: Future[_] =>
-             |        f.await.result.getOrElse(throw f.exception.get)
-             |      case r: Response[_] =>
-             |        r.get
-             |      case x => x
-             |    }.grouped(%d).toStream.flatMap{
+             |  def parse(in: Option[Stream[Response[Any]]]): Option[Stream[(%s)]] =
+             |    in.map(_.grouped(%d).toStream.flatMap{
              |      case Stream(%s) => Some((%s))
              |      case _ => None
              |    })
              |}
              |""".stripMargin.format(arity,
-                                     mapMkString { n => n.alpha},
-                                     mapMkString { n => "%s: Parse[%s]".format(n.element, n.alpha) },
+                                     mapMkString { n => "%s: Parse: Manifest".format(n.alpha) },
                                      mapMkString { n => "Option[%s]".format(n.alpha) },
                                      mapMkString { n => "Bulk[%s]()".format(n.alpha) },
+                                     mapMkString { n => "Option[%s]".format(n.alpha) },
                                      arity,
                                      mapMkString { n => n.seqElem },
-                                     mapMkString { n => n.seqElem })
+                                     mapMkString { n => "requireType[Response[Option[%s]]](%s).get" format (n.alpha, n.seqElem) })
       }
 
       val tupleSortCommands = for (arity: Int <- arities) yield {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          "case class sort%d[%s](key: Any, by: Option[Any] = None, limit: Option[(Int, Int)] = None, get: Product%d[%s], order: Option[SortOrder] = None, alpha: Boolean = false)(implicit format: Format, %s) extends Command(MultiBulkAsTuple%d[%s]) with SortTupled\n".format(
+          "case class sort%d[%s](key: Any, by: Option[Any] = None, limit: Option[(Int, Int)] = None, get: Product%d[%s], order: Option[SortOrder] = None, alpha: Boolean = false)(implicit format: Format, %s) extends Command(MultiBulkAsTuple%d[%s]()(%s)) with SortTupled\n".format(
             arity,
             mapMkString {n => n.alpha},
             arity,
             mapMkString {n => "Any"},
             mapMkString { n => "%s: Parse[%s]".format(n.element, n.alpha) },
             arity,
-            mapMkString {n => n.alpha})
+            mapMkString {n => n.alpha},
+            mapMkString {n => "%s, %s.manifest" format (n.element, n.element)})
       }
 
       val source = "package net.fyrie.redis\n" +
               "package handlers {\n\n" +
               "import serialization.Parse\n" +
+              "import utils._\n" +
               "import se.scalablesolutions.akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}\n" +
               tupleHandlers.mkString("\n") +
               "}\n\n" +

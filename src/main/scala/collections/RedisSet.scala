@@ -8,11 +8,11 @@ import se.scalablesolutions.akka.dispatch.{Future}
 import scala.collection.mutable
 
 object RedisSet {
-  def apply[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A]): RedisSet[A] =
-    new RedisSet[A](name)(conn, format, parser)
+  def apply[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]): RedisSet[A] =
+    new RedisSet[A](name)(conn, format, parser, m)
 }
 
-class RedisSet[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A]) extends mutable.Set[A] {
+class RedisSet[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]) extends mutable.Set[A] {
   protected val rediskey = name.getBytes
 
   override def repr: mutable.Set[A] =

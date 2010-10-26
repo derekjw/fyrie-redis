@@ -8,11 +8,11 @@ import scala.collection.mutable.{IndexedSeq}
 import se.scalablesolutions.akka.dispatch.{Future}
 
 object RedisList {
-  def apply[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A]): RedisList[A] =
-    new RedisList[A](name)(conn, format, parser)
+  def apply[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]): RedisList[A] =
+    new RedisList[A](name)(conn, format, parser, m)
 }
 
-class RedisList[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A]) extends IndexedSeq[A] {
+class RedisList[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]) extends IndexedSeq[A] {
   protected val key = name.getBytes
 
   def update(idx: Int, elem: A): Unit = conn ! Commands.lset(key, idx, elem)

@@ -6,13 +6,13 @@ import serialization._
 import se.scalablesolutions.akka.dispatch.{Future}
 
 object RedisVar {
-  def apply[A](name: String, default: Option[A] = None)(implicit conn: RedisClient, format: Format, parser: Parse[A]): RedisVar[A] =
-    new RedisVar[A](name, default)(conn, format, parser)
+  def apply[A](name: String, default: Option[A] = None)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]): RedisVar[A] =
+    new RedisVar[A](name, default)(conn, format, parser, m)
 }
 
 /**  Modeled to be similar to Option
  */
-class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: RedisClient, format: Format, parser: Parse[A]) {
+class RedisVar[A](val name: String, default: Option[A] = None)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]) {
   protected val key = name.getBytes
 
   default.foreach(this.setnx)
@@ -67,7 +67,7 @@ object RedisLongVar {
   def apply(name: String, default: Option[Long] = None)(implicit conn: RedisClient): RedisLongVar = new RedisLongVar(name, default)(conn)
 }
 
-class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: RedisClient) extends RedisVar[Long](name, default)(conn, Format.default, Parse.Implicits.parseLong) {
+class RedisLongVar(name: String, default: Option[Long] = None)(implicit conn: RedisClient) extends RedisVar[Long](name, default)(conn, Format.default, Parse.Implicits.parseLong, manifest[Long]) {
 
   def incr: Long = conn send Commands.incr(key)
 

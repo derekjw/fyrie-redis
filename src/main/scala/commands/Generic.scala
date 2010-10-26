@@ -18,7 +18,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/KeysCommand">Redis Command Reference</a>
    */
-  case class keys[A](pattern: Any = "*")(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A])
+  case class keys[A](pattern: Any = "*")(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
 
   /**
    * Request a random key.
@@ -27,7 +27,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RandomkeyCommand">Redis Command Reference</a>
    */
-  case class randomkey[A]()(implicit parse: Parse[A]) extends Command(Bulk[A])
+  case class randomkey[A]()(implicit parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   /**
    * Rename a key.
@@ -218,7 +218,7 @@ trait GenericCommands {
                      order: Option[SortOrder] = None,
                      alpha: Boolean = false)(implicit
                                              format: Format,
-                                             parse: Parse[A]) extends Command(MultiBulk[A]) {
+                                             parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
     override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get) ++
                         argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None))
   }

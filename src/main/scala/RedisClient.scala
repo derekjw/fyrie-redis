@@ -15,10 +15,10 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
                   port: Int = config.getInt("fyrie-redis.port", 6379)) {
   val actor = actorOf(new RedisClientSession(host, port)).start
 
-  def !(command: Command[_])(implicit sender: Option[ActorRef] = None): Unit =
+  def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None, cm: Manifest[A]): Unit =
     actor ! Request(command.toBytes, command.handler)
 
-  def !![A](command: Command[A]): Option[A] = {
+  def !![A: Manifest](command: Command[A]): Option[A] = {
     val future = this !!! command
     try {
       future.await
@@ -29,17 +29,16 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
     else future.result
   }
 
-  def !!![A](command: Command[A]): Future[A] = {
+  def !!![A: Manifest](command: Command[A]): Future[A] =
     command.handler match {
+      case sh: SingleHandler[_,_] =>
+        actor !!! Request(command.toBytes, command.handler)
       case mh: MultiHandler[_] =>
         val future: Future[Option[Stream[Future[Any]]]] = actor !!! Request(command.toBytes, command.handler)
-        (future map (mh.parse[Future])).asInstanceOf[Future[A]]
-      case _ =>
-        actor !!! Request(command.toBytes, command.handler)
+        future.map(x => mh.parse(x.map(_.map(f => FutureResponder.futureToResponse(f)))))
     }
-  }
 
-  def send[A](command: Command[A]): A = {
+  def send[A: Manifest](command: Command[A]): A = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get

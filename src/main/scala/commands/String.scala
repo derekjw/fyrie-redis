@@ -12,11 +12,11 @@ trait StringCommands {
 
   // GET (key)
   // gets the value for the specified key.
-  case class get[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A])
+  case class get[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   // GETSET (key, value)
   // is an atomic set this value and return the old value command.
-  case class getset[A](key: Any, value: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A])
+  case class getset[A](key: Any, value: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   // SETNX (key, value)
   // sets the value for the specified key, only if the key is not there.
@@ -40,7 +40,7 @@ trait StringCommands {
 
   // MGET (key, key, key, ...)
   // get the values of all the specified keys.
-  case class mget[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]) {
+  case class mget[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
     override def args = keys.iterator
   }
 

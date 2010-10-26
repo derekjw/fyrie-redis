@@ -22,7 +22,7 @@ package serialization {
   }
 
   object Parse {
-    def apply[T](f: (Array[Byte]) => T) = new Parse[T](f)
+    def apply[T: Manifest](f: (Array[Byte]) => T) = new Parse[T](f)
 
     object Implicits {
       implicit val parseString = Parse[String](new String(_, "UTF-8"))
@@ -35,7 +35,7 @@ package serialization {
     implicit val parseDefault = Parse[String](new String(_, "UTF-8"))
   }
 
-  class Parse[A](val fromBinary: (Array[Byte]) => A) extends Function1[Array[Byte], A] {
+  class Parse[A](val fromBinary: (Array[Byte]) => A)(implicit val manifest: Manifest[A]) extends Function1[Array[Byte], A] {
     def apply(in: Array[Byte]): A = fromBinary(in)
   }
 

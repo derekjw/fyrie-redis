@@ -27,7 +27,7 @@ trait NodeCommands {
 
   // INFO
   // the info command returns different information and statistics about the server.
-  case class info[A](implicit parse: Parse[A]) extends Command(Bulk[A])
+  case class info[A](implicit parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   // MONITOR
   // is a debugging command that outputs the whole sequence of commands received by the Redis server.
@@ -42,7 +42,7 @@ trait NodeCommands {
 
   object config {
 
-    case class get[A](param: Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]) {
+    case class get[A](param: Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
       override def name = "CONFIG"
       override def args = Iterator("GET", param)
     }

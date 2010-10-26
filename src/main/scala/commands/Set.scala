@@ -16,7 +16,7 @@ trait SetCommands {
 
   // SPOP
   // Remove and return (pop) a random element from the Set value at key.
-  case class spop[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A])
+  case class spop[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 
   // SMOVE
   // Move the specified member from one Set to another atomically.
@@ -32,7 +32,7 @@ trait SetCommands {
 
   // SINTER
   // Return the intersection between the Sets stored at key1, key2, ..., keyN.
-  case class sinter[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]) {
+  case class sinter[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
     override def args = keys.iterator
   }
 
@@ -45,7 +45,7 @@ trait SetCommands {
 
   // SUNION
   // Return the union between the Sets stored at key1, key2, ..., keyN.
-  case class sunion[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]) {
+  case class sunion[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
     override def args = keys.iterator
   }
 
@@ -58,7 +58,7 @@ trait SetCommands {
 
   // SDIFF
   // Return the difference between the Set stored at key1 and all the Sets key2, ..., keyN.
-  case class sdiff[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]) {
+  case class sdiff[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
     override def args = keys.iterator
   }
 
@@ -71,9 +71,9 @@ trait SetCommands {
 
   // SMEMBERS
   // Return all the members of the Set value at key.
-  case class smembers[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A])
+  case class smembers[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
 
   // SRANDMEMBER
   // Return a random element from a Set
-  case class srandmember[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A])
+  case class srandmember[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 }

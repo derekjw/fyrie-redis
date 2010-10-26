@@ -166,7 +166,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     writeBuf._2.flip
   }
 
-  def respond(data: RedisType) {
+  def respond[T](data: RedisType[T]) {
     responseQueue.dequeue.apply(data).reverse.foreach(_ +=: responseQueue)
   }
 

@@ -6,4 +6,6 @@ import handlers.{Handler}
 
 trait Message
 
-case class Request(bytes: Array[Byte], handler: Handler[_]) extends Message
+case class Request[T: Manifest](bytes: Array[Byte], handler: Handler[T]) extends Message {
+  val handlerManifest = implicitly[Manifest[T]]
+}
