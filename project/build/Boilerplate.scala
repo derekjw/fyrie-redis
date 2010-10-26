@@ -27,12 +27,18 @@ trait Boilerplate {
           val ns = (1 to arity) map N.apply
           def mapMkString(f: N => String): String = ns.map(f).mkString(", ")
 
-          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends Handler[Option[Stream[Future[RedisBulk]]], Option[Stream[(%s)]]] {
+          """|final case class MultiBulkAsTuple%d[%s](implicit %s) extends MultiHandler[Option[Stream[(%s)]]] {
              |
              |  def handlers = Stream.continually(Stream(%s)).flatten
              |
-             |  def parseResult(in: Option[Stream[Future[RedisBulk]]]): Option[Stream[(%s)]] =
-             |    in.map(_.map(_.await.result.get).grouped(%d).toStream.flatMap{
+             |  def parse[T[_]](in: Option[Stream[T[Any]]]): Option[Stream[Any]] =
+             |    in.map(_.map{
+             |      case f: Future[_] =>
+             |        f.await.result.getOrElse(throw f.exception.get)
+             |      case r: Response[_] =>
+             |        r.get
+             |      case x => x
+             |    }.grouped(%d).toStream.flatMap{
              |      case Stream(%s) => Some((%s))
              |      case _ => None
              |    })
@@ -42,10 +48,9 @@ trait Boilerplate {
                                      mapMkString { n => "%s: Parse[%s]".format(n.element, n.alpha) },
                                      mapMkString { n => "Option[%s]".format(n.alpha) },
                                      mapMkString { n => "Bulk[%s]()".format(n.alpha) },
-                                     mapMkString { n => "Option[%s]".format(n.alpha) },
                                      arity,
-                                     mapMkString { n => "RedisBulk(%s)" format n.seqElem },
-                                     mapMkString { n => "%s.map(x => %s(x))".format(n.seqElem,n.element) })
+                                     mapMkString { n => n.seqElem },
+                                     mapMkString { n => n.seqElem })
       }
 
       val tupleSortCommands = for (arity: Int <- arities) yield {

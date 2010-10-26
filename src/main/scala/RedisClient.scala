@@ -3,6 +3,7 @@ package redis
 
 import actors._
 import messages.{Request}
+import handlers._
 
 import se.scalablesolutions.akka.dispatch.{Future, FutureTimeoutException}
 import se.scalablesolutions.akka.actor.{Actor,ActorRef}
@@ -14,10 +15,10 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
                   port: Int = config.getInt("fyrie-redis.port", 6379)) {
   val actor = actorOf(new RedisClientSession(host, port)).start
 
-  def !(command: Command[_,_])(implicit sender: Option[ActorRef] = None): Unit =
+  def !(command: Command[_])(implicit sender: Option[ActorRef] = None): Unit =
     actor ! Request(command.toBytes, command.handler)
 
-  def !![A,B](command: Command[A,B]): Option[B] = {
+  def !![A](command: Command[A]): Option[A] = {
     val future = this !!! command
     try {
       future.await
@@ -28,10 +29,17 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
     else future.result
   }
 
-  def !!![A,B](command: Command[A,B]): Future[B] =
-    (actor !!! Request(command.toBytes, command.handler)).map(command.handler.parseResult)
+  def !!![A](command: Command[A]): Future[A] = {
+    command.handler match {
+      case mh: MultiHandler[_] =>
+        val future: Future[Option[Stream[Future[Any]]]] = actor !!! Request(command.toBytes, command.handler)
+        (future map (mh.parse[Future])).asInstanceOf[Future[A]]
+      case _ =>
+        actor !!! Request(command.toBytes, command.handler)
+    }
+  }
 
-  def send[A,B](command: Command[A,B]): B = {
+  def send[A](command: Command[A]): A = {
     val future = this !!! command
     future.await
     if (future.exception.isDefined) throw future.exception.get
@@ -43,6 +51,31 @@ class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost
   }
 
   def disconnect = stop
+
+  def shutdownWorkarounds = {
+    org.fusesource.hawtdispatch.ScalaDispatch.globalQueue.asInstanceOf[org.fusesource.hawtdispatch.internal.GlobalDispatchQueue].shutdown
+
+    val tf = classOf[java.lang.Thread].getDeclaredField("subclassAudits")
+    tf.setAccessible(true)
+    val cache = tf.get(null).asInstanceOf[java.util.Map[_,_]]
+    cache.synchronized {cache.clear}
+
+    val lf = classOf[java.util.logging.Level].getDeclaredField("known")
+    lf.setAccessible(true)
+    val known = lf.get(null).asInstanceOf[java.util.ArrayList[java.util.logging.Level]]
+    known.synchronized {
+      known.clear
+      known.add(java.util.logging.Level.OFF)
+      known.add(java.util.logging.Level.SEVERE)
+      known.add(java.util.logging.Level.WARNING)
+      known.add(java.util.logging.Level.INFO)
+      known.add(java.util.logging.Level.CONFIG)
+      known.add(java.util.logging.Level.FINE)
+      known.add(java.util.logging.Level.FINER)
+      known.add(java.util.logging.Level.FINEST)
+      known.add(java.util.logging.Level.ALL)
+    }
+  }
 }
 
 case class RedisErrorException(message: String) extends RuntimeException(message)

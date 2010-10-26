@@ -18,11 +18,10 @@ import scala.collection.mutable.ArrayBuilder
  *                any needed modifications before being sent. A default
  *                Format is supplied implicitly.
  *
- * @tparam A the raw return type of the Redis command
- * @tparam B the parsed return type of the Redis command
+ * @tparam A the return type of the Redis command
  *
  */
-abstract class Command[A,B](val handler: Handler[A,B])(implicit format: Format) extends Product {
+abstract class Command[A](val handler: Handler[A])(implicit format: Format) extends Product {
 
   /**
    * Provides the name of the Redis command, formatted as upper case.

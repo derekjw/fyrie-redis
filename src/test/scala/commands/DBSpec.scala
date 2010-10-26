@@ -109,11 +109,14 @@ class OperationsSpec extends Spec
         dbsize,
         mget(Seq("testkey1", "testkey2")))) should be(Some(List((), 1, (), 2, Some(List(Some("testvalue1"), Some("testvalue2"))))))
     }
-    it("should survive an error") {
-      r send multiexec(Seq(
-        set("a", "abc"),
-        lpop("a"),
-        get("a"))) should be(Some(List((), Some("abc"))))
+    it("should throw an error") {
+      val thrown = evaluating {
+        (r send multiexec(Seq(
+          set("a", "abc"),
+          lpop("a"),
+          get("a")))).map(_.force)
+      } should produce[Exception]
+      thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }
 

@@ -6,4 +6,4 @@ import handlers.{Handler}
 
 trait Message
 
-case class Request(bytes: Array[Byte], handler: Handler[_,_]) extends Message
+case class Request(bytes: Array[Byte], handler: Handler[_]) extends Message

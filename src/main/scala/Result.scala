@@ -19,6 +19,8 @@ sealed abstract class Response[+A] extends Product {
 
   def get: A
 
+  def fold[X](ifResult: A => X, ifError: Throwable => X): X
+
   def getOrElse[B >: A](default: => B): B = if (isError) default else this.get
 
   def map[B](f: A => B): Response[B]
@@ -31,7 +33,7 @@ sealed abstract class Response[+A] extends Product {
 
   def toOption: Option[A] = if (isError) None else Some(get)
 
-  def toEither: Either[Exception,A] = this match {
+  def toEither: Either[Throwable,A] = this match {
     case Error(e) => Left(e)
     case Result(r) => Right(r)
   }
@@ -53,13 +55,15 @@ sealed abstract class Response[+A] extends Product {
 
 final case class Result[A](value: A) extends Response[A] {
   def get = value
+  def fold[X](ifResult: A => X, ifError: Throwable => X): X = ifResult(value)
   def map[B](f: A => B): Response[B] = Result(f(value))
   def isError = false
   override def toString = "Result(" + value.toString + ")"
 }
 
-final case class Error(exception: Exception) extends Response[Nothing] {
+final case class Error(exception: Throwable) extends Response[Nothing] {
   def get = throw exception
+  def fold[X](ifResult: Nothing => X, ifError: Throwable => X): X = ifError(exception)
   def map[B](f: Nothing => B): Response[B] = this
   def isError = true
   override def toString = "Error(" + exception.toString + ")"
