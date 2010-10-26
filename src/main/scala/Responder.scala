@@ -46,7 +46,6 @@ final case class FutureResponder(handler: Handler[_], future: CompletableFuture[
   def apply(in: RedisType[_]): Seq[Responder] = (in, handler) match {
     case (RedisError(err),_) =>
       complete(Error(err))
-      Nil
     case (b: RedisBulk, bh: Bulk[_]) =>
       globalQueue ^ (complete(bh.parse(b)))
       Nil
@@ -55,7 +54,6 @@ final case class FutureResponder(handler: Handler[_], future: CompletableFuture[
         case Some(value) => complete(sh.parse(value))
         case None => complete(Error(new RedisProtocolException("Incorrect Type: "+in)))
       }
-      Nil
     case (RedisString("OK"), MultiExec(handlers)) =>
       Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
     case (RedisMulti(Some(length)), mh: MultiHandler[_]) =>
@@ -64,14 +62,14 @@ final case class FutureResponder(handler: Handler[_], future: CompletableFuture[
       hfs.map(hf => FutureResponder(hf._1, hf._2._1))
     case (RedisMulti(None), mh: MultiHandler[_]) =>
       complete(Result(None))
-      Nil
     case (_, _) =>
       complete(Error(new RedisProtocolException("Incorrect value: "+in+" for handler: "+handler)))
-      Nil
   }
 
-  def complete(response: Response[_]): Unit =
+  def complete(response: Response[_]): List[Nothing] = {
     response.fold(future.completeWithResult(_), future.completeWithException(_))
+    Nil
+  }
 }
 
 final case class NoResponder(handler: Handler[_]) extends Responder {
