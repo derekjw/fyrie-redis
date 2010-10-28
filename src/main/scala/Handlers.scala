@@ -7,7 +7,7 @@ import utils._
 
 import se.scalablesolutions.akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}
 
-abstract class Handler[A: Manifest] {
+abstract class Handler[A](implicit val manifest: Manifest[A]) {
   def verify(in: String, expect: String): Unit =
     if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
 
@@ -30,8 +30,8 @@ final case class MultiExec(handlers: Seq[Handler[_]]) extends MultiHandler[Any] 
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[Any]] = in.map(_.map(_.get))
 }
 
-case object NoHandler extends SingleHandler[Unit, Response[Nothing]] {
-  def parse(in: Unit): Response[Nothing] = throw new RedisErrorException("No handler")
+case object NoHandler extends SingleHandler[Unit, Unit] {
+  def parse(in: Unit): Response[Unit] = throw new RedisErrorException("No handler")
 }
 
 case object Status extends SingleHandler[RedisString, String] {
@@ -64,7 +64,7 @@ final case class Bulk[A: Parse: Manifest]() extends SingleHandler[RedisBulk, Opt
 
 final case class MultiBulk[A: Parse: Manifest]() extends MultiHandler[Option[A]] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[Option[A]]] =
-    in.map(_.map(requireType[Response[Option[A]]](_).get))
+    in.map(_.map(_.asA[Option[A]].get))
 
   def handlers = Stream.continually(Bulk[A]())
 }
@@ -72,7 +72,7 @@ final case class MultiBulk[A: Parse: Manifest]() extends MultiHandler[Option[A]]
 final case class MultiBulkAsPairs[K: Parse: Manifest, V: Parse: Manifest]() extends MultiHandler[(K, V)] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[(K,V)]] =
     in.map(_.grouped(2).toStream.flatMap{
-      case Stream(k,v) => (requireType[Response[Option[K]]](k).get, requireType[Response[Option[V]]](v).get) match {
+      case Stream(k, v) => (k.asA[Option[K]].get, v.asA[Option[V]].get) match {
         case (Some(k), Some(v)) => Some((k, v))
         case _ => None
       }
@@ -85,7 +85,7 @@ final case class MultiBulkAsPairs[K: Parse: Manifest, V: Parse: Manifest]() exte
 final case class MultiBulkWithScores[A: Parse: Manifest]() extends MultiHandler[(A, Double)] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[(A, Double)]] =
     in.map(_.grouped(2).toStream.flatMap{
-      case Stream(k,v) => (requireType[Response[Option[A]]](k).get, requireType[Response[Option[Double]]](v).get) match {
+      case Stream(k, v) => (k.asA[Option[A]].get, v.asA[Option[Double]].get) match {
         case (Some(k), Some(v)) => Some((k, v))
         case _ => None
       }
@@ -97,7 +97,7 @@ final case class MultiBulkWithScores[A: Parse: Manifest]() extends MultiHandler[
 
 final case class MultiBulkAsFlat[A: Parse: Manifest]() extends MultiHandler[A] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[A]] =
-    in.map(_.flatMap(requireType[Response[Option[A]]](_).get))
+    in.map(_.flatMap(_.asA[Option[A]].get))
 
   def handlers = Stream.continually(Bulk[A]())
 }

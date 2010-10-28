@@ -1,24 +1,25 @@
 package net.fyrie.redis
 
-sealed trait RedisType[A] {
+sealed trait RedisType {
+  type Value
   def isError: Boolean = false
-  def value: A
+  def value: Value
 }
 
 object RedisString {
   def apply(in: Array[Byte]) = new RedisString(new String(in, "UTF-8"))
 }
-final case class RedisString(value: String) extends RedisType[String]
+final case class RedisString(value: String) extends RedisType { type Value = String }
 
 object RedisInteger {
   def apply(in: Array[Byte]) = new RedisInteger(new String(in, "UTF-8").toLong)
 }
-final case class RedisInteger(value: Long) extends RedisType[Long]
+final case class RedisInteger(value: Long) extends RedisType { type Value = Long }
 
 object RedisBulk {
   def apply(in: Array[Byte]) = new RedisBulk(Some(in))
 }
-final case class RedisBulk(value: Option[Array[Byte]]) extends RedisType[Option[Array[Byte]]]
+final case class RedisBulk(value: Option[Array[Byte]]) extends RedisType { type Value = Option[Array[Byte]] }
 
 object RedisMulti {
   def apply(in: Array[Byte]) = {
@@ -26,11 +27,12 @@ object RedisMulti {
     if (length < 0) new RedisMulti(None) else new RedisMulti(Some(length))
   }
 }
-final case class RedisMulti(value: Option[Int]) extends RedisType[Option[Int]]
+final case class RedisMulti(value: Option[Int]) extends RedisType { type Value = Option[Int] }
 
 object RedisError {
   def apply(in: Array[Byte]) = new RedisError(new RedisErrorException(new String(in, "UTF-8")))
 }
-final case class RedisError(value: Exception) extends RedisType[Exception] {
+final case class RedisError(value: Exception) extends RedisType {
+  type Value = Exception
   override def isError = true
 }
