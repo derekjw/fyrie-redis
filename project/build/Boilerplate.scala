@@ -44,7 +44,7 @@ trait Boilerplate {
                                      mapMkString { n => "Option[%s]".format(n.alpha) },
                                      arity,
                                      mapMkString { n => n.seqElem },
-                                     mapMkString { n => "requireType[Response[Option[%s]]](%s).get" format (n.alpha, n.seqElem) })
+                                     mapMkString { n => "%s.asA[Option[%s]].get" format (n.seqElem, n.alpha) })
       }
 
       val tupleSortCommands = for (arity: Int <- arities) yield {
