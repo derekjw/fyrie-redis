@@ -23,7 +23,28 @@ object Responder {
 }
 
 final case class ActorResponder(handler: Handler[_], target: ActorRef) extends Responder {
-  def apply(in: RedisType[_]): Seq[Responder] = error("not implmented")
+  def apply(in: RedisType[_]): Seq[Responder] = (in, handler) match {
+    case (RedisError(err),_) =>
+      target ! Error(err)
+      Nil
+    case (b: RedisBulk, bh: Bulk[_]) =>
+      target ! (b, bh)
+      Nil
+    case (_, sh: SingleHandler[_,_]) =>
+      checkType(in)(sh.inputManifest) match {
+        case Some(value) => target ! sh.parse(value)
+        case None => target ! Error(new RedisProtocolException("Incorrect Type: "+in))
+      }
+      Nil
+    case (RedisString("OK"), MultiExec(handlers)) =>
+      Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
+    case (rm @ RedisMulti(length), mh: MultiHandler[_]) =>
+      target ! (rm, mh)
+      length map (mh.handlers.take(_).map(h => ActorResponder(h, target))) getOrElse Nil
+    case (_, _) =>
+      target ! Error(new RedisProtocolException("Incorrect value: "+in+" for handler: "+handler))
+      Nil
+  }
 }
 object FutureResponder {
   def mkFutures[A](in: Handler[A]): (CompletableFuture[Any], Future[A]) = {

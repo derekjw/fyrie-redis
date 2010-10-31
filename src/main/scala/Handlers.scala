@@ -7,7 +7,7 @@ import utils._
 
 import se.scalablesolutions.akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}
 
-abstract class Handler[A: Manifest] {
+abstract class Handler[A](implicit val manifest: Manifest[A]) {
   def verify(in: String, expect: String): Unit =
     if (in != expect) throw new RedisProtocolException("Expected '" + expect + "' reply, got: " + in)
 
