@@ -59,7 +59,7 @@
       <span class="symbol">
         <span class="name">Bulk</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span class="implicit">implicit </span><span name="evidence$5">evidence$5: Parse[A]</span>, <span name="evidence$6">evidence$6: Manifest[A]</span>)</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$4">evidence$4: Parse[A]</span>, <span name="evidence$5">evidence$5: Manifest[A]</span>)</span>
         <span class="result"> extends SingleHandler[RedisBulk, Option[A]] with Product</span>
       </span>
       </a></h4>
@@ -93,7 +93,7 @@
       <span class="symbol">
         <span class="name">MultiBulk</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span class="implicit">implicit </span><span name="evidence$7">evidence$7: Parse[A]</span>, <span name="evidence$8">evidence$8: Manifest[A]</span>)</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$6">evidence$6: Parse[A]</span>, <span name="evidence$7">evidence$7: Manifest[A]</span>)</span>
         <span class="result"> extends MultiHandler[Option[A]] with Product</span>
       </span>
       </a></h4>
@@ -110,7 +110,7 @@
       <span class="symbol">
         <span class="name">MultiBulkAsFlat</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span class="implicit">implicit </span><span name="evidence$15">evidence$15: Parse[A]</span>, <span name="evidence$16">evidence$16: Manifest[A]</span>)</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$14">evidence$14: Parse[A]</span>, <span name="evidence$15">evidence$15: Manifest[A]</span>)</span>
         <span class="result"> extends MultiHandler[A] with Product</span>
       </span>
       </a></h4>
@@ -127,7 +127,7 @@
       <span class="symbol">
         <span class="name">MultiBulkAsPairs</span>
         <span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span>
-        <span class="params">(<span class="implicit">implicit </span><span name="evidence$9">evidence$9: Parse[K]</span>, <span name="evidence$10">evidence$10: Manifest[K]</span>, <span name="evidence$11">evidence$11: Parse[V]</span>, <span name="evidence$12">evidence$12: Manifest[V]</span>)</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$8">evidence$8: Parse[K]</span>, <span name="evidence$9">evidence$9: Manifest[K]</span>, <span name="evidence$10">evidence$10: Parse[V]</span>, <span name="evidence$11">evidence$11: Manifest[V]</span>)</span>
         <span class="result"> extends MultiHandler[(K, V)] with Product</span>
       </span>
       </a></h4>
@@ -297,7 +297,7 @@
       <span class="symbol">
         <span class="name">MultiBulkWithScores</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span class="implicit">implicit </span><span name="evidence$13">evidence$13: Parse[A]</span>, <span name="evidence$14">evidence$14: Manifest[A]</span>)</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="evidence$12">evidence$12: Parse[A]</span>, <span name="evidence$13">evidence$13: Manifest[A]</span>)</span>
         <span class="result"> extends MultiHandler[(A, Double)] with Product</span>
       </span>
       </a></h4>
@@ -395,7 +395,7 @@
         <span class="name">NoHandler</span>
         
         
-        <span class="result"> extends SingleHandler[Unit, Response[Nothing]] with Product</span>
+        <span class="result"> extends SingleHandler[Unit, Unit] with Product</span>
       </span>
       </a></h4>
       

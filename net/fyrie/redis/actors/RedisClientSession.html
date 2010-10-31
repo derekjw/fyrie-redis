@@ -986,13 +986,13 @@ possible to check whether the contents of the list are of the requested typed.
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#respond">
-      <a id="respond[T](RedisType[T]):Unit"></a>
+      <a id="respond[T&lt;:RedisType](T)(Manifest[T]):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">respond</span>
-        <span class="tparams">[<span name="T">T</span>]</span>
-        <span class="params">(<span name="data">data: <a href="../RedisType.html" class="extype" name="net.fyrie.redis.RedisType">RedisType</a>[T]</span>)</span>
+        <span class="tparams">[<span name="T">T &lt;: <a href="../RedisType.html" class="extype" name="net.fyrie.redis.RedisType">RedisType</a></span>]</span>
+        <span class="params">(<span name="data">data: T</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[T]</span>)</span>
         <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4>

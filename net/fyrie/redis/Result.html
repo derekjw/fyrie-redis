@@ -26,7 +26,7 @@
       <span class="symbol">
         <span class="name">Result</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="value">value: A</span>)</span>
+        <span class="params">(<span name="value">value: A</span>, <span name="manifest">manifest: Manifest[A]</span>)</span>
         <span class="result"> extends <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[A] with <span class="extype" name="scala.Product">Product</span></span>
       </span>
       </h4>
@@ -70,7 +70,7 @@
       <span class="symbol">
         <span class="name">Result</span>
         
-        <span class="params">(<span name="value">value: A</span>)</span>
+        <span class="params">(<span name="value">value: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="manifest">manifest: Manifest[A]</span>)</span>
         
       </span>
       </h4>
@@ -229,6 +229,23 @@
             
             
           </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#asA">
+      <a id="asA[B](Manifest[B]):Response[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asA</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="m">m: Manifest[B]</span>)</span>
+        <span class="result">: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[B]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>
+        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
       <a id="asInstanceOf[T0]:T0"></a>
@@ -568,14 +585,33 @@ possible to check whether the contents of the list are of the requested typed.
             
           </div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Result#manifest">
+      <a id="manifest:Manifest[A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit val</span>
+      <span class="symbol">
+        <span class="name">manifest</span>
+        
+        
+        <span class="result">: Manifest[A]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.Result">Result</a> → <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>
+        </div></div>
+          
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Result#map">
-      <a id="map[B]((A) ⇒ B):Response[B]"></a>
+      <a id="map[B]((A) ⇒ B)(Manifest[B]):Response[B]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">map</span>
         <span class="tparams">[<span name="B">B</span>]</span>
-        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[B]</span>)</span>
         <span class="result">: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[B]</span>
       </span>
       </h4>

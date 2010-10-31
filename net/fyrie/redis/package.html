@@ -96,14 +96,14 @@
 serialization with the given <code>Format</code> and provides a Handler for
 the server's response.</p>
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error">
-      <a id="Error:Error"></a>
+      <a id="Error:Error[A]"></a>
       <h4 class="signature"><a href="Error.html">
       <span class="kind">case class</span>
       <span class="symbol">
         <span class="name">Error</span>
-        
-        <span class="params">(<span name="exception">exception: Throwable</span>)</span>
-        <span class="result"> extends Response[Nothing] with Product</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="exception">exception: Throwable</span>, <span name="manifest">manifest: Manifest[A]</span>)</span>
+        <span class="result"> extends Response[A] with Product</span>
       </span>
       </a></h4>
       
@@ -154,7 +154,7 @@ the server's response.</p>
         <span class="name">RedisBulk</span>
         
         <span class="params">(<span name="value">value: Option[Array[Byte]]</span>)</span>
-        <span class="result"> extends RedisType[Option[Array[Byte]]] with Product</span>
+        <span class="result"> extends RedisType with Product</span>
       </span>
       </a></h4>
       
@@ -195,7 +195,7 @@ the server's response.</p>
         <span class="name">RedisError</span>
         
         <span class="params">(<span name="value">value: Exception</span>)</span>
-        <span class="result"> extends RedisType[Exception] with Product</span>
+        <span class="result"> extends RedisType with Product</span>
       </span>
       </a></h4>
       
@@ -224,7 +224,7 @@ the server's response.</p>
         <span class="name">RedisInteger</span>
         
         <span class="params">(<span name="value">value: Long</span>)</span>
-        <span class="result"> extends RedisType[Long] with Product</span>
+        <span class="result"> extends RedisType with Product</span>
       </span>
       </a></h4>
       
@@ -241,7 +241,7 @@ the server's response.</p>
         <span class="name">RedisMulti</span>
         
         <span class="params">(<span name="value">value: Option[Int]</span>)</span>
-        <span class="result"> extends RedisType[Option[Int]] with Product</span>
+        <span class="result"> extends RedisType with Product</span>
       </span>
       </a></h4>
       
@@ -270,7 +270,7 @@ the server's response.</p>
         <span class="name">RedisString</span>
         
         <span class="params">(<span name="value">value: String</span>)</span>
-        <span class="result"> extends RedisType[String] with Product</span>
+        <span class="result"> extends RedisType with Product</span>
       </span>
       </a></h4>
       
@@ -280,12 +280,12 @@ the server's response.</p>
         </div></div>
           
     </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.RedisType">
-      <a id="RedisType:RedisType[A]"></a>
+      <a id="RedisType:RedisType"></a>
       <h4 class="signature"><a href="RedisType.html">
       <span class="kind">trait</span>
       <span class="symbol">
         <span class="name">RedisType</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
+        
         
         <span class="result"> extends AnyRef</span>
       </span>
@@ -319,7 +319,7 @@ the server's response.</p>
       <span class="kind">class</span>
       <span class="symbol">
         <span class="name">Response</span>
-        <span class="tparams">[<span name="A">+A</span>]</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
         
         <span class="result"> extends Product</span>
       </span>
@@ -330,6 +330,18 @@ the server's response.</p>
           attributes: sealed abstract 
         </div></div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.ResponseFuture">
+      <a id="ResponseFuture:ResponseFuture[A]"></a>
+      <h4 class="signature"><a href="ResponseFuture.html">
+      <span class="kind">class</span>
+      <span class="symbol">
+        <span class="name">ResponseFuture</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        
+        <span class="result"> extends DefaultCompletableFuture[A]</span>
+      </span>
+      </a></h4>
+      
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Result">
       <a id="Result:Result[A]"></a>
       <h4 class="signature"><a href="Result.html">
@@ -337,7 +349,7 @@ the server's response.</p>
       <span class="symbol">
         <span class="name">Result</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="value">value: A</span>)</span>
+        <span class="params">(<span name="value">value: A</span>, <span name="manifest">manifest: Manifest[A]</span>)</span>
         <span class="result"> extends Response[A] with Product</span>
       </span>
       </a></h4>

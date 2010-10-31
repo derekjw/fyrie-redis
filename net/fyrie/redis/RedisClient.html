@@ -81,37 +81,37 @@
         <div class="values members" id="values">
               <h3>Value Members</h3>
               <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisClient#!">
-      <a id="![A](Command[A])(Option[ActorRef],Manifest[A]):Unit"></a>
+      <a id="![A](Command[A])(Option[ActorRef]):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">!</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="sender">sender: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="se.scalablesolutions.akka.actor.ActorRef">ActorRef</span>]</span>, <span name="cm">cm: Manifest[A]</span>)</span>
+        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="sender">sender: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="se.scalablesolutions.akka.actor.ActorRef">ActorRef</span>] =<span class="symbol">None</span></span>)</span>
         <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4>
       
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisClient#!!">
-      <a id="!![A](Command[A])(Manifest[A]):Option[A]"></a>
+      <a id="!![A](Command[A]):Option[A]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">!!</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span>
+        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span>
         <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
       </span>
       </h4>
       
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisClient#!!!">
-      <a id="!!![A](Command[A])(Manifest[A]):Future[A]"></a>
+      <a id="!!![A](Command[A]):Future[A]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">!!!</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span>
+        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span>
         <span class="result">: <span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[A]</span>
       </span>
       </h4>
@@ -578,13 +578,13 @@ possible to check whether the contents of the list are of the requested typed.
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisClient#send">
-      <a id="send[A](Command[A])(Manifest[A]):A"></a>
+      <a id="send[A](Command[A]):A"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">send</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span>
+        <span class="params">(<span name="command">command: <a href="Command.html" class="extype" name="net.fyrie.redis.Command">Command</a>[A]</span>)</span>
         <span class="result">: A</span>
       </span>
       </h4>

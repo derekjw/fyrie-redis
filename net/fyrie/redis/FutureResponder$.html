@@ -357,13 +357,13 @@ there are no more references to the object.</p><p>The details of when and if the
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.FutureResponder#futureToResponse">
-      <a id="futureToResponse[A](Future[A]):Response[A]"></a>
+      <a id="futureToResponse[A](Future[A])(Manifest[A]):Response[A]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">futureToResponse</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="in">in: <span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[A]</span>)</span>
+        <span class="params">(<span name="in">in: <span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span>
         <span class="result">: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[A]</span>
       </span>
       </h4>
@@ -445,13 +445,13 @@ possible to check whether the contents of the list are of the requested typed.
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.FutureResponder#mkFutures">
-      <a id="mkFutures[A](Handler[A]):(CompletableFuture[Any], Future[A])"></a>
+      <a id="mkFutures[A](Handler[A])(Manifest[A]):(CompletableFuture[Any], Future[A])"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">mkFutures</span>
         <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="in">in: <a href="handlers/Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[A]</span>)</span>
+        <span class="params">(<span name="in">in: <a href="handlers/Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[A]</span>)</span>
         <span class="result">: (<span class="extype" name="se.scalablesolutions.akka.dispatch.CompletableFuture">CompletableFuture</span>[<span class="extype" name="scala.Any">Any</span>], <span class="extype" name="se.scalablesolutions.akka.dispatch.Future">Future</span>[A])</span>
       </span>
       </h4>

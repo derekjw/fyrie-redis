@@ -25,9 +25,9 @@
       <span class="kind">case class</span>
       <span class="symbol">
         <span class="name">Error</span>
-        
-        <span class="params">(<span name="exception">exception: Throwable</span>)</span>
-        <span class="result"> extends <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>] with <span class="extype" name="scala.Product">Product</span></span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="exception">exception: Throwable</span>, <span name="manifest">manifest: Manifest[A]</span>)</span>
+        <span class="result"> extends <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[A] with <span class="extype" name="scala.Product">Product</span></span>
       </span>
       </h4>
       <div class="fullcomment" id="comment"><div class="block">
@@ -35,7 +35,7 @@
         </div><div class="block">
             go to: <a href="Error$.html">companion</a>
           </div><div class="block">
-            linear super types: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>], <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, AnyRef, <span class="extype" name="scala.Any">Any</span>
+            linear super types: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[A], <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, AnyRef, <span class="extype" name="scala.Any">Any</span>
           </div></div>
 
       <div id="template">
@@ -64,13 +64,13 @@
         <div class="members" id="constructors">
               <h3>Instance constructors</h3>
               <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error#this">
-      <a id="this:Error"></a>
+      <a id="this:Error[A]"></a>
       <h4 class="signature">
       <span class="kind">new</span>
       <span class="symbol">
         <span class="name">Error</span>
         
-        <span class="params">(<span name="exception">exception: Throwable</span>)</span>
+        <span class="params">(<span name="exception">exception: Throwable</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="manifest">manifest: Manifest[A]</span>)</span>
         
       </span>
       </h4>
@@ -229,6 +229,23 @@
             
             
           </div>
+          
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#asA">
+      <a id="asA[B](Manifest[B]):Response[B]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol">
+        <span class="name">asA</span>
+        <span class="tparams">[<span name="B">B</span>]</span>
+        <span class="params">(<span class="implicit">implicit </span><span name="m">m: Manifest[B]</span>)</span>
+        <span class="result">: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[B]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          definition classes: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>
+        </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
       <a id="asInstanceOf[T0]:T0"></a>
@@ -403,13 +420,13 @@ there are no more references to the object.</p><p>The details of when and if the
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error#fold">
-      <a id="fold[X]((Nothing) ⇒ X,(Throwable) ⇒ X):X"></a>
+      <a id="fold[X]((A) ⇒ X,(Throwable) ⇒ X):X"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">fold</span>
         <span class="tparams">[<span name="X">X</span>]</span>
-        <span class="params">(<span name="ifResult">ifResult: (<span class="extype" name="scala.Nothing">Nothing</span>) ⇒ X</span>, <span name="ifError">ifError: (Throwable) ⇒ X</span>)</span>
+        <span class="params">(<span name="ifResult">ifResult: (A) ⇒ X</span>, <span name="ifError">ifError: (Throwable) ⇒ X</span>)</span>
         <span class="result">: X</span>
       </span>
       </h4>
@@ -420,13 +437,13 @@ there are no more references to the object.</p><p>The details of when and if the
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#foreach">
-      <a id="foreach[U]((Nothing) ⇒ U):Unit"></a>
+      <a id="foreach[U]((A) ⇒ U):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">foreach</span>
         <span class="tparams">[<span name="U">U</span>]</span>
-        <span class="params">(<span name="f">f: (<span class="extype" name="scala.Nothing">Nothing</span>) ⇒ U</span>)</span>
+        <span class="params">(<span name="f">f: (A) ⇒ U</span>)</span>
         <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4>
@@ -580,14 +597,33 @@ possible to check whether the contents of the list are of the requested typed.
             
           </div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error#manifest">
+      <a id="manifest:Manifest[A]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit val</span>
+      <span class="symbol">
+        <span class="name">manifest</span>
+        
+        
+        <span class="result">: Manifest[A]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="" class="extype" name="net.fyrie.redis.Error">Error</a> → <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>
+        </div></div>
+          
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error#map">
-      <a id="map[B]((Nothing) ⇒ B):Response[B]"></a>
+      <a id="map[B]((A) ⇒ B)(Manifest[B]):Response[B]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">map</span>
         <span class="tparams">[<span name="B">B</span>]</span>
-        <span class="params">(<span name="f">f: (<span class="extype" name="scala.Nothing">Nothing</span>) ⇒ B</span>)</span>
+        <span class="params">(<span name="f">f: (A) ⇒ B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[B]</span>)</span>
         <span class="result">: <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[B]</span>
       </span>
       </h4>
@@ -774,14 +810,14 @@ possible to check whether the contents of the list are of the requested typed.
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#toEither">
-      <a id="toEither:Either[Throwable, Nothing]"></a>
+      <a id="toEither:Either[Throwable, A]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">toEither</span>
         
         
-        <span class="result">: <span class="extype" name="scala.Either">Either</span>[Throwable, <span class="extype" name="scala.Nothing">Nothing</span>]</span>
+        <span class="result">: <span class="extype" name="scala.Either">Either</span>[Throwable, A]</span>
       </span>
       </h4>
       
@@ -791,14 +827,14 @@ possible to check whether the contents of the list are of the requested typed.
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#toList">
-      <a id="toList:List[Nothing]"></a>
+      <a id="toList:List[A]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">toList</span>
         
         
-        <span class="result">: List[<span class="extype" name="scala.Nothing">Nothing</span>]</span>
+        <span class="result">: List[A]</span>
       </span>
       </h4>
       
@@ -808,14 +844,14 @@ possible to check whether the contents of the list are of the requested typed.
         </div></div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response#toOption">
-      <a id="toOption:Option[Nothing]"></a>
+      <a id="toOption:Option[A]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">toOption</span>
         
         
-        <span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Nothing">Nothing</span>]</span>
+        <span class="result">: <span class="extype" name="scala.Option">Option</span>[A]</span>
       </span>
       </h4>
       
@@ -907,7 +943,7 @@ possible to check whether the contents of the list are of the requested typed.
             </div>
 
         <div class="parent" name="net.fyrie.redis.Response">
-              <h3>Inherited from <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]</h3>
+              <h3>Inherited from <a href="Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[A]</h3>
             </div><div class="parent" name="scala.Product">
               <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
             </div><div class="parent" name="scala.Equals">

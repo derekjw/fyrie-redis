@@ -27,11 +27,11 @@
         <span class="name">NoHandler</span>
         
         
-        <span class="result"> extends <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<span class="extype" name="scala.Unit">Unit</span>, <a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]] with <span class="extype" name="scala.Product">Product</span></span>
+        <span class="result"> extends <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<span class="extype" name="scala.Unit">Unit</span>, <span class="extype" name="scala.Unit">Unit</span>] with <span class="extype" name="scala.Product">Product</span></span>
       </span>
       </h4>
       <div class="fullcomment" id="comment"><div class="block">
-            linear super types: <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<span class="extype" name="scala.Unit">Unit</span>, <a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]], <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]], AnyRef, <span class="extype" name="scala.Any">Any</span>
+            linear super types: <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<span class="extype" name="scala.Unit">Unit</span>, <span class="extype" name="scala.Unit">Unit</span>], <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Unit">Unit</span>], AnyRef, <span class="extype" name="scala.Any">Any</span>
           </div></div>
 
       <div id="template">
@@ -483,6 +483,25 @@ possible to check whether the contents of the list are of the requested typed.
             
           </div>
           
+    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.Handler#manifest">
+      <a id="manifest:Manifest[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit val</span>
+      <span class="symbol">
+        <span class="name">manifest</span>
+        
+        
+        <span class="result">: Manifest[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      
+            
+            <div class="fullcomment"><div class="block">
+          attributes: implicit 
+        </div><div class="block">
+          definition classes: <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>
+        </div></div>
+          
     </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -554,14 +573,14 @@ possible to check whether the contents of the list are of the requested typed.
           </div>
           
     </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers.NoHandler#parse">
-      <a id="parse(Unit):Response[Nothing]"></a>
+      <a id="parse(Unit):Response[Unit]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol">
         <span class="name">parse</span>
         
         <span class="params">(<span name="in">in: <span class="extype" name="scala.Unit">Unit</span></span>)</span>
-        <span class="result">: <a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]</span>
+        <span class="result">: <a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
       </span>
       </h4>
       
@@ -799,9 +818,9 @@ possible to check whether the contents of the list are of the requested typed.
             </div><div class="parent" name="scala.Equals">
               <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
             </div><div class="parent" name="net.fyrie.redis.handlers.SingleHandler">
-              <h3>Inherited from <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<span class="extype" name="scala.Unit">Unit</span>, <a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]]</h3>
+              <h3>Inherited from <a href="SingleHandler.html" class="extype" name="net.fyrie.redis.handlers.SingleHandler">SingleHandler</a>[<span class="extype" name="scala.Unit">Unit</span>, <span class="extype" name="scala.Unit">Unit</span>]</h3>
             </div><div class="parent" name="net.fyrie.redis.handlers.Handler">
-              <h3>Inherited from <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<a href="../Response.html" class="extype" name="net.fyrie.redis.Response">Response</a>[<span class="extype" name="scala.Nothing">Nothing</span>]]</h3>
+              <h3>Inherited from <a href="Handler.html" class="extype" name="net.fyrie.redis.handlers.Handler">Handler</a>[<span class="extype" name="scala.Unit">Unit</span>]</h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from AnyRef</h3>
             </div><div class="parent" name="scala.Any">
