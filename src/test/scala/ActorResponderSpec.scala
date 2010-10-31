@@ -73,6 +73,9 @@ class ActorResponderSpec extends Specification {
 }
 
 class MatchingActor(r: RedisClient, future: CompletableFuture[List[Option[Any]]], var expectList: List[Response[_]]) extends Actor {
+
+  self.dispatcher = Dispatchers.globalHawtDispatcher
+
   var results: List[Option[Any]] = Nil
 
   def expect(in: Any): Unit = {
