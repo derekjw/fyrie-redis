@@ -221,8 +221,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
       readSingleLine map { (data) =>
         respond(RedisString(data))
         readHandler = Idle
-        true
-      } getOrElse false
+      } isDefined
     }
   }
 
@@ -231,8 +230,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
       readSingleLine map { (data) =>
         respond(RedisInteger(data))
         readHandler = Idle
-        true
-      } getOrElse false
+      } isDefined
     }
   }
 
@@ -254,8 +252,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
           respond(RedisBulk(None))
           Idle
         }
-        true
-      } getOrElse false
+      } isDefined
     }
   }
 
@@ -309,8 +306,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
       readSingleLine map { (data) =>
         respond(RedisMulti(data))
         readHandler = Idle
-        true
-      } getOrElse false
+      } isDefined
     }
   }
 
