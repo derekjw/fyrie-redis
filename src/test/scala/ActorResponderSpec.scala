@@ -92,10 +92,10 @@ class MatchingActor(r: RedisClient, future: CompletableFuture[List[Option[Any]]]
   def receive = {
     case cmd: Command[_] =>
       r ! cmd
-    case (rb: RedisBulk, bh: Bulk[_]) =>
-      expect(bh.parse(rb))
-    case (RedisMulti(length), mh: MultiHandler[_]) =>
+    case Result(MultiParser(length, parser)) =>
       expect(Result(length))
+    case LazyResponse(res: Response[_]) =>
+      expect(res)
     case res: Response[_] =>
       expect(res)
   }

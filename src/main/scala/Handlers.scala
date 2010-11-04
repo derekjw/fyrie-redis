@@ -14,7 +14,7 @@ abstract class Handler[A](implicit val manifest: Manifest[A]) {
   def handlers: Seq[Handler[_]]
 }
 
-abstract class SingleHandler[A: Manifest, B: Manifest] extends Handler[B] {
+abstract class SingleHandler[A: RedisType: Manifest, B: Manifest] extends Handler[B] {
   implicit val inputManifest = implicitly[Manifest[A]]
 
   def parse(in: A): Response[B]
@@ -26,40 +26,42 @@ abstract class MultiHandler[A: Manifest] extends Handler[Option[Stream[A]]] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[A]]
 }
 
+case class MultiParser[A: Manifest](length: Option[Int], parse: Option[Stream[Response[Any]]] => A)
+
 final case class MultiExec(handlers: Seq[Handler[_]]) extends MultiHandler[Any] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[Any]] = in.map(_.map(_.get))
 }
 
-case object NoHandler extends SingleHandler[Unit, Unit] {
-  def parse(in: Unit): Response[Unit] = throw new RedisErrorException("No handler")
+case object NoHandler extends SingleHandler[Exception, Unit] {
+  def parse(in: Exception): Response[Unit] = throw in
 }
 
-case object Status extends SingleHandler[RedisString, String] {
-  def parse(in: RedisString): Response[String] = Result(in.value)
+case object Status extends SingleHandler[String, String] {
+  def parse(in: String): Response[String] = Result(in)
 }
 
-case object OkStatus extends SingleHandler[RedisString, Unit] {
-  def parse(in: RedisString): Response[Unit] = Response(verify(in.value, "OK"))
+case object OkStatus extends SingleHandler[String, Unit] {
+  def parse(in: String): Response[Unit] = Response(verify(in, "OK"))
 }
 
-case object QueuedStatus extends SingleHandler[RedisString, Unit] {
-  def parse(in: RedisString): Response[Unit] = Response(verify(in.value, "QUEUED"))
+case object QueuedStatus extends SingleHandler[String, Unit] {
+  def parse(in: String): Response[Unit] = Response(verify(in, "QUEUED"))
 }
 
-case object LongInt extends SingleHandler[RedisInteger, Long] {
-  def parse(in: RedisInteger): Response[Long] = Result(in.value)
+case object LongInt extends SingleHandler[Long, Long] {
+  def parse(in: Long): Response[Long] = Result(in)
 }
 
-case object ShortInt extends SingleHandler[RedisInteger, Int] {
-  def parse(in: RedisInteger): Response[Int] = Response(in.value.toInt)
+case object ShortInt extends SingleHandler[Long, Int] {
+  def parse(in: Long): Response[Int] = Response(in.toInt)
 }
 
-case object IntAsBoolean extends SingleHandler[RedisInteger, Boolean] {
-  def parse(in: RedisInteger): Response[Boolean] = Result(in.value > 0L)
+case object IntAsBoolean extends SingleHandler[Long, Boolean] {
+  def parse(in: Long): Response[Boolean] = Result(in > 0L)
 }
 
-final case class Bulk[A: Parse: Manifest]() extends SingleHandler[RedisBulk, Option[A]] {
-  def parse(in: RedisBulk): Response[Option[A]] = Response(in.value.map(x => x))
+final case class Bulk[A: Parse: Manifest]() extends SingleHandler[Option[Array[Byte]], Option[A]] {
+  def parse(in: Option[Array[Byte]]): Response[Option[A]] = Response(in.map(x => x))
 }
 
 final case class MultiBulk[A: Parse: Manifest]() extends MultiHandler[Option[A]] {

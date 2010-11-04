@@ -3,8 +3,8 @@ package redis
 package actors
 
 import messages._
-
 import handlers._
+import RedisType._
 
 import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
 import Actor.{ actorOf }
@@ -166,7 +166,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
     writeBuf._2.flip
   }
 
-  def respond[T <: RedisType: Manifest](data: T) {
+  def respond[T: RedisType: Manifest](data: T) {
     responseQueue.dequeue.apply(data).reverse.foreach(_ +=: responseQueue)
   }
 
@@ -249,7 +249,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
       readSingleLine map { (data) =>
         val size = new String(data, "UTF-8").toInt
         readHandler = if (size > -1) (new ReadBulkData(size)) else {
-          respond(RedisBulk(None))
+          respond(Option.empty[Array[Byte]])
           Idle
         }
       } isDefined
@@ -282,7 +282,7 @@ final class RedisClientSession(host: String, port: Int) extends Actor {
           readBuf.get(ar)
           ar
         }
-        respond(RedisBulk(Some(data)))
+        respond(RedisBulk(data))
         readHandler = ReadEOL
         true
       } else false

@@ -2,7 +2,7 @@ package net.fyrie.redis
 
 import handlers._
 import utils._
-
+import RedisType._
 import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
 import se.scalablesolutions.akka.dispatch._
 
@@ -11,7 +11,7 @@ import org.fusesource.hawtdispatch.ScalaDispatch._
 sealed trait Responder {
   def handler: Handler[_]
 
-  def apply[T <: RedisType: Manifest](in: T): Seq[Responder]
+  def apply[T: RedisType: Manifest](in: T): Seq[Responder]
 }
 
 object Responder {
@@ -23,12 +23,13 @@ object Responder {
 }
 
 final case class ActorResponder(handler: Handler[_], target: ActorRef) extends Responder {
-  def apply[T <: RedisType: Manifest](in: T): Seq[Responder] = (in, handler) match {
-    case (RedisError(err),_) =>
-      target ! Error(err)
+  def apply[T: RedisType: Manifest](in: T): Seq[Responder] = (implicitly[RedisType[T]], handler) match {
+    case (RedisError,_) =>
+      target ! Error(in)
       Nil
-    case (b: RedisBulk, bh: Bulk[_]) =>
-      target ! (b, bh)
+    case (RedisBulk, bh: Bulk[_]) =>
+      implicit val handlerManifest = bh.manifest
+      target ! LazyResponse(bh.parse(in))
       Nil
     case (_, sh: SingleHandler[_,_]) =>
       ifType(in, sh.inputManifest) { x =>
@@ -37,11 +38,12 @@ final case class ActorResponder(handler: Handler[_], target: ActorRef) extends R
         target ! Error(new RedisProtocolException("Incorrect Type: "+x))
       }
       Nil
-    case (RedisString("OK"), MultiExec(handlers)) =>
+    case (RedisString, MultiExec(handlers)) if in == "OK" =>
       Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
-    case (rm @ RedisMulti(length), mh: MultiHandler[_]) =>
-      target ! (rm, mh)
-      length map (mh.handlers.take(_).map(h => ActorResponder(h, target))) getOrElse Nil
+    case (RedisMulti, mh: MultiHandler[_]) =>
+      implicit val handlerManifest = mh.manifest
+      target ! Result(MultiParser(in, mh.parse _))
+      in map (mh.handlers.take(_).map(h => ActorResponder(h, target))) getOrElse Nil
     case (_, _) =>
       target ! Error(new RedisProtocolException("Incorrect value: "+in+" for handler: "+handler))
       Nil
@@ -68,11 +70,11 @@ object FutureResponder {
 final case class FutureResponder(handler: Handler[_], future: CompletableFuture[Any]) extends Responder {
   import FutureResponder.mkFutures
 
-  def apply[T <: RedisType: Manifest](in: T): Seq[Responder] = (in, handler) match {
-    case (RedisError(err),_) =>
-      complete(Error(err))
-    case (b: RedisBulk, bh: Bulk[_]) =>
-      globalQueue ^ (complete(bh.parse(b)))
+  def apply[T: RedisType: Manifest](in: T): Seq[Responder] = (implicitly[RedisType[T]], handler) match {
+    case (RedisError,_) =>
+      complete(Error(in))
+    case (RedisBulk, bh: Bulk[_]) =>
+      globalQueue ^ (complete(bh.parse(in)))
       Nil
     case (_, sh: SingleHandler[_,_]) =>
       ifType(in, sh.inputManifest) { x =>
@@ -80,13 +82,13 @@ final case class FutureResponder(handler: Handler[_], future: CompletableFuture[
       } { x =>
         complete(Error(new RedisProtocolException("Incorrect Type: "+x)))
       }
-    case (RedisString("OK"), MultiExec(handlers)) =>
+    case (RedisString, MultiExec(handlers)) if in == "OK" =>
       Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
-    case (RedisMulti(Some(length)), mh: MultiHandler[_]) =>
-      val hfs = mh.handlers.take(length).toStream map (h => (h, mkFutures(h)))
+    case (RedisMulti, mh: MultiHandler[_]) if in.isDefined =>
+      val hfs = mh.handlers.take(in.get).toStream map (h => (h, mkFutures(h)))
       complete(Response(Some(hfs.map(_._2._2))))
       hfs.map(hf => FutureResponder(hf._1, hf._2._1))
-    case (RedisMulti(None), mh: MultiHandler[_]) =>
+    case (RedisMulti, mh: MultiHandler[_]) =>
       complete(Result(None))
     case (_, _) =>
       complete(Error(new RedisProtocolException("Incorrect value: "+in+" for handler: "+handler)))
@@ -99,10 +101,10 @@ final case class FutureResponder(handler: Handler[_], future: CompletableFuture[
 }
 
 final case class NoResponder(handler: Handler[_]) extends Responder {
-  def apply[T <: RedisType: Manifest](in: T): Seq[Responder] = in match {
-    case RedisMulti(Some(length)) =>
-      handler.handlers.take(length).map(NoResponder(_))
-    case RedisMulti(None) => Nil
+  def apply[T: RedisType: Manifest](in: T): Seq[Responder] = implicitly[RedisType[T]] match {
+    case RedisMulti if in.isDefined =>
+      handler.handlers.take(in.get).map(NoResponder(_))
+    case RedisMulti => Nil
     case x =>
       handler match {
         case MultiExec(handlers) =>

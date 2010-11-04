@@ -78,3 +78,13 @@ class ResponseFuture[A](timeout: Long = 0)(implicit val manifest: Manifest[A]) e
   def toResponse: Response[A] =
     this.await.result.map(Result(_)(manifest)).orElse(this.exception.map(Error(_)(manifest))).getOrElse(Error(error("ERROR")))
 }
+
+object LazyResponse {
+  def apply[A: Manifest](value: => A) = new LazyResponse(value)
+  def unapply[A](in: LazyResponse[A]): Option[A] = Some(in.apply)
+}
+
+class LazyResponse[A](value: => A)(implicit val manifest: Manifest[A]) {
+  lazy val response: A = value
+  def apply = response
+}
