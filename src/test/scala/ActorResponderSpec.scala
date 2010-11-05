@@ -30,7 +30,7 @@ class ActorResponderSpec extends Specification {
       val actor = actorOf(new MatchingActor(r,
                                             future,
                                             List(Result(()),
-                                                 Result(Some("testval1"))))).start
+                                                 Result(Option("testval1"))))).start
       actor ! set("testkey1", "testval1")
       actor ! get("testkey1")
       future.await
@@ -42,17 +42,17 @@ class ActorResponderSpec extends Specification {
       val actor = actorOf(new MatchingActor(r,
                                             future,
                                             List(Result(()),
-                                                 Result(Some("testval1")),
+                                                 Result(Option("testval1")),
                                                  Result(1),
                                                  Result(2),
                                                  Result(3),
                                                  Result(4),
-                                                 Result(Some("testval2")),
-                                                 Result(Some(3)),
-                                                 Result(Some("testval5")),
-                                                 Result(Some("testval4")),
-                                                 Result(Some("testval3")),
-                                                 Result(Some("testval3")),
+                                                 Result(Option("testval2")),
+                                                 Result(Option(3)),
+                                                 Result(Option("testval5")),
+                                                 Result(Option("testval4")),
+                                                 Result(Option("testval3")),
+                                                 Result(Option("testval3")),
                                                  Result(2)
                                                ))).start
       actor ! set("testkey1", "testval1")
@@ -78,11 +78,11 @@ class MatchingActor(r: RedisClient, future: CompletableFuture[List[Option[Any]]]
 
   var results: List[Option[Any]] = Nil
 
-  def expect(in: Any): Unit = {
+  def expect[A](in: Response[A]): Unit = {
     expectList match {
       case h :: t =>
         expectList = t
-        results = (if (in == h) None else Some(in)) :: results
+        results = (if (in == h && in.manifest == h.manifest) None else Some((in, in.manifest.toString, h.manifest.toString))) :: results
       case Nil =>
         results = Some(in) :: results
     }
