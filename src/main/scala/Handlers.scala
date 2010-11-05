@@ -24,9 +24,11 @@ abstract class SingleHandler[A: RedisType: Manifest, B: Manifest] extends Handle
 
 abstract class MultiHandler[A: Manifest] extends Handler[Option[Stream[A]]] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[A]]
+
+  def parser(length: Option[Int]) = Result(MultiParser(length, parse _)(this.manifest))
 }
 
-case class MultiParser[A: Manifest](length: Option[Int], parse: Option[Stream[Response[Any]]] => A)
+case class MultiParser[A](length: Option[Int], parse: Option[Stream[Response[Any]]] => A)(implicit val manifest: Manifest[A])
 
 final case class MultiExec(handlers: Seq[Handler[_]]) extends MultiHandler[Any] {
   def parse(in: Option[Stream[Response[Any]]]): Option[Stream[Any]] = in.map(_.map(_.get))
@@ -62,6 +64,8 @@ case object IntAsBoolean extends SingleHandler[Long, Boolean] {
 
 final case class Bulk[A: Parse: Manifest]() extends SingleHandler[Option[Array[Byte]], Option[A]] {
   def parse(in: Option[Array[Byte]]): Response[Option[A]] = Response(in.map(x => x))
+
+  def lazyParse(in: Option[Array[Byte]]) = LazyResponse(parse(in))
 }
 
 final case class MultiBulk[A: Parse: Manifest]() extends MultiHandler[Option[A]] {

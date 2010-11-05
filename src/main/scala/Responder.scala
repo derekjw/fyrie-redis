@@ -28,8 +28,7 @@ final case class ActorResponder(handler: Handler[_], target: ActorRef) extends R
       target ! Error(in)
       Nil
     case (RedisBulk, bh: Bulk[_]) =>
-      implicit val handlerManifest = bh.manifest
-      target ! LazyResponse(bh.parse(in))
+      target ! bh.lazyParse(in)
       Nil
     case (_, sh: SingleHandler[_,_]) =>
       ifType(in, sh.inputManifest) { x =>
@@ -41,8 +40,7 @@ final case class ActorResponder(handler: Handler[_], target: ActorRef) extends R
     case (RedisString, MultiExec(handlers)) if in == "OK" =>
       Stream.continually(NoResponder(QueuedStatus)).take(handlers.length).foldLeft(List[Responder](this)){case (l,q) => q :: l}
     case (RedisMulti, mh: MultiHandler[_]) =>
-      implicit val handlerManifest = mh.manifest
-      target ! Result(MultiParser(in, mh.parse _))
+      target ! mh.parser(in)
       in map (mh.handlers.take(_).map(h => ActorResponder(h, target))) getOrElse Nil
     case (_, _) =>
       target ! Error(new RedisProtocolException("Incorrect value: "+in+" for handler: "+handler))
