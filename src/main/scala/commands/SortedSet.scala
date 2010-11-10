@@ -45,7 +45,7 @@ trait SortedSetCommands {
 
   // ZRANGEBYSCORE
   //
-  case class zrangebyscore[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
+  case class zrangebyscore[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
     override def args = Iterator(key, serializeDouble(min, minInclusive), serializeDouble(max, maxInclusive)) ++ argN2("LIMIT", limit)
   }
 
