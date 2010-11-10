@@ -8,7 +8,7 @@ class FyrieRedisProject(info: ProjectInfo) extends DefaultProject(info) with Akk
   override def compileAction = super.compileAction dependsOn(generateSortTuple)
 
   val akkaActor = "se.scalablesolutions.akka" % "akka-actor_2.8.0"  % "1.0-M1"
-  val specs = "org.scala-tools.testing" %% "specs" % "1.6.5" % "test"
+  val specs = "org.scala-tools.testing" %% "specs" % "1.6.6" % "test"
   val scalatest = "org.scalatest" % "scalatest" % "1.2" % "test"
   val junit = "junit" % "junit" % "4.8.1" % "test"
 
