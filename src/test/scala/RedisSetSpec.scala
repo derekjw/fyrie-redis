@@ -9,7 +9,7 @@ import specification.Context
 class RedisSetSpec extends Specification {
   implicit val r = new RedisClient
 
-  val empty = new Context {
+  val emptyDb = new Context {
     before {
       r !! flushdb
     }
@@ -18,7 +18,7 @@ class RedisSetSpec extends Specification {
     }
   }
 
-  "size" ->- empty should {
+  "size" ->- emptyDb should {
     "return 0 for empty set" in {
       val set = RedisSet[String]("test set 1")
       set must haveSize(0)
@@ -33,7 +33,7 @@ class RedisSetSpec extends Specification {
       set must haveSize(3)
     }
   }
-  "spop" ->- empty should {
+  "spop" ->- emptyDb should {
     "pop from the set" in {
       val set = RedisSet[String]("test set 1")
       val vs = Set("Hello", "World", "test1", "test2", "I'm last")

@@ -13,7 +13,7 @@ import akka.dispatch._
 class ActorResponderSpec extends Specification {
   var r: RedisClient = _
 
-  val empty = new Context {
+  val emptyDb = new Context {
     before {
       r = new RedisClient
       r send flushdb
@@ -24,7 +24,7 @@ class ActorResponderSpec extends Specification {
     }
   }
 
-  "sending requests from an actor" ->- empty should {
+  "sending requests from an actor" ->- emptyDb should {
     "return simple requests" in {
       val future = new DefaultCompletableFuture[List[Option[Any]]](5000)
       val actor = actorOf(new MatchingActor(r,
