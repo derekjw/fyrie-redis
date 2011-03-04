@@ -3,8 +3,8 @@ package net.fyrie.redis
 import handlers._
 import utils._
 import RedisType._
-import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
-import se.scalablesolutions.akka.dispatch._
+import akka.actor.{ Actor, ActorRef }
+import akka.dispatch._
 
 import org.fusesource.hawtdispatch.ScalaDispatch._
 

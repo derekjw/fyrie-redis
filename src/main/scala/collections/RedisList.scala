@@ -5,7 +5,7 @@ import serialization._
 
 import scala.collection.mutable.{IndexedSeq}
 
-import se.scalablesolutions.akka.dispatch.{Future}
+import akka.dispatch.{Future}
 
 object RedisList {
   def apply[A](name: String)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]): RedisList[A] =

@@ -74,7 +74,7 @@ final case class Error[A](exception: Throwable)(implicit val manifest: Manifest[
   override def toString = "Error(" + exception.toString + ")"
 }
 
-class ResponseFuture[A](timeout: Long = 0)(implicit val manifest: Manifest[A]) extends se.scalablesolutions.akka.dispatch.DefaultCompletableFuture[A](timeout) {
+class ResponseFuture[A](timeout: Long = 0)(implicit val manifest: Manifest[A]) extends akka.dispatch.DefaultCompletableFuture[A](timeout) {
   def toResponse: Response[A] =
     this.await.result.map(Result(_)(manifest)).orElse(this.exception.map(Error(_)(manifest))).getOrElse(Error(error("ERROR")))
 }

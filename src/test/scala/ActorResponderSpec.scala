@@ -6,9 +6,9 @@ import handlers._
 import org.specs._
 import specification.Context
 
-import se.scalablesolutions.akka.actor._
+import akka.actor._
 import Actor._
-import se.scalablesolutions.akka.dispatch._
+import akka.dispatch._
 
 class ActorResponderSpec extends Specification {
   var r: RedisClient = _

@@ -5,7 +5,7 @@ import serialization.{ Parse }
 import Parse.Implicits._
 import utils._
 
-import se.scalablesolutions.akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}
+import akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}
 
 abstract class Handler[A](implicit val manifest: Manifest[A]) {
   def verify(in: String, expect: String): Unit =

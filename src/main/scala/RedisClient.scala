@@ -5,11 +5,11 @@ import actors._
 import messages.{Request}
 import handlers._
 
-import se.scalablesolutions.akka.dispatch.{Future, FutureTimeoutException}
-import se.scalablesolutions.akka.actor.{Actor,ActorRef}
+import akka.dispatch.{Future, FutureTimeoutException}
+import akka.actor.{Actor,ActorRef}
 import Actor.{actorOf}
-import se.scalablesolutions.akka.dispatch._
-import se.scalablesolutions.akka.config.Config._
+import akka.dispatch._
+import akka.config.Config._
 
 class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost"),
                   port: Int = config.getInt("fyrie-redis.port", 6379)) {

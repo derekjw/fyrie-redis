@@ -6,11 +6,11 @@ import messages._
 import handlers._
 import RedisType._
 
-import se.scalablesolutions.akka.actor.{ Actor, ActorRef }
+import akka.actor.{ Actor, ActorRef }
 import Actor.{ actorOf }
-import se.scalablesolutions.akka.config.Config._
+import akka.config.Config._
 
-import se.scalablesolutions.akka.dispatch._
+import akka.dispatch._
 
 import org.fusesource.hawtdispatch._
 import org.fusesource.hawtdispatch.ScalaDispatch._
