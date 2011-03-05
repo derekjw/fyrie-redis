@@ -6,14 +6,14 @@ import handlers._
 import org.specs._
 import specification.Context
 
-import se.scalablesolutions.akka.actor._
+import akka.actor._
 import Actor._
-import se.scalablesolutions.akka.dispatch._
+import akka.dispatch._
 
 class ActorResponderSpec extends Specification {
   var r: RedisClient = _
 
-  val empty = new Context {
+  val clean = new Context {
     before {
       r = new RedisClient
       r send flushdb
@@ -24,7 +24,7 @@ class ActorResponderSpec extends Specification {
     }
   }
 
-  "sending requests from an actor" ->- empty should {
+  "sending requests from an actor" ->- clean should {
     "return simple requests" in {
       val future = new DefaultCompletableFuture[List[Option[Any]]](5000)
       val actor = actorOf(new MatchingActor(r,

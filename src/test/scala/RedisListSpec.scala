@@ -9,7 +9,7 @@ import specification.Context
 class RedisListSpec extends Specification {
   implicit val r = new RedisClient
 
-  val empty = new Context {
+  val clean = new Context {
     before {
       r !! flushdb
     }
@@ -18,7 +18,7 @@ class RedisListSpec extends Specification {
     }
   }
 
-  "size" ->- empty should {
+  "size" ->- clean should {
     "return 0 for empty list" in {
       val list = RedisList[String]("test list 1")
       list must haveSize(0)
@@ -31,7 +31,7 @@ class RedisListSpec extends Specification {
       list must haveSize(3)
     }
   }
-  "slice" ->- empty should {
+  "slice" ->- clean should {
     "return a slice" in {
       val list = RedisList[String]("test list 1")
       "I'm going first" +=: list += ("Hello", "World")
@@ -39,7 +39,7 @@ class RedisListSpec extends Specification {
       list.slice(0,1) must_== Seq("I'm going first", "Hello")
     }
   }
-  "lpop/rpop" ->- empty should {
+  "lpop/rpop" ->- clean should {
     "pop from the list" in {
       val list = RedisList[String]("test list 1")
       list += ("Hello", "World", "test1", "test2", "I'm last")

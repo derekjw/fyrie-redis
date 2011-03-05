@@ -8,7 +8,7 @@ import specification.Context
 class ExceptionHandlingSpec extends Specification {
   var r: RedisClient = _
 
-  val empty = new Context {
+  val clean = new Context {
     before {
       r = new RedisClient
       r send flushdb
@@ -19,7 +19,7 @@ class ExceptionHandlingSpec extends Specification {
     }
   }
 
-  "redis exceptions" ->- empty should {
+  "redis exceptions" ->- clean should {
     "recover" in {
       "single commands" in {
         r send set("hello", "world")

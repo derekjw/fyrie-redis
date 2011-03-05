@@ -3,7 +3,7 @@ package collection
 
 import serialization._
 
-import se.scalablesolutions.akka.dispatch.{Future}
+import akka.dispatch.{Future}
 
 object RedisVar {
   def apply[A](name: String, default: Option[A] = None)(implicit conn: RedisClient, format: Format, parser: Parse[A], m: Manifest[A]): RedisVar[A] =

@@ -3,7 +3,7 @@ package collection
 
 import serialization._
 
-import se.scalablesolutions.akka.dispatch.{Future}
+import akka.dispatch.{Future}
 
 import scala.collection.mutable
 

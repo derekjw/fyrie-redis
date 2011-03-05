@@ -66,7 +66,7 @@ trait Boilerplate {
               "package handlers {\n\n" +
               "import serialization.Parse\n" +
               "import utils._\n" +
-              "import se.scalablesolutions.akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}\n" +
+              "import akka.dispatch.{Future, CompletableFuture, DefaultCompletableFuture}\n" +
               tupleHandlers.mkString("\n") +
               "}\n\n" +
               "package commands {\n\n" +
