@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/*package net.fyrie.redis
 package commands
 
 import handlers._
@@ -84,3 +84,4 @@ trait SortedSetCommands {
     override def args = Iterator(dstKey, kws.size) ++ kws.iterator.map(_._1) ++ arg1("WEIGHTS") ++ kws.iterator.map(_._2) ++ argN1("AGGREGATE", aggregate)
   }
 }
+*/

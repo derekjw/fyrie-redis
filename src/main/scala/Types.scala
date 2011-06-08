@@ -1,23 +1,25 @@
-package net.fyrie.redis
+package net.fyrie.redis.types
 
-object RedisType {
-  implicit object RedisString extends RedisType[String] {
-    def apply(in: Array[Byte]): String = new String(in, "UTF-8")
-  }
-  implicit object RedisInteger extends RedisType[Long] {
-    def apply(in: Array[Byte]): Long = new String(in, "UTF-8").toLong
-  }
-  implicit object RedisBulk extends RedisType[Option[Array[Byte]]] {
-    def apply(in: Array[Byte]): Option[Array[Byte]] = Some(in)
-  }
-  implicit object RedisMulti extends RedisType[Option[Int]] {
-    def apply(in: Array[Byte]): Option[Int] = Some(new String(in, "UTF-8").toInt).filter(_ >= 0)
-  }
-  implicit object RedisError extends RedisType[Exception] {
-    def apply(in: Array[Byte]): Exception = new RedisErrorException(new String(in, "UTF-8"))
-  }
+import akka.util.ByteString
+
+sealed trait RedisType
+
+case class RedisString(value: String) extends RedisType
+
+case class RedisInteger(value: Long) extends RedisType
+
+object RedisBulk {
+  val notfound = new RedisBulk(None)
+  val empty = new RedisBulk(Some(ByteString.empty))
 }
 
-sealed trait RedisType[A] {
-  def apply(in: Array[Byte]): A
+case class RedisBulk(value: Option[ByteString]) extends RedisType
+
+object RedisMulti {
+  val notfound = new RedisMulti(None)
+  val empty = new RedisMulti(Some(Nil))
 }
+
+case class RedisMulti(value: Option[List[RedisType]]) extends RedisType
+
+case class RedisError(value: String) extends RedisType

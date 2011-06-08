@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/*package net.fyrie.redis
 
 import serialization._
 import handlers.{ Handler }
@@ -119,3 +119,4 @@ object Commands
   with GenericCommands
   with NodeCommands
   with SortTupleCommands
+*/

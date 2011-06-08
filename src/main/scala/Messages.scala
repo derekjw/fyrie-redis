@@ -2,8 +2,11 @@ package net.fyrie
 package redis
 package messages
 
-import handlers.{Handler}
+import akka.util.ByteString
+import akka.actor.IO
 
-trait Message
+sealed trait Message
 
-case class Request[T](bytes: Array[Byte], handler: Handler[T]) extends Message
+case class Request(bytes: ByteString) extends Message
+case object Run extends Message
+case class Socket(handle: IO.SocketHandle) extends Message

@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/*package net.fyrie.redis
 package commands
 
 import handlers._
@@ -54,3 +54,4 @@ trait NodeCommands {
 
   }
 }
+*/

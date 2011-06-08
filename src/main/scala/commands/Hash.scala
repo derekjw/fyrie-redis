@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/*package net.fyrie.redis
 package commands
 
 import Command._
@@ -34,3 +34,4 @@ trait HashCommands {
 
   case class hlen(key : Any)(implicit format: Format) extends Command(LongInt)
 }
+*/

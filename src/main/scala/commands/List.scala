@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/*package net.fyrie.redis
 package commands
 
 import handlers._
@@ -62,3 +62,4 @@ trait ListCommands {
     override def args = arg1(key) ++ values.iterator ++ arg1(timeoutInSeconds)
   }
 }
+*/

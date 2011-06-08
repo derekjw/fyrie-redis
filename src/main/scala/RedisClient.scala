@@ -3,79 +3,78 @@ package redis
 
 import actors._
 import messages.{Request}
-import handlers._
+import Protocol.EOL
+import types._
 
-import akka.dispatch.{Future, FutureTimeoutException}
-import akka.actor.{Actor,ActorRef}
+import akka.actor.{Actor,ActorRef,IOManager}
 import Actor.{actorOf}
-import akka.dispatch._
-import akka.config.Config._
+import akka.util.ByteString
+import akka.dispatch.Future
 
-class RedisClient(host: String = config.getString("fyrie-redis.host", "localhost"),
-                  port: Int = config.getInt("fyrie-redis.port", 6379)) {
-  val actor = actorOf(new RedisClientSession(host, port)).start
+class RedisClient(host: String = "localhost", port: Int = 6379) extends commands.StringCommands with commands.GenericCommands {
+  val ioManager = actorOf(new IOManager()).start
+  val actor = actorOf(new RedisClientSession(ioManager, host, port)).start
 
-  def ![A](command: Command[A])(implicit sender: Option[ActorRef] = None): Unit =
-    actor ! Request(command.toBytes, command.handler)
-
-  def !![A](command: Command[A]): Option[A] = {
-    val future = this !!! command
-    try {
-      future.await
-    } catch {
-      case e: FutureTimeoutException => None
+  protected def send(in: List[ByteString]): Future[RedisType] = {
+    var count = 0
+    var cmd = ByteString.empty
+    in foreach { bytes =>
+      count += 1
+      cmd ++= ByteString("$"+bytes.length) ++ EOL ++ bytes ++ EOL
     }
-    if (future.exception.isDefined) throw future.exception.get
-    else future.result
+    actor !!! Request(ByteString("*"+count) ++ EOL ++ cmd)
   }
 
-  def !!![A](command: Command[A]): Future[A] =
-    command.handler match {
-      case sh: SingleHandler[_,_] =>
-        actor !!! Request(command.toBytes, command.handler)
-      case mh: MultiHandler[_] =>
-        val future: Future[Option[Stream[Future[Any]]]] = actor !!! Request(command.toBytes, command.handler)
-        future.map(x => mh.parse(x.map(_.map(f => FutureResponder.futureToResponse(f)))))
+  protected implicit def mapMultiBulk(future: Future[RedisType]): Future[Option[List[Option[ByteString]]]] = future map {
+      _ match {
+        case RedisMulti(m) => m map {
+          _ map {
+            _ match {
+              case RedisBulk(b) => b
+              case RedisError(e) => throw RedisErrorException(e)
+              case _ => throw RedisProtocolException("Unexpected response")
+            }
+          }
+        }
+        case RedisError(e) => throw RedisErrorException(e)
+        case _ => throw RedisProtocolException("Unexpected response")
+      }
     }
 
-  def send[A](command: Command[A]): A = {
-    val future = this !!! command
-    future.await
-    if (future.exception.isDefined) throw future.exception.get
-    else future.result.get
-  }
-
-  def stop = {
-    actor.stop
-  }
-
-  def disconnect = stop
-
-  def shutdownWorkarounds = {
-    org.fusesource.hawtdispatch.ScalaDispatch.globalQueue.asInstanceOf[org.fusesource.hawtdispatch.internal.GlobalDispatchQueue].shutdown
-
-    val tf = classOf[java.lang.Thread].getDeclaredField("subclassAudits")
-    tf.setAccessible(true)
-    val cache = tf.get(null).asInstanceOf[java.util.Map[_,_]]
-    cache.synchronized {cache.clear}
-
-    val lf = classOf[java.util.logging.Level].getDeclaredField("known")
-    lf.setAccessible(true)
-    val known = lf.get(null).asInstanceOf[java.util.ArrayList[java.util.logging.Level]]
-    known.synchronized {
-      known.clear
-      known.add(java.util.logging.Level.OFF)
-      known.add(java.util.logging.Level.SEVERE)
-      known.add(java.util.logging.Level.WARNING)
-      known.add(java.util.logging.Level.INFO)
-      known.add(java.util.logging.Level.CONFIG)
-      known.add(java.util.logging.Level.FINE)
-      known.add(java.util.logging.Level.FINER)
-      known.add(java.util.logging.Level.FINEST)
-      known.add(java.util.logging.Level.ALL)
+  protected implicit def mapBulk(future: Future[RedisType]): Future[Option[ByteString]] = future map {
+      _ match {
+        case RedisBulk(b) => b
+        case RedisError(e) => throw RedisErrorException(e)
+        case _ => throw RedisProtocolException("Unexpected response")
+      }
     }
-  }
+
+  protected implicit def mapLong(future: Future[RedisType]): Future[Long] = future map {
+      _ match {
+        case RedisInteger(n) => n
+        case RedisError(e) => throw RedisErrorException(e)
+        case _ => throw RedisProtocolException("Unexpected response")
+      }
+    }
+
+  protected implicit def mapBool(future: Future[RedisType]): Future[Boolean] = future map {
+      _ match {
+        case RedisInteger(1) => true
+        case RedisInteger(0) => false
+        case RedisError(e) => throw RedisErrorException(e)
+        case _ => throw RedisProtocolException("Unexpected response")
+      }
+    }
+
+  protected implicit def mapOkStatus(future: Future[RedisType]): Future[Unit] = future map {
+      _ match {
+        case RedisString("OK") => Unit
+        case RedisError(e) => throw RedisErrorException(e)
+        case _ => throw RedisProtocolException("Unexpected response")
+      }
+    }
 }
+
 
 case class RedisErrorException(message: String) extends RuntimeException(message)
 case class RedisProtocolException(message: String) extends RuntimeException(message)
@@ -101,3 +100,4 @@ object AggregateScore {
     val getBytes = "MAX".getBytes
   }
 }
+

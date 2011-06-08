@@ -1,13 +1,29 @@
 package net.fyrie.redis
 package commands
 
-import Command._
-import handlers._
-import serialization.{Parse, Format}
+import serialization._
+import types._
 
-import scala.collection.mutable.ArrayBuilder
+import akka.util.ByteString
+import akka.dispatch.Future
 
 trait GenericCommands {
+  this: RedisClient =>
+  import Protocol._
+
+  def flushall(): Future[Unit] = send(FLUSHALL :: Nil)
+}
+
+/*
+trait Commands {
+}
+
+object Constants {
+}
+
+trait GenericCommands {
+  self: Commands =>
+  import Contsnts._
 
   /**
    * Request keys matching `pattern`.
@@ -18,7 +34,10 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/KeysCommand">Redis Command Reference</a>
    */
-  case class keys[A](pattern: Any = "*")(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
+  def keys[A: Write](pattern: A): Result[Seq[ByteString]] =
+    send(KEYS :: pattern :: Nil)
+
+  def keys: Result[List[ByteString]] = keys(ByteString("*"))
 
   /**
    * Request a random key.
@@ -27,7 +46,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RandomkeyCommand">Redis Command Reference</a>
    */
-  case class randomkey[A]()(implicit parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def randomkey: Result[Option[ByteString]] = send(List(RANDOMKEY))
 
   /**
    * Rename a key.
@@ -39,7 +58,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RenameCommand">Redis Command Reference</a>
    */
-  case class rename(oldkey: Any, newkey: Any)(implicit format: Format) extends Command(OkStatus)
+  def rename(oldkey: Any, newkey: Any)(implicit format: Format): Future[Unit] =
+    send("RENAME" :: oldkey :: newkey :: Nil)
 
   /**
    * Rename a key if `newkey` does not already exist. Returns true if
@@ -52,7 +72,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RenamenxCommand">Redis Command Reference</a>
    */
-  case class renamenx(oldkey: Any, newkey: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def renamenx(oldkey: Any, newkey: Any)(implicit format: Format): Future[Boolean] =
+    send("RENAMENX" :: oldkey :: newkey :: Nil)
 
   /**
    * Request the number of keys in the current database.
@@ -61,7 +82,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/DbsizeCommand">Redis Command Reference</a>
    */
-  case object dbsize extends Command(ShortInt)
+  def dbsize(): Future[Int] = send("DBSIZE")
 
   /**
    * Tests if `key` exists.
@@ -72,7 +93,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/ExistsCommand">Redis Command Reference</a>
    */
-  case class exists(key: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def exists(key: Any)(implicit format: Format): Future[Boolean] =
+    send("EXISTS" :: key :: Nil)
 
   /**
    * Delete each key in `keys`. Returns the actual number of keys deleted.
@@ -88,9 +110,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/DelCommand">Redis Command Reference</a>
    */
-  case class del(keys: Iterable[Any])(implicit format: Format) extends Command(ShortInt) {
-    override def args = keys.iterator
-  }
+  def del(keys: Iterable[Any])(implicit format: Format): Future[Int] =
+    send("DEL" :: keys.toList)
 
   /**
    * Requests the type of the value stored at `key`.
@@ -101,9 +122,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/TypeCommand">Redis Command Reference</a>
    */
-  case class getType(key: Any)(implicit format: Format) extends Command(Status) {
-    override def name = "TYPE"
-  }
+  def getType(key: Any)(implicit format: Format): Future[String] =
+    send("TYPE" :: key :: Nil)
 
   /**
    * Set a timeout of the specified key. After the timeout the key will be
@@ -116,7 +136,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/ExpireCommand">Redis Command Reference</a>
    */
-  case class expire(key: Any, seconds: Int)(implicit format: Format) extends Command(IntAsBoolean)
+  //def expire(key: Any, seconds: Int)(implicit format: Format): Future[Boolean]
 
   /**
    * Set a timeout of the specified key. After the timeout the key will be
@@ -129,7 +149,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/ExpireCommand">Redis Command Reference</a>
    */
-  case class expireat(key: Any, unixtime: Int)(implicit format: Format) extends Command(IntAsBoolean)
+  //def expireat(key: Any, unixtime: Int)(implicit format: Format): Future[Boolean]
 
   /**
    * Select a DB with the supplied zero-based index.
@@ -140,7 +160,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/SelectCommand">Redis Command Reference</a>
    */
-  case class select(index: Int = 0)(implicit format: Format) extends Command(OkStatus)
+  //def select(index: Int = 0)(implicit format: Format): Future[Unit]
 
   /**
    * Delete all keys in the currently selected database.
@@ -149,7 +169,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/FlushdbCommand">Redis Command Reference</a>
    */
-  case object flushdb extends Command(OkStatus)
+  //def flushdb(): Future[Unit]
 
   /**
    * Delete all keys in all databases.
@@ -158,7 +178,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/FlushallCommand">Redis Command Reference</a>
    */
-  case object flushall extends Command(OkStatus)
+  //def flushall(): Future[Unit]
 
   /**
    * Move `key` from the currently selected database to the database at index `db`.
@@ -171,7 +191,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/MoveCommand">Redis Command Reference</a>
    */
-  case class move(key: Any, db: Int = 0)(implicit format: Format) extends Command(IntAsBoolean)
+  //def move(key: Any, db: Int = 0)(implicit format: Format): Future[Boolean]
 
   /**
    * Asks the server to close the connection.
@@ -180,7 +200,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/QuitCommand">Redis Command Reference</a>
    */
-  case object quit extends Command(NoHandler)
+  //def quit(): Unit
 
   /**
    * Supply a password if required to send commands.
@@ -191,7 +211,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/AuthCommand">Redis Command Reference</a>
    */
-  case class auth(secret: Any)(implicit format: Format) extends Command(OkStatus)
+  //def auth(secret: Any)(implicit format: Format): Future[Unit]
 
   /**
    * Sorts the elements contained in a List, Set, or Sorted Set value at `key`.
@@ -211,7 +231,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/SortCommand">Redis Command Reference</a>
    */
-  case class sort[A](key: Any,
+  /*case class sort[A](key: Any,
                      by: Option[Any] = None,
                      limit: Option[(Int, Int)] = None,
                      get: Seq[Any] = Nil,
@@ -221,7 +241,7 @@ trait GenericCommands {
                                              parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
     override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get) ++
                         argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None))
-  }
+  }*/
 
   /**
    * Executes a list of commands atomically. Returns a list of each command's response. If an
@@ -233,7 +253,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/MultiExecCommand">Redis Command Reference</a>
    */
-  case class multiexec(commands: Seq[Command[_]]) extends Command(MultiExec(commands.map(_.handler))) {
+  /*case class multiexec(commands: Seq[Command[_]]) extends Command(MultiExec(commands.map(_.handler))) {
     override def toBytes = {
       val b = new ArrayBuilder.ofByte
       b ++= create(Seq("MULTI".getBytes))
@@ -241,9 +261,9 @@ trait GenericCommands {
       b ++= create(Seq("EXEC".getBytes))
       b.result
     }
-  }
+  }*/
 }
-
+/*
 trait SortTupled {
   self: Command[_] =>
   val key: Any
@@ -255,3 +275,5 @@ trait SortTupled {
   override def name = "SORT"
   override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get.productIterator.toStream) ++ argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None))
 }
+*/
+*/

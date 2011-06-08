@@ -1,58 +1,47 @@
 package net.fyrie.redis
 package commands
 
-import Command._
-import handlers._
 import serialization._
+import types._
+
+import akka.util.ByteString
+import akka.dispatch.Future
 
 trait StringCommands {
-  // SET KEY (key, value)
-  // sets the key with the specified value.
-  case class set(key: Any, value: Any)(implicit format: Format) extends Command(OkStatus)
+  this: RedisClient =>
+  import Protocol._
 
-  // GET (key)
-  // gets the value for the specified key.
-  case class get[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def set[K: Store,V: Store](key: K, value: V): Future[Unit] =
+    send(SET :: Store(key) :: Store(value) :: Nil)
 
-  // GETSET (key, value)
-  // is an atomic set this value and return the old value command.
-  case class getset[A](key: Any, value: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def get[K: Store](key: K): Future[Option[ByteString]] =
+    send(GET :: Store(key) :: Nil)
 
-  // SETNX (key, value)
-  // sets the value for the specified key, only if the key is not there.
-  case class setnx(key: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def getset[K: Store, V: Store](key: K, value: V): Future[Option[ByteString]] =
+    send(GETSET :: Store(key) :: Store(value) :: Nil)
 
-  // INCR (key)
-  // increments the specified key by 1
-  case class incr(key: Any)(implicit format: Format) extends Command(LongInt)
+  def setnx[K: Store, V: Store](key: K, value: V): Future[Boolean] =
+    send(SETNX :: Store(key) :: Store(value) :: Nil)
 
-  // INCR (key, increment)
-  // increments the specified key by increment
-  case class incrby(key: Any, increment: Long)(implicit format: Format) extends Command(LongInt)
+  def incr[K: Store](key: K): Future[Long] =
+    send(INCR :: Store(key) :: Nil)
 
-  // DECR (key)
-  // decrements the specified key by 1
-  case class decr(key: Any)(implicit format: Format) extends Command(LongInt)
+  def incrby[K: Store](key: K, increment: Long): Future[Long] =
+    send(INCRBY :: Store(key) :: Store(increment) :: Nil)
 
-  // DECR (key, increment)
-  // decrements the specified key by increment
-  case class decrby(key: Any, increment: Long)(implicit format: Format) extends Command(LongInt)
+  def decr[K: Store](key: K): Future[Long] =
+    send(DECR :: Store(key) :: Nil)
 
-  // MGET (key, key, key, ...)
-  // get the values of all the specified keys.
-  case class mget[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
-    override def args = keys.iterator
-  }
+  def decrby[K: Store](key: K, decrement: Long): Future[Long] =
+    send(DECRBY :: Store(key) :: Store(decrement) :: Nil)
 
-  // MSET (key1 value1 key2 value2 ..)
-  // set the respective key value pairs. Overwrite value if key exists
-  case class mset(kvs: Iterable[Product2[Any, Any]])(implicit format: Format) extends Command(OkStatus) {
-    override def args = argN2(kvs)
-  }
+  def mget[K: Store](keys: Seq[K]): Future[Option[List[Option[ByteString]]]] =
+    send(MGET :: (keys.map(Store(_))(collection.breakOut): List[ByteString]) )
 
-  // MSETNX (key1 value1 key2 value2 ..)
-  // set the respective key value pairs. Noop if any key exists
-  case class msetnx(kvs: Iterable[Product2[Any, Any]])(implicit format: Format) extends Command(IntAsBoolean) {
-    override def args = argN2(kvs)
-  }
+  def mset[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Future[Unit] =
+    send(MSET :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]) )
+
+  def msetnx[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Future[Boolean] =
+    send(MSETNX :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]) )
 }
+

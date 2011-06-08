@@ -1,43 +1,44 @@
 package net.fyrie.redis
+package serialization
 
-package serialization {
+import akka.util.ByteString
 
-  object Format {
-    def apply(f: PartialFunction[Any, Any]): Format = new Format(f)
+trait Store[A] {
+  def apply(value: A): ByteString
+}
 
-    implicit val default: Format = new Format(Map.empty)
-  }
+object Store extends StoreDefaults {
 
-  class Format(val format: PartialFunction[Any, Any]) {
-    def apply(in: Any): Array[Byte] =
-      (if (format.isDefinedAt(in)) (format(in)) else (in)) match {
-        case b: Array[Byte] => b
-        case d: Double => Command.serializeDouble(d)
-        case x => x.toString.getBytes("UTF-8")
-      }
+  def apply[A](value: A)(implicit store: Store[A]): ByteString = store(value)
 
-    def orElse(that: Format): Format = Format(format orElse that.format)
-
-    def orElse(that: PartialFunction[Any, Any]): Format = Format(format orElse that)
-  }
-
-  object Parse {
-    def apply[T: Manifest](f: (Array[Byte]) => T) = new Parse[T](f)
-
-    object Implicits {
-      implicit val parseString = Parse[String](new String(_, "UTF-8"))
-      implicit val parseByteArray = Parse[Array[Byte]](x => x)
-      implicit val parseInt = Parse[Int](new String(_, "UTF-8").toInt)
-      implicit val parseLong = Parse[Long](new String(_, "UTF-8").toLong)
-      implicit val parseDouble = Parse[Double](new String(_, "UTF-8").toDouble)
-    }
-
-    implicit val parseDefault = Parse[String](new String(_, "UTF-8"))
-  }
-
-  class Parse[A](val fromBinary: (Array[Byte]) => A)(implicit val manifest: Manifest[A]) extends Function1[Array[Byte], A] {
-    def apply(in: Array[Byte]): A = fromBinary(in)
-  }
+  def asString[A]: Store[A] = new Store[A] { def apply(value: A) = ByteString(value.toString) }
 
 }
 
+trait StoreDefaults {
+  implicit val storeByteString = new Store[ByteString] { def apply(value: ByteString) = value }
+  implicit val storeByteArray = new Store[Array[Byte]] { def apply(value: Array[Byte]) = ByteString(value) }
+  implicit val storeString = new Store[String] { def apply(value: String) = ByteString(value) }
+  implicit val storeInt = Store.asString[Int]
+  implicit val storeLong = Store.asString[Long]
+
+  // TODO: add special formatting
+  implicit val storeFloat = Store.asString[Float]
+  implicit val storeDouble = Store.asString[Double]
+}
+
+trait Parse[A] {
+  def apply(bytes: ByteString): A
+}
+
+object Parse {
+  def apply[A](bytes: ByteString)(implicit parse: Parse[A]): A = parse(bytes)
+
+  implicit val parseByteString = new Parse[ByteString] { def apply(bytes: ByteString) = bytes.compact }
+  implicit val parseByteArray = new Parse[Array[Byte]] { def apply(bytes: ByteString) = bytes.toArray }
+  implicit val parseString = new Parse[String] { def apply(bytes: ByteString) = bytes.utf8String }
+  implicit val parseInt = new Parse[Int] { def apply(bytes: ByteString) = bytes.utf8String.toInt }
+  implicit val parseLong = new Parse[Long] { def apply(bytes: ByteString) = bytes.utf8String.toLong }
+  implicit val parseFloat = new Parse[Float] { def apply(bytes: ByteString) = bytes.utf8String.toFloat }
+  implicit val parseDouble = new Parse[Double] { def apply(bytes: ByteString) = bytes.utf8String.toDouble }
+}

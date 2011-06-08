@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/*package net.fyrie.redis
 package commands
 
 import Command._
@@ -77,3 +77,4 @@ trait SetCommands {
   // Return a random element from a Set
   case class srandmember[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
 }
+*/
