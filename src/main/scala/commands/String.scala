@@ -35,7 +35,7 @@ trait StringCommands {
   def decrby[K: Store](key: K, decrement: Long): Result[Long] =
     send(DECRBY :: Store(key) :: Store(decrement) :: Nil)
 
-  def mget[K: Store](keys: Seq[K]): Result[Option[List[Option[ByteString]]]] =
+  def mget[K: Store](keys: Seq[K]): Result[List[Option[ByteString]]] =
     send(MGET :: (keys.map(Store(_))(collection.breakOut): List[ByteString]) )
 
   def mset[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Unit] =

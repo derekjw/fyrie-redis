@@ -11,20 +11,6 @@ trait GenericCommands {
   this: Commands =>
   import Protocol._
 
-  def flushall(): Result[Unit] = send(FLUSHALL :: Nil)
-}
-
-/*
-trait Commands {
-}
-
-object Constants {
-}
-
-trait GenericCommands {
-  self: Commands =>
-  import Contsnts._
-
   /**
    * Request keys matching `pattern`.
    *
@@ -34,10 +20,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/KeysCommand">Redis Command Reference</a>
    */
-  def keys[A: Write](pattern: A): Result[Seq[ByteString]] =
-    send(KEYS :: pattern :: Nil)
-
-  def keys: Result[List[ByteString]] = keys(ByteString("*"))
+  def keys[A: Store](pattern: A): Result[Set[ByteString]] = send(KEYS :: Store(pattern) :: Nil)
+  def keys: Result[Set[ByteString]] = send(KEYS :: ALLKEYS :: Nil)
 
   /**
    * Request a random key.
@@ -58,8 +42,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RenameCommand">Redis Command Reference</a>
    */
-  def rename(oldkey: Any, newkey: Any)(implicit format: Format): Future[Unit] =
-    send("RENAME" :: oldkey :: newkey :: Nil)
+  def rename[A: Store, B: Store](oldkey: A, newkey: B): Result[Unit] =
+    send(RENAME :: Store(oldkey) :: Store(newkey) :: Nil)
 
   /**
    * Rename a key if `newkey` does not already exist. Returns true if
@@ -72,8 +56,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RenamenxCommand">Redis Command Reference</a>
    */
-  def renamenx(oldkey: Any, newkey: Any)(implicit format: Format): Future[Boolean] =
-    send("RENAMENX" :: oldkey :: newkey :: Nil)
+  def renamenx[A: Store, B: Store](oldkey: A, newkey: B): Result[Boolean] =
+    send(RENAMENX :: Store(oldkey) :: Store(newkey) :: Nil)
 
   /**
    * Request the number of keys in the current database.
@@ -82,7 +66,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/DbsizeCommand">Redis Command Reference</a>
    */
-  def dbsize(): Future[Int] = send("DBSIZE")
+  def dbsize(): Result[Int] = send(DBSIZE :: Nil)
 
   /**
    * Tests if `key` exists.
@@ -93,8 +77,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/ExistsCommand">Redis Command Reference</a>
    */
-  def exists(key: Any)(implicit format: Format): Future[Boolean] =
-    send("EXISTS" :: key :: Nil)
+  def exists[A: Store](key: A): Result[Boolean] = send(EXISTS :: Store(key) :: Nil)
 
   /**
    * Delete each key in `keys`. Returns the actual number of keys deleted.
@@ -110,8 +93,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/DelCommand">Redis Command Reference</a>
    */
-  def del(keys: Iterable[Any])(implicit format: Format): Future[Int] =
-    send("DEL" :: keys.toList)
+  def del[A: Store](keys: Iterable[A]): Result[Int] = send(DEL :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
+  def del[A: Store](key: A): Result[Int] = send(DEL :: Store(key) :: Nil)
 
   /**
    * Requests the type of the value stored at `key`.
@@ -122,8 +105,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/TypeCommand">Redis Command Reference</a>
    */
-  def getType(key: Any)(implicit format: Format): Future[String] =
-    send("TYPE" :: key :: Nil)
+  def typeof[A: Store](key: A): Result[String] = send(TYPE :: Store(key) :: Nil)
 
   /**
    * Set a timeout of the specified key. After the timeout the key will be
@@ -136,7 +118,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/ExpireCommand">Redis Command Reference</a>
    */
-  //def expire(key: Any, seconds: Int)(implicit format: Format): Future[Boolean]
+  def expire[A: Store](key: A, seconds: Long): Result[Boolean] =
+    send(EXPIRE :: Store(key) :: Store(seconds) :: Nil)
 
   /**
    * Set a timeout of the specified key. After the timeout the key will be
@@ -149,7 +132,8 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/ExpireCommand">Redis Command Reference</a>
    */
-  //def expireat(key: Any, unixtime: Int)(implicit format: Format): Future[Boolean]
+  def expireat[A: Store](key: A, unixtime: Long): Result[Boolean] =
+    send(EXPIREAT :: Store(key) :: Store(unixtime) :: Nil)
 
   /**
    * Select a DB with the supplied zero-based index.
@@ -160,7 +144,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/SelectCommand">Redis Command Reference</a>
    */
-  //def select(index: Int = 0)(implicit format: Format): Future[Unit]
+  def select(index: Int = 0): Result[Unit] = send(SELECT :: Store(index) :: Nil)
 
   /**
    * Delete all keys in the currently selected database.
@@ -169,7 +153,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/FlushdbCommand">Redis Command Reference</a>
    */
-  //def flushdb(): Future[Unit]
+  def flushdb(): Result[Unit] = send(FLUSHDB :: Nil)
 
   /**
    * Delete all keys in all databases.
@@ -178,7 +162,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/FlushallCommand">Redis Command Reference</a>
    */
-  //def flushall(): Future[Unit]
+  def flushall(): Result[Unit] = send(FLUSHALL :: Nil)
 
   /**
    * Move `key` from the currently selected database to the database at index `db`.
@@ -191,7 +175,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/MoveCommand">Redis Command Reference</a>
    */
-  //def move(key: Any, db: Int = 0)(implicit format: Format): Future[Boolean]
+  def move[A: Store](key: A, db: Int = 0): Result[Boolean] = send(MOVE :: Store(key) :: Store(db) :: Nil)
 
   /**
    * Asks the server to close the connection.
@@ -200,7 +184,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/QuitCommand">Redis Command Reference</a>
    */
-  //def quit(): Unit
+  def quit(): Result[Unit] = send(QUIT :: Nil)
 
   /**
    * Supply a password if required to send commands.
@@ -211,7 +195,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/AuthCommand">Redis Command Reference</a>
    */
-  //def auth(secret: Any)(implicit format: Format): Future[Unit]
+  def auth[A: Store](secret: A): Result[Unit] = send(AUTH :: Store(secret) :: Nil)
 
   /**
    * Sorts the elements contained in a List, Set, or Sorted Set value at `key`.
@@ -276,4 +260,4 @@ trait SortTupled {
   override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get.productIterator.toStream) ++ argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None))
 }
 */
-*/
+

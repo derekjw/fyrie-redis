@@ -93,12 +93,12 @@ class StringOperationsSpec extends Spec
       r.set("anshin-1", "debasish")
       r.set("anshin-2", "maulindu")
       r.set("anshin-3", "nilanjan")
-      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-3")).parse[String] should equal(Some(List(Some("debasish"), Some("maulindu"), Some("nilanjan"))))
+      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-3")).parse[String] should equal(List(Some("debasish"), Some("maulindu"), Some("nilanjan")))
     }
     it("should give None for non-existing keys") {
       r.set("anshin-1", "debasish")
       r.set("anshin-2", "maulindu")
-      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-4")).parse[String] should equal(Some(List(Some("debasish"), Some("maulindu"), None)))
+      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-4")).parse[String] should equal(List(Some("debasish"), Some("maulindu"), None))
     }
   }
 

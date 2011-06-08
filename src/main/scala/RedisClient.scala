@@ -32,9 +32,14 @@ trait RedisClientAsync extends Commands {
   protected def send(in: List[ByteString]): Future[RedisType] = actor !!! Request(format(in))
 
   protected implicit def resultAsMultiBulk(future: Future[RedisType]): Future[Option[List[Option[ByteString]]]] = future map toMultiBulk
+  protected implicit def resultAsMultiBulkList(future: Future[RedisType]): Future[List[Option[ByteString]]] = future map toMultiBulkList
+  protected implicit def resultAsMultiBulkFlat(future: Future[RedisType]): Future[Option[List[ByteString]]] = future map toMultiBulkFlat
+  protected implicit def resultAsMultiBulkSet(future: Future[RedisType]): Future[Set[ByteString]] = future map toMultiBulkSet
   protected implicit def resultAsBulk(future: Future[RedisType]): Future[Option[ByteString]] = future map toBulk
   protected implicit def resultAsLong(future: Future[RedisType]): Future[Long] = future map toLong
+  protected implicit def resultAsInt(future: Future[RedisType]): Future[Int] = future map (toLong(_).toInt)
   protected implicit def resultAsBool(future: Future[RedisType]): Future[Boolean] = future map toBool
+  protected implicit def resultAsStatus(future: Future[RedisType]): Future[String] = future map toStatus
   protected implicit def resultAsOkStatus(future: Future[RedisType]): Future[Unit] = future map toOkStatus
 
 }
@@ -46,9 +51,14 @@ trait RedisClientSync extends Commands {
   protected def send(in: List[ByteString]): RedisType = (actor !!! Request(format(in))).get
 
   protected implicit def resultAsMultiBulk(raw: RedisType): Option[List[Option[ByteString]]] = toMultiBulk(raw)
+  protected implicit def resultAsMultiBulkList(raw: RedisType): List[Option[ByteString]] = toMultiBulkList(raw)
+  protected implicit def resultAsMultiBulkFlat(raw: RedisType): Option[List[ByteString]] = toMultiBulkFlat(raw)
+  protected implicit def resultAsMultiBulkSet(raw: RedisType): Set[ByteString] = toMultiBulkSet(raw)
   protected implicit def resultAsBulk(raw: RedisType): Option[ByteString] = toBulk(raw)
   protected implicit def resultAsLong(raw: RedisType): Long = toLong(raw)
+  protected implicit def resultAsInt(raw: RedisType): Int = toLong(raw).toInt
   protected implicit def resultAsBool(raw: RedisType): Boolean = toBool(raw)
+  protected implicit def resultAsStatus(raw: RedisType): String = toStatus(raw)
   protected implicit def resultAsOkStatus(raw: RedisType): Unit = toOkStatus(raw)
 
 }
@@ -60,9 +70,14 @@ trait RedisClientQuiet extends Commands {
   protected def send(in: List[ByteString]) = actor ! Request(format(in))
 
   protected implicit def resultAsMultiBulk(raw: Unit): Unit = ()
+  protected implicit def resultAsMultiBulkList(raw: Unit): Unit = ()
+  protected implicit def resultAsMultiBulkFlat(raw: Unit): Unit = ()
+  protected implicit def resultAsMultiBulkSet(raw: Unit): Unit = ()
   protected implicit def resultAsBulk(raw: Unit): Unit = ()
   protected implicit def resultAsLong(raw: Unit): Unit = ()
+  protected implicit def resultAsInt(raw: Unit): Unit = ()
   protected implicit def resultAsBool(raw: Unit): Unit = ()
+  protected implicit def resultAsStatus(raw: Unit): Unit = ()
   protected implicit def resultAsOkStatus(raw: Unit): Unit = ()
 }
 
@@ -85,13 +100,38 @@ trait Commands extends commands.StringCommands with commands.GenericCommands {
   }
 
   protected implicit def resultAsMultiBulk(raw: RawResult): Result[Option[List[Option[ByteString]]]]
+  protected implicit def resultAsMultiBulkList(raw: RawResult): Result[List[Option[ByteString]]]
+  protected implicit def resultAsMultiBulkFlat(raw: RawResult): Result[Option[List[ByteString]]]
+  protected implicit def resultAsMultiBulkSet(raw: RawResult): Result[Set[ByteString]]
   protected implicit def resultAsBulk(raw: RawResult): Result[Option[ByteString]]
   protected implicit def resultAsLong(raw: RawResult): Result[Long]
+  protected implicit def resultAsInt(raw: RawResult): Result[Int]
   protected implicit def resultAsBool(raw: RawResult): Result[Boolean]
+  protected implicit def resultAsStatus(raw: RawResult): Result[String]
   protected implicit def resultAsOkStatus(raw: RawResult): Result[Unit]
 
   protected val toMultiBulk: RedisType => Option[List[Option[ByteString]]] = _ match {
       case RedisMulti(m) => m map (_ map toBulk)
+      case RedisError(e) => throw RedisErrorException(e)
+      case _ => throw RedisProtocolException("Unexpected response")
+    }
+
+  protected val toMultiBulkList: RedisType => List[Option[ByteString]] = _ match {
+      case RedisMulti(Some(m)) => m map toBulk
+      case RedisMulti(None) => Nil
+      case RedisError(e) => throw RedisErrorException(e)
+      case _ => throw RedisProtocolException("Unexpected response")
+    }
+
+  protected val toMultiBulkFlat: RedisType => Option[List[ByteString]] = _ match {
+      case RedisMulti(m) => m map (_ flatMap (toBulk(_).toList))
+      case RedisError(e) => throw RedisErrorException(e)
+      case _ => throw RedisProtocolException("Unexpected response")
+    }
+
+  protected val toMultiBulkSet: RedisType => Set[ByteString] = _ match {
+      case RedisMulti(Some(m)) => m.flatMap(toBulk(_).toList)(collection.breakOut)
+      case RedisMulti(None) => Set.empty
       case RedisError(e) => throw RedisErrorException(e)
       case _ => throw RedisProtocolException("Unexpected response")
     }
@@ -111,6 +151,12 @@ trait Commands extends commands.StringCommands with commands.GenericCommands {
   protected val toBool: RedisType => Boolean = _ match {
       case RedisInteger(1) => true
       case RedisInteger(0) => false
+      case RedisError(e) => throw RedisErrorException(e)
+      case _ => throw RedisProtocolException("Unexpected response")
+    }
+
+  protected val toStatus: RedisType => String = _ match {
+      case RedisString(s) => s
       case RedisError(e) => throw RedisErrorException(e)
       case _ => throw RedisProtocolException("Unexpected response")
     }
