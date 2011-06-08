@@ -8,40 +8,40 @@ import akka.util.ByteString
 import akka.dispatch.Future
 
 trait StringCommands {
-  this: RedisClient =>
+  this: Commands =>
   import Protocol._
 
-  def set[K: Store,V: Store](key: K, value: V): Future[Unit] =
+  def set[K: Store,V: Store](key: K, value: V): Result[Unit] =
     send(SET :: Store(key) :: Store(value) :: Nil)
 
-  def get[K: Store](key: K): Future[Option[ByteString]] =
+  def get[K: Store](key: K): Result[Option[ByteString]] =
     send(GET :: Store(key) :: Nil)
 
-  def getset[K: Store, V: Store](key: K, value: V): Future[Option[ByteString]] =
+  def getset[K: Store, V: Store](key: K, value: V): Result[Option[ByteString]] =
     send(GETSET :: Store(key) :: Store(value) :: Nil)
 
-  def setnx[K: Store, V: Store](key: K, value: V): Future[Boolean] =
+  def setnx[K: Store, V: Store](key: K, value: V): Result[Boolean] =
     send(SETNX :: Store(key) :: Store(value) :: Nil)
 
-  def incr[K: Store](key: K): Future[Long] =
+  def incr[K: Store](key: K): Result[Long] =
     send(INCR :: Store(key) :: Nil)
 
-  def incrby[K: Store](key: K, increment: Long): Future[Long] =
+  def incrby[K: Store](key: K, increment: Long): Result[Long] =
     send(INCRBY :: Store(key) :: Store(increment) :: Nil)
 
-  def decr[K: Store](key: K): Future[Long] =
+  def decr[K: Store](key: K): Result[Long] =
     send(DECR :: Store(key) :: Nil)
 
-  def decrby[K: Store](key: K, decrement: Long): Future[Long] =
+  def decrby[K: Store](key: K, decrement: Long): Result[Long] =
     send(DECRBY :: Store(key) :: Store(decrement) :: Nil)
 
-  def mget[K: Store](keys: Seq[K]): Future[Option[List[Option[ByteString]]]] =
+  def mget[K: Store](keys: Seq[K]): Result[Option[List[Option[ByteString]]]] =
     send(MGET :: (keys.map(Store(_))(collection.breakOut): List[ByteString]) )
 
-  def mset[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Future[Unit] =
+  def mset[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Unit] =
     send(MSET :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]) )
 
-  def msetnx[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Future[Boolean] =
+  def msetnx[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Boolean] =
     send(MSETNX :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]) )
 }
 

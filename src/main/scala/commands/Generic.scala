@@ -8,10 +8,10 @@ import akka.util.ByteString
 import akka.dispatch.Future
 
 trait GenericCommands {
-  this: RedisClient =>
+  this: Commands =>
   import Protocol._
 
-  def flushall(): Future[Unit] = send(FLUSHALL :: Nil)
+  def flushall(): Result[Unit] = send(FLUSHALL :: Nil)
 }
 
 /*
