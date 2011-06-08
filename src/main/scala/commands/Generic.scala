@@ -21,7 +21,7 @@ trait GenericCommands {
    * @see <a href="http://code.google.com/p/redis/wiki/KeysCommand">Redis Command Reference</a>
    */
   def keys[A: Store](pattern: A): Result[Set[ByteString]] = send(KEYS :: Store(pattern) :: Nil)
-  def keys: Result[Set[ByteString]] = send(KEYS :: ALLKEYS :: Nil)
+  def keys(): Result[Set[ByteString]] = send(KEYS :: ALLKEYS :: Nil)
 
   /**
    * Request a random key.
@@ -30,7 +30,7 @@ trait GenericCommands {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RandomkeyCommand">Redis Command Reference</a>
    */
-  def randomkey: Result[Option[ByteString]] = send(List(RANDOMKEY))
+  def randomkey(): Result[Option[ByteString]] = send(List(RANDOMKEY))
 
   /**
    * Rename a key.

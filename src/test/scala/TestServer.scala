@@ -10,11 +10,11 @@ trait RedisTestServer extends BeforeAndAfterEach  with BeforeAndAfterAll {
   val r = new RedisClient
 
   override def beforeAll = {
-    r.flushall
+    r.sync.flushall
   }
 
   override def afterEach = {
-    r.flushall
+    r.sync.flushall
   }
 /*
   override def afterAll = {

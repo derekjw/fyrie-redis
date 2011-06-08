@@ -14,3 +14,5 @@ autoCompilerPlugins := true
 addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.0")
 
 scalacOptions += "-P:continuations:enable"
+
+parallelExecution in Test := false

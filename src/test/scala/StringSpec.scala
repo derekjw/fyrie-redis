@@ -2,7 +2,6 @@ package net.fyrie.redis
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
-import serialization._
 
 class StringOperationsSpec extends Spec 
                            with ShouldMatchers

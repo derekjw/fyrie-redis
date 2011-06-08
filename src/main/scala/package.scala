@@ -15,7 +15,7 @@ package object redis {
   implicit def parseMultiBulk(value: Option[List[Option[ByteString]]]) = new ParseMultiBulk(value)
   implicit def parseMultiBulkList(value: List[Option[ByteString]]) = new ParseMultiBulkList(value)
   implicit def parseMultiBulkFlat(value: Option[List[ByteString]]) = new ParseMultiBulkFlat(value)
-  implicit def parseMultiBulkSet(value: List[ByteString]) = new ParseMultiBulkSet(value)
+  implicit def parseMultiBulkSet(value: Set[ByteString]) = new ParseMultiBulkSet(value)
 }
 
 package redis {
@@ -46,7 +46,7 @@ package redis {
   private[redis] class ParseMultiBulkFlat(value: Option[List[ByteString]]) {
     def parse[A](implicit parseA: Parse[A]): Option[List[A]] = value.map(_.map(parseA(_)))
   }
-  private[redis] class ParseMultiBulkSet(value: List[ByteString]) {
-    def parse[A](implicit parseA: Parse[A]): List[A] = value.map(parseA(_))
+  private[redis] class ParseMultiBulkSet(value: Set[ByteString]) {
+    def parse[A](implicit parseA: Parse[A]): Set[A] = value.map(parseA(_))
   }
 }
