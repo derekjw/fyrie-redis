@@ -1,65 +1,64 @@
-/*package net.fyrie.redis
+package net.fyrie.redis
 package commands
 
-import handlers._
 import serialization._
-import Command._
+import akka.util.ByteString
 
 trait ListCommands {
-  // LPUSH
-  // add string value to the head of the list stored at key
-  case class lpush(key: Any, value: Any)(implicit format: Format) extends Command(ShortInt)
+  this: Commands =>
+  import Protocol._
 
-  // RPUSH
-  // add string value to the head of the list stored at key
-  case class rpush(key: Any, value: Any)(implicit format: Format) extends Command(ShortInt)
+  def blpop[K: Store: Parse](keys: Seq[K], timeout: Int = 0): Result[Option[(K, ByteString)]] =
+    send(BLPOP :: (Store(timeout) :: (keys.map(Store(_))(collection.breakOut): List[ByteString])).reverse)
 
-  // LLEN
-  // return the length of the list stored at the specified key.
-  // If the key does not exist zero is returned (the same behaviour as for empty lists).
-  // If the value stored at key is not a list an error is returned.
-  case class llen(key: Any)(implicit format: Format) extends Command(ShortInt)
+  def brpop[K: Store: Parse](keys: Seq[K], timeout: Int = 0): Result[Option[(K, ByteString)]] =
+    send(BRPOP :: (Store(timeout) :: (keys.map(Store(_))(collection.breakOut): List[ByteString])).reverse)
 
-  // LRANGE
-  // return the specified elements of the list stored at the specified key.
-  // Start and end are zero-based indexes.
-  case class lrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
+  def brpoplpush[A: Store, B: Store](srcKey: A, dstKey: B, timeout: Int = 0): Result[Option[ByteString]] =
+    send(BRPOPLPUSH :: Store(srcKey) :: Store(dstKey) :: Store(timeout) :: Nil)
 
-  // LTRIM
-  // Trim an existing list so that it will contain only the specified range of elements specified.
-  case class ltrim(key: Any, start: Int = 0, end: Int = -1)(implicit format: Format) extends Command(OkStatus)
+  def lindex[K: Store](key: K, index: Int): Result[Option[ByteString]] =
+    send(LINDEX :: Store(key) :: Store(index) :: Nil)
 
-  // LINDEX
-  // return the especified element of the list stored at the specified key.
-  // Negative indexes are supported, for example -1 is the last element, -2 the penultimate and so on.
-  case class lindex[A](key: Any, index: Int)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def linsertbefore[K: Store, A: Store, B: Store](key: K, pivot: A, value: B): Result[Option[Int]] =
+    send(LINSERT :: Store(key) :: BEFORE :: Store(pivot) :: Store(value) :: Nil)
 
-  // LSET
-  // set the list element at index with the new value. Out of range indexes will generate an error
-  case class lset(key: Any, index: Int, value: Any)(implicit format: Format) extends Command(OkStatus)
+  def linsertafter[K: Store, A: Store, B: Store](key: K, pivot: A, value: B): Result[Option[Int]] =
+    send(LINSERT :: Store(key) :: AFTER :: Store(pivot) :: Store(value) :: Nil)
 
-  // LREM
-  // Remove the first count occurrences of the value element from the list.
-  case class lrem(key: Any, count: Int = 0, value: Any)(implicit format: Format) extends Command(ShortInt)
+  def llen[K: Store](key: K): Result[Int] =
+    send(LLEN :: Store(key) :: Nil)
 
-  // LPOP
-  // atomically return and remove the first (LPOP) or last (RPOP) element of the list
-  case class lpop[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def lpop[K: Store](key: K): Result[Option[ByteString]] =
+    send(LPOP :: Store(key) :: Nil)
 
-  // RPOP
-  // atomically return and remove the first (LPOP) or last (RPOP) element of the list
-  case class rpop[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def lpush[K: Store, V: Store](key: K, value: V): Result[Int] =
+    send(LPUSH :: Store(key) :: Store(value) :: Nil)
 
-  // RPOPLPUSH
-  // Remove the first count occurrences of the value element from the list.
-  case class rpoplpush[A](srcKey: Any, dstKey: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def lpushx[K: Store, V: Store](key: K, value: V): Result[Int] =
+    send(LPUSHX :: Store(key) :: Store(value) :: Nil)
 
-  case class blpop[A](key: Any, values: Iterable[Any], timeoutInSeconds: Int)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
-    override def args = arg1(key) ++ values.iterator ++ arg1(timeoutInSeconds)
-  }
+  def lrange[K: Store](key: K, start: Int = 0, end: Int = -1): Result[Option[List[ByteString]]] =
+    send(LRANGE :: Store(key) :: Store(start) :: Store(end) :: Nil)
 
-  case class brpop[A](key: Any, values: Iterable[Any], timeoutInSeconds: Int)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
-    override def args = arg1(key) ++ values.iterator ++ arg1(timeoutInSeconds)
-  }
+  def lrem[K: Store, V: Store](key: K, value: V, count: Int = 0): Result[Int] =
+    send(LREM :: Store(key) :: Store(count) :: Store(value) :: Nil)
+
+  def lset[K: Store, V: Store](key: K, index: Int, value: V): Result[Unit] =
+    send(LSET :: Store(key) :: Store(index) :: Store(value) :: Nil)
+
+  def ltrim[K: Store](key: K, start: Int = 0, end: Int = -1): Result[Unit] =
+    send(LTRIM :: Store(key) :: Store(start) :: Store(end) :: Nil)
+
+  def rpop[K: Store](key: K): Result[Option[ByteString]] =
+    send(RPOP :: Store(key) :: Nil)
+
+  def rpoplpush[A: Store, B: Store](srcKey: A, dstKey: B): Result[Option[ByteString]] =
+    send(RPOPLPUSH :: Store(srcKey) :: Store(dstKey) :: Nil)
+
+  def rpush[K: Store, V: Store](key: K, value: V): Result[Int] =
+    send(RPUSH :: Store(key) :: Store(value) :: Nil)
+
+  def rpushx[K: Store, V: Store](key: K, value: V): Result[Int] =
+    send(RPUSHX :: Store(key) :: Store(value) :: Nil)
 }
-*/

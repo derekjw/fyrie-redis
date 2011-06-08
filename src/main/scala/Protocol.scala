@@ -3,9 +3,11 @@ package net.fyrie.redis
 import akka.util.ByteString
 
 object Protocol {
+  val AFTER = ByteString("AFTER")
   val ALLKEYS = ByteString("*")
   val APPEND = ByteString("APPEND")
   val AUTH = ByteString("AUTH")
+  val BEFORE = ByteString("BEFORE")
   val BGREWRITEAOF = ByteString("BGREWRITEAOF")
   val BGSAVE = ByteString("BGSAVE")
   val BLPOP = ByteString("BLPOP")
@@ -75,6 +77,7 @@ object Protocol {
   val RENAMENX = ByteString("RENAMENX")
   val RESETSTAT = ByteString("RESETSTAT")
   val RPOP = ByteString("RPOP")
+  val RPOPLPUSH = ByteString("RPOPLPUSH")
   val RPUSH = ByteString("RPUSH")
   val RPUSHX = ByteString("RPUSHX")
   val SADD = ByteString("SADD")
