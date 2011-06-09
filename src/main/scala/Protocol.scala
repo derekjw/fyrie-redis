@@ -106,7 +106,7 @@ object Protocol {
   val STRLEN = ByteString("STRLEN")
   val SUBSCRIBE = ByteString("SUBSCRIBE")
   val SUNION = ByteString("SUNION")
-  val SUNIONSTORE = ByteString("SNIONSTORE")
+  val SUNIONSTORE = ByteString("SUNIONSTORE")
   val SYNC = ByteString("SYNC")
   val TTL = ByteString("TTL")
   val TYPE = ByteString("TYPE")
@@ -130,4 +130,17 @@ object Protocol {
   val ZREVRANK = ByteString("ZREVRANK")
   val ZSCORE = ByteString("ZSCORE")
   val ZUNIONSTORE = ByteString("ZUNIONSTORE")
+}
+
+sealed trait SortOrder
+object SortOrder {
+  case object Asc extends SortOrder
+  case object Desc extends SortOrder
+}
+
+sealed trait Aggregate
+object Aggregate {
+  case object Sum extends Aggregate
+  case object Min extends Aggregate
+  case object Max extends Aggregate
 }

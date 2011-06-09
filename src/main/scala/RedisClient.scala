@@ -92,7 +92,7 @@ trait RedisClientQuiet extends Commands {
 }
 
 import commands._
-trait Commands extends StringCommands with GenericCommands with ListCommands{
+trait Commands extends Strings with GenericCommands with Lists with Sets {
   type RawResult
   type Result[_]
 
@@ -193,25 +193,3 @@ trait Commands extends StringCommands with GenericCommands with ListCommands{
 case class RedisErrorException(message: String) extends RuntimeException(message)
 case class RedisProtocolException(message: String) extends RuntimeException(message)
 case class RedisConnectionException(message: String) extends RuntimeException(message)
-
-trait SortOrder
-object SortOrder {
-  case object ASC extends SortOrder
-  case object DESC extends SortOrder
-}
-
-trait AggregateScore {
-  def getBytes: Array[Byte]
-}
-object AggregateScore {
-  case object SUM extends AggregateScore {
-    val getBytes = "SUM".getBytes
-  }
-  case object MIN extends AggregateScore {
-    val getBytes = "MIN".getBytes
-  }
-  case object MAX extends AggregateScore {
-    val getBytes = "MAX".getBytes
-  }
-}
-

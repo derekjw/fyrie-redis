@@ -4,7 +4,7 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait ListCommands {
+trait Lists {
   this: Commands =>
   import Protocol._
 

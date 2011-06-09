@@ -1,80 +1,52 @@
-/*package net.fyrie.redis
+package net.fyrie.redis
 package commands
 
-import Command._
-import handlers._
 import serialization._
+import akka.util.ByteString
 
-trait SetCommands {
-  // SADD
-  // Add the specified member to the set value stored at key.
-  case class sadd(key: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+trait Sets {
+  this: Commands =>
+  import Protocol._
 
-  // SREM
-  // Remove the specified member from the set value stored at key.
-  case class srem(key: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def sadd[K: Store, V: Store](key: K, value: V): Result[Boolean] =
+    send(SADD :: Store(key) :: Store(value) :: Nil)
 
-  // SPOP
-  // Remove and return (pop) a random element from the Set value at key.
-  case class spop[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def scard[K: Store](key: K): Result[Int] =
+    send(SCARD :: Store(key) :: Nil)
 
-  // SMOVE
-  // Move the specified member from one Set to another atomically.
-  case class smove(sourceKey: Any, destKey: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def sdiff[A: Store, B: Store](key: A, diffkeys: Iterable[B]): Result[Set[ByteString]] =
+    send(SDIFF :: Store(key) :: (diffkeys.map(Store(_))(collection.breakOut): List[ByteString]))
 
-  // SCARD
-  // Return the number of elements (the cardinality) of the Set at key.
-  case class scard(key: Any)(implicit format: Format) extends Command(ShortInt)
+  def sdiffstore[A: Store, B: Store, C: Store](dstkey: A, key: B, diffkeys: Iterable[C]): Result[Int] =
+    send(SDIFFSTORE :: Store(dstkey) :: Store(key) :: (diffkeys.map(Store(_))(collection.breakOut): List[ByteString]))
 
-  // SISMEMBER
-  // Test if the specified value is a member of the Set at key.
-  case class sismember(key: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def sinter[K: Store](keys: Iterable[K]): Result[Set[ByteString]] =
+    send(SINTER :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
 
-  // SINTER
-  // Return the intersection between the Sets stored at key1, key2, ..., keyN.
-  case class sinter[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
-    override def args = keys.iterator
-  }
+  def sinterstore[A: Store, B: Store](dstkey: A, keys: Iterable[B]): Result[Int] =
+    send(SINTERSTORE :: Store(dstkey) :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
 
-  // SINTERSTORE
-  // Compute the intersection between the Sets stored at key1, key2, ..., keyN,
-  // and store the resulting Set at dstkey.
-  case class sinterstore(dstkey: Any, keys: Iterable[Any])(implicit format: Format) extends Command(ShortInt) {
-    override def args = arg1(dstkey) ++ keys.iterator
-  }
+  def sismember[K: Store, V: Store](key: K, value: V): Result[Boolean] =
+    send(SISMEMBER :: Store(key) :: Store(value) :: Nil)
 
-  // SUNION
-  // Return the union between the Sets stored at key1, key2, ..., keyN.
-  case class sunion[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
-    override def args = keys.iterator
-  }
+  def smembers[K: Store](key: K): Result[Set[ByteString]] =
+    send(SMEMBERS :: Store(key) :: Nil)
 
-  // SUNIONSTORE
-  // Compute the union between the Sets stored at key1, key2, ..., keyN,
-  // and store the resulting Set at dstkey.
-  case class sunionstore(dstkey: Any, keys: Iterable[Any])(implicit format: Format) extends Command(ShortInt) {
-    override def args = arg1(dstkey) ++ keys.iterator
-  }
+  def smove[A: Store, B: Store, V: Store](srcKey: A, dstKey: B, value: V): Result[Boolean] =
+    send(SMOVE :: Store(srcKey) :: Store(dstKey) :: Store(value) :: Nil)
 
-  // SDIFF
-  // Return the difference between the Set stored at key1 and all the Sets key2, ..., keyN.
-  case class sdiff[A](keys: Iterable[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
-    override def args = keys.iterator
-  }
+  def spop[K: Store](key: K): Result[Option[ByteString]] =
+    send(SPOP :: Store(key) :: Nil)
 
-  // SDIFFSTORE
-  // Compute the difference between the Set key1 and all the Sets key2, ..., keyN,
-  // and store the resulting Set at dstkey.
-  case class sdiffstore(dstkey: Any, keys: Iterable[Any])(implicit format: Format) extends Command(ShortInt) {
-    override def args = arg1(dstkey) ++ keys.iterator
-  }
+  def srandmember[K: Store](key: K): Result[Option[ByteString]] =
+    send(SRANDMEMBER :: Store(key) :: Nil)
 
-  // SMEMBERS
-  // Return all the members of the Set value at key.
-  case class smembers[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
+  def srem[K: Store, V: Store](key: K, value: V): Result[Boolean] =
+    send(SREM :: Store(key):: Store(value) :: Nil)
 
-  // SRANDMEMBER
-  // Return a random element from a Set
-  case class srandmember[A](key: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def sunion[K: Store](keys: Iterable[K]): Result[Set[ByteString]] =
+    send(SUNION :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
+
+  def sunionstore[A: Store, B: Store](dstkey: A, keys: Iterable[B]): Result[Int] =
+    send(SUNIONSTORE :: Store(dstkey) :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
 }
-*/
