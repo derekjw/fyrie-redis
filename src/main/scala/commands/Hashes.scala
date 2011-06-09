@@ -1,11 +1,8 @@
-/*package net.fyrie.redis
+package net.fyrie.redis
 package commands
 
-import Command._
-import handlers._
-import serialization._
-
-trait HashCommands {
+trait Hashes {
+/*
   case class hset(key: Any, field: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
 
   case class hsetnx(key: Any, field: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
@@ -32,6 +29,6 @@ trait HashCommands {
 
   case class hdel(key : Any, field : Any)(implicit format: Format) extends Command(IntAsBoolean)
 
-  case class hlen(key : Any)(implicit format: Format) extends Command(LongInt)
+  case class hlen(key : Any)(implicit format: Format) extends Command(LongInt)*/
 }
-*/
+

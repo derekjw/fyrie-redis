@@ -2,12 +2,9 @@ package net.fyrie.redis
 package commands
 
 import serialization._
-import types._
-
 import akka.util.ByteString
-import akka.dispatch.Future
 
-trait GenericCommands {
+trait Keys {
   this: Commands =>
   import Protocol._
 

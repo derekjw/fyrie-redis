@@ -1,11 +1,8 @@
-/*package net.fyrie.redis
+package net.fyrie.redis
 package commands
 
-import handlers._
-import serialization._
-import Command._
-
-trait SortedSetCommands {
+trait SortedSets {
+/*
   // ZADD
   // Add the specified member having the specified score to the sorted set stored at key.
   case class zadd(key: Any, score: Double, member: Any)(implicit format: Format) extends Command(IntAsBoolean)
@@ -83,5 +80,5 @@ trait SortedSetCommands {
     override def name = "ZUNIONSTORE"
     override def args = Iterator(dstKey, kws.size) ++ kws.iterator.map(_._1) ++ arg1("WEIGHTS") ++ kws.iterator.map(_._2) ++ argN1("AGGREGATE", aggregate)
   }
-}
 */
+}

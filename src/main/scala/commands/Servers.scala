@@ -1,11 +1,8 @@
-/*package net.fyrie.redis
+package net.fyrie.redis
 package commands
 
-import handlers._
-import serialization._
-import Command._
-
-trait NodeCommands {
+trait Servers {
+/*
   // SAVE
   // save the DB on disk now.
   case object save extends Command(OkStatus)
@@ -53,5 +50,5 @@ trait NodeCommands {
     }
 
   }
-}
 */
+}

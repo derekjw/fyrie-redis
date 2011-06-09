@@ -92,7 +92,7 @@ trait RedisClientQuiet extends Commands {
 }
 
 import commands._
-trait Commands extends Strings with GenericCommands with Lists with Sets {
+trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
   type RawResult
   type Result[_]
 
