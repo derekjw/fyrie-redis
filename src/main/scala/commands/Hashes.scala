@@ -1,34 +1,48 @@
 package net.fyrie.redis
 package commands
 
+import serialization._
+import akka.util.ByteString
+
 trait Hashes {
-/*
-  case class hset(key: Any, field: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  this: Commands =>
+  import Protocol._
 
-  case class hsetnx(key: Any, field: Any, value: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def hdel[K: Store, F: Store](key : K, field : F): Result[Boolean] =
+    send(HDEL :: Store(key) :: Store(field) :: Nil)
 
-  case class hmset(key : Any, fvs: Iterable[Product2[Any,Any]])(implicit format: Format) extends Command(OkStatus) {
-    override def args = arg1(key) ++ argN2(fvs)
-  }
+  def hexists[K: Store, F: Store](key : K, field : F): Result[Boolean] =
+    send(HEXISTS :: Store(key) :: Store(field) :: Nil)
 
-  case class hget[A](key : Any, field : Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def hget[K: Store, F: Store](key : K, field : F): Result[Option[ByteString]] =
+    send(HGET :: Store(key) :: Store(field) :: Nil)
 
-  case class hmget[A](key : Any, fields : Seq[Any])(implicit format: Format, parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
-    override def args = arg1(key) ++ fields.iterator
-  }
+  def hgetall[K: Store](key : K): Result[Map[ByteString, ByteString]] =
+    send(HGETALL :: Store(key) :: Nil)
 
-  case class hkeys[A](key : Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
+  def hincrby[K: Store, F: Store](key : K, field : F, value : Long = 1): Result[Long] =
+    send(HINCRBY :: Store(key) :: Store(field) :: Store(value) :: Nil)
 
-  case class hvals[A](key : Any)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
+  def hkeys[K: Store](key : K): Result[Set[ByteString]] =
+    send(HKEYS :: Store(key) :: Nil)
 
-  case class hgetall[K,V](key : Any)(implicit format: Format, parseK: Parse[K], parseV: Parse[V]) extends Command(MultiBulkAsPairs[K,V]()(implicitly, parseK.manifest, implicitly, parseV.manifest))
+  def hlen[K: Store](key : K): Result[Long] =
+    send(HLEN :: Store(key) :: Nil)
 
-  case class hincrby(key : Any, field : Any, value : Long = 1)(implicit format: Format) extends Command(LongInt)
+  def hmget[K: Store, F: Store](key : K, fields : Seq[F]): Result[List[Option[ByteString]]] =
+    send(HMGET :: Store(key) :: (fields.map(Store(_))(collection.breakOut): List[ByteString]))
 
-  case class hexists(key : Any, field : Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def hmset[K: Store, F: Store, V: Store](key : K, fvs: Iterable[Product2[F,V]]): Result[Unit] =
+    send(HMSET :: Store(key) :: (fvs.flatMap(fv => Iterable(Store(fv._1), Store(fv._2)))(collection.breakOut): List[ByteString]))
 
-  case class hdel(key : Any, field : Any)(implicit format: Format) extends Command(IntAsBoolean)
+  def hset[K: Store, F: Store, V: Store](key: K, field: F, value: V): Result[Boolean] =
+    send(HSET :: Store(key) :: Store(field) :: Store(value) :: Nil)
 
-  case class hlen(key : Any)(implicit format: Format) extends Command(LongInt)*/
+  def hsetnx[K: Store, F: Store, V: Store](key: K, field: F, value: V): Result[Boolean] =
+    send(HSETNX :: Store(key) :: Store(field) :: Store(value) :: Nil)
+
+  def hvals[K: Store](key : K): Result[Set[ByteString]] =
+    send(HVALS :: Store(key) :: Nil)
+
 }
 

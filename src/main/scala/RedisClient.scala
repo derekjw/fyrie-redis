@@ -36,6 +36,7 @@ trait RedisClientAsync extends Commands {
   protected implicit def resultAsMultiBulkList(future: Future[RedisType]): Future[List[Option[ByteString]]] = future map toMultiBulkList
   protected implicit def resultAsMultiBulkFlat(future: Future[RedisType]): Future[Option[List[ByteString]]] = future map toMultiBulkFlat
   protected implicit def resultAsMultiBulkSet(future: Future[RedisType]): Future[Set[ByteString]] = future map toMultiBulkSet
+  protected implicit def resultAsMultiBulkMap(future: Future[RedisType]): Future[Map[ByteString, ByteString]] = future map toMultiBulkMap
   protected implicit def resultAsMultiBulkSinglePair(future: Future[RedisType]): Future[Option[(ByteString, ByteString)]] = future map toMultiBulkSinglePair
   protected implicit def resultAsMultiBulkSinglePairK[K: Parse](future: Future[RedisType]): Future[Option[(K, ByteString)]] = future map (toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2)))
   protected implicit def resultAsBulk(future: Future[RedisType]): Future[Option[ByteString]] = future map toBulk
@@ -58,6 +59,7 @@ trait RedisClientSync extends Commands {
   protected implicit def resultAsMultiBulkList(raw: RedisType): List[Option[ByteString]] = toMultiBulkList(raw)
   protected implicit def resultAsMultiBulkFlat(raw: RedisType): Option[List[ByteString]] = toMultiBulkFlat(raw)
   protected implicit def resultAsMultiBulkSet(raw: RedisType): Set[ByteString] = toMultiBulkSet(raw)
+  protected implicit def resultAsMultiBulkMap(raw: RedisType): Map[ByteString, ByteString] = toMultiBulkMap(raw)
   protected implicit def resultAsMultiBulkSinglePair(raw: RedisType): Option[(ByteString, ByteString)] = toMultiBulkSinglePair(raw)
   protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: RedisType): Option[(K, ByteString)] = toMultiBulkSinglePair(raw).map(kv => (Parse(kv._1), kv._2))
   protected implicit def resultAsBulk(raw: RedisType): Option[ByteString] = toBulk(raw)
@@ -80,6 +82,7 @@ trait RedisClientQuiet extends Commands {
   protected implicit def resultAsMultiBulkList(raw: Unit): Unit = ()
   protected implicit def resultAsMultiBulkFlat(raw: Unit): Unit = ()
   protected implicit def resultAsMultiBulkSet(raw: Unit): Unit = ()
+  protected implicit def resultAsMultiBulkMap(raw: Unit): Unit = ()
   protected implicit def resultAsMultiBulkSinglePair(raw: Unit): Unit = ()
   protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Unit): Unit = ()
   protected implicit def resultAsBulk(raw: Unit): Unit = ()
@@ -114,6 +117,7 @@ trait Commands extends Keys with Servers with Strings with Lists with Sets with 
   protected implicit def resultAsMultiBulkList(raw: RawResult): Result[List[Option[ByteString]]]
   protected implicit def resultAsMultiBulkFlat(raw: RawResult): Result[Option[List[ByteString]]]
   protected implicit def resultAsMultiBulkSet(raw: RawResult): Result[Set[ByteString]]
+  protected implicit def resultAsMultiBulkMap(raw: RawResult): Result[Map[ByteString, ByteString]]
   protected implicit def resultAsMultiBulkSinglePair(raw: RawResult): Result[Option[(ByteString, ByteString)]]
   protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: RawResult): Result[Option[(K, ByteString)]]
   protected implicit def resultAsBulk(raw: RawResult): Result[Option[ByteString]]
@@ -150,6 +154,15 @@ trait Commands extends Keys with Servers with Strings with Lists with Sets with 
       case _ => throw RedisProtocolException("Unexpected response")
     }
 
+  protected val toMultiBulkMap: RedisType => Map[ByteString, ByteString] = _ match {
+      case RedisMulti(Some(m)) => m.grouped(2).collect {
+        case List(RedisBulk(Some(a)), RedisBulk(Some(b))) => (a, b)
+      } toMap
+      case RedisMulti(None) => Map.empty
+      case RedisError(e) => throw RedisErrorException(e)
+      case _ => throw RedisProtocolException("Unexpected response")
+    }
+
   protected val toMultiBulkSinglePair: RedisType => Option[(ByteString, ByteString)] = _ match {
       case RedisMulti(Some(List(RedisBulk(Some(a)),RedisBulk(Some(b))))) => Some((a,b))
       case RedisMulti(_) => None
@@ -178,6 +191,7 @@ trait Commands extends Keys with Servers with Strings with Lists with Sets with 
 
   protected val toStatus: RedisType => String = _ match {
       case RedisString(s) => s
+      case RedisBulk(Some(b)) => Parse[String](b)
       case RedisError(e) => throw RedisErrorException(e)
       case _ => throw RedisProtocolException("Unexpected response")
     }
