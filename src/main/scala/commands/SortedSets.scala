@@ -1,84 +1,120 @@
 package net.fyrie.redis
 package commands
 
+import serialization._
+import akka.util.ByteString
+
 trait SortedSets {
-/*
-  // ZADD
-  // Add the specified member having the specified score to the sorted set stored at key.
-  case class zadd(key: Any, score: Double, member: Any)(implicit format: Format) extends Command(IntAsBoolean)
+  this: Commands =>
+  import Protocol._
 
-  // ZREM
-  // Remove the specified member from the sorted set value stored at key.
-  case class zrem(key: Any, member: Any)(implicit format: Format) extends Command(ShortInt)
+  def zadd[K: Store, M: Store](key: K, member: M, score: Double = 1.0): Result[Boolean] =
+    send(ZADD :: Store(key) :: Store(score) :: Store(member) :: Nil)
 
-  // ZINCRBY
-  //
-  case class zincrby[A](key: Any, incr: Double, member: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def zcard[K: Store](key: K): Result[Int] =
+    send(ZCARD :: Store(key) :: Nil)
 
-  // ZCARD
-  //
-  case class zcard(key: Any)(implicit format: Format) extends Command(ShortInt)
+  def zcount[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max): Result[Int] =
+    send(ZCOUNT :: Store(key) :: Store(min) :: Store(max) :: Nil)
 
-  // ZSCORE
-  //
-  case class zscore[A](key: Any, element: Any)(implicit format: Format, parse: Parse[A]) extends Command(Bulk[A]()(implicitly, parse.manifest))
+  def zincrby[K: Store, M: Store](key: K, member: M, incr: Double = 1.0): Result[Double] =
+    send(ZINCRBY :: Store(key) :: Store(incr) :: Store(member) :: Nil)
 
-  // ZRANGE
-  //
-
-  case class zrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
-
-  case class zrangeWithScores[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]()(implicitly, parse.manifest)) {
-    override def name = "ZRANGE"
-    override def args = super.args ++ arg1("WITHSCORES")
+  def zinterstore[D: Store, K: Store](dstKey: D, keys: Iterable[K], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
+    var cmd = AGGREGATE :: Store(aggregate) :: Nil
+    var keyCount = 0
+    keys foreach { k =>
+      cmd ::= Store(k)
+      keyCount += 1
+    }
+    send(ZINTERSTORE :: Store(dstKey) :: Store(keyCount) :: cmd)
   }
 
-  case class zrevrange[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest))
-
-  case class zrevrangeWithScores[A](key: Any, start: Int = 0, end: Int = -1)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]()(implicitly, parse.manifest)) {
-    override def name = "ZREVRANGE"
-    override def args = super.args ++ arg1("WITHSCORES")
+  def zinterstoreWeighted[D: Store, K: Store](dstKey: D, kws: Iterable[Product2[K, Double]], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
+    var cmd: List[ByteString] = Nil
+    var keyCount = 0
+    kws foreach { kw =>
+      cmd ::= Store(kw._1)
+      keyCount += 1
+    }
+    cmd ::= WEIGHTS
+    kws foreach { kw => cmd ::= Store(kw._2) }
+    send(ZINTERSTORE :: Store(dstKey) :: Store(keyCount) :: (Store(aggregate) :: AGGREGATE :: cmd).reverse)
   }
 
-  // ZRANGEBYSCORE
-  //
-  case class zrangebyscore[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkAsFlat[A]()(implicitly, parse.manifest)) {
-    override def args = Iterator(key, serializeDouble(min, minInclusive), serializeDouble(max, maxInclusive)) ++ argN2("LIMIT", limit)
+  def zrange[K: Store](key: K, start: Int = 0, stop: Int = -1): Result[List[ByteString]] =
+    send(ZRANGE :: Store(key) :: Store(start) :: Store(stop) :: Nil)
+
+  def zrangeWithScores[K: Store](key: K, start: Int = 0, stop: Int = -1): Result[List[(ByteString, Double)]] =
+    send(ZRANGE :: Store(key) :: Store(start) :: Store(stop) :: WITHSCORES :: Nil)
+
+  def zrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[ByteString]] =
+    send(ZRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: (limit match {
+      case NoLimit => Nil
+      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+    }))
+
+  def zrangebyscoreWithScores[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[(ByteString, Double)]] =
+    send(ZRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: WITHSCORES :: (limit match {
+      case NoLimit => Nil
+      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+    }))
+
+  def zrank[K: Store, M: Store](key: K, member: M): Result[Option[Int]] =
+    send(ZRANK :: Store(key) :: Store(member) :: Nil)
+
+  def zrem[K: Store, M: Store](key: K, member: M): Result[Boolean] =
+    send(ZREM :: Store(key) :: Store(member) :: Nil)
+
+  def zremrangebyrank[K: Store](key: K, start: Int = 0, stop: Int = -1): Result[Int] =
+    send(ZREMRANGEBYRANK :: Store(key) :: Store(start) :: Store(stop) :: Nil)
+
+  def zremrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max): Result[Int] =
+    send(ZREMRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: Nil)
+
+  def zrevrange[K: Store](key: K, start: Int = 0, stop: Int = -1): Result[List[ByteString]] =
+    send(ZREVRANGE :: Store(key) :: Store(start) :: Store(stop) :: Nil)
+
+  def zrevrangeWithScores[K: Store](key: K, start: Int = 0, stop: Int = -1): Result[List[(ByteString, Double)]] =
+    send(ZREVRANGE :: Store(key) :: Store(start) :: Store(stop) :: WITHSCORES :: Nil)
+
+  def zrevrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[ByteString]] =
+    send(ZREVRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: (limit match {
+      case NoLimit => Nil
+      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+    }))
+
+  def zrevrangebyscoreWithScores[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[(ByteString, Double)]] =
+    send(ZREVRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: WITHSCORES :: (limit match {
+      case NoLimit => Nil
+      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+    }))
+
+  def zrevrank[K: Store, M: Store](key: K, member: M): Result[Option[Int]] =
+    send(ZREVRANK :: Store(key) :: Store(member) :: Nil)
+
+  def zscore[K: Store, M: Store](key: K, member: M): Result[Option[Double]] =
+    send(ZSCORE :: Store(key) :: Store(member) :: Nil)
+
+  def zunionstore[D: Store, K: Store](dstKey: D, keys: Iterable[K], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
+    var cmd = AGGREGATE :: Store(aggregate) :: Nil
+    var keyCount = 0
+    keys foreach { k =>
+      cmd ::= Store(k)
+      keyCount += 1
+    }
+    send(ZUNIONSTORE :: Store(dstKey) :: Store(keyCount) :: cmd)
   }
 
-  case class zrangebyscoreWithScores[A](key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true, limit: Option[(Int, Int)] = None)(implicit format: Format, parse: Parse[A]) extends Command(MultiBulkWithScores[A]()(implicitly, parse.manifest)) {
-    override def name = "ZRANGEBYSCORE"
-    override def args = Iterator(key, serializeDouble(min, minInclusive), serializeDouble(max, maxInclusive)) ++ argN2("LIMIT", limit) ++ arg1("WITHSCORES")
+  def zunionstoreWeighted[D: Store, K: Store](dstKey: D, kws: Iterable[Product2[K, Double]], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
+    var cmd: List[ByteString] = Nil
+    var keyCount = 0
+    kws foreach { kw =>
+      cmd ::= Store(kw._1)
+      keyCount += 1
+    }
+    cmd ::= WEIGHTS
+    kws foreach { kw => cmd ::= Store(kw._2) }
+    send(ZUNIONSTORE :: Store(dstKey) :: Store(keyCount) :: (Store(aggregate) :: AGGREGATE :: cmd).reverse)
   }
-
-  case class zcount(key: Any, min: Double = Double.MinValue, minInclusive: Boolean = true, max: Double = Double.MaxValue, maxInclusive: Boolean = true)(implicit format: Format) extends Command(ShortInt) {
-    override def args = Iterator(key, serializeDouble(min, minInclusive), serializeDouble(max, maxInclusive))
-  }
-
-  // ZRANK
-  // ZREVRANK
-  //
-  case class zrank(key: Any, member: Any)(implicit format: Format) extends Command(ShortInt)
-
-  case class zrevrank(key: Any, member: Any)(implicit format: Format) extends Command(ShortInt)
-
-  // ZREMRANGEBYRANK
-  //
-  case class zremrangebyrank(key: Any, start: Int = 0, end: Int = -1)(implicit format: Format) extends Command(ShortInt)
-
-  // ZREMRANGEBYSCORE
-  //
-  case class zremrangebyscore(key: Any, start: Double, end: Double)(implicit format: Format) extends Command(ShortInt)
-
-  // ZUNION
-  //
-  case class zunionstore(dstKey: Any, keys: Iterable[Any], aggregate: Option[AggregateScore] = None)(implicit format: Format) extends Command(ShortInt) {
-    override def args = Iterator(dstKey, keys.size) ++ keys.iterator ++ argN1("AGGREGATE", aggregate)
-  }
-
-  case class zunionstoreWeighted(dstKey: Any, kws: Iterable[Product2[Any, Double]], aggregate: Option[AggregateScore] = None)(implicit format: Format) extends Command(ShortInt) {
-    override def name = "ZUNIONSTORE"
-    override def args = Iterator(dstKey, kws.size) ++ kws.iterator.map(_._1) ++ arg1("WEIGHTS") ++ kws.iterator.map(_._2) ++ argN1("AGGREGATE", aggregate)
-  }
-*/
 }

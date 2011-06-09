@@ -13,6 +13,16 @@ object Store extends StoreDefaults {
 
   def asString[A]: Store[A] = new Store[A] { def apply(value: A) = ByteString(value.toString) }
 
+  def asDouble(d: Double, inclusive: Boolean = true): Array[Byte] = {
+    (if (inclusive) ("") else ("(")) + {
+      if (d.isInfinity) {
+        if (d > 0.0) "+inf" else "-inf"
+      } else {
+        d.toString
+      }
+    }
+  }.getBytes
+
 }
 
 trait StoreDefaults {
@@ -21,10 +31,23 @@ trait StoreDefaults {
   implicit val storeString = new Store[String] { def apply(value: String) = ByteString(value) }
   implicit val storeInt = Store.asString[Int]
   implicit val storeLong = Store.asString[Long]
-
-  // TODO: add special formatting
   implicit val storeFloat = Store.asString[Float]
   implicit val storeDouble = Store.asString[Double]
+  implicit val storeScore = new Store[RedisScore] {
+    def apply(score: RedisScore) = score match {
+      case _ if score.value == Double.PositiveInfinity => Protocol.INFPOS
+      case _ if score.value == Double.NegativeInfinity => Protocol.INFNEG
+      case InclusiveScore(d) => ByteString(d.toString)
+      case ExclusiveScore(d) => ByteString("(" + d.toString)
+    }
+  }
+  implicit val storeAggregate = new Store[Aggregate] {
+    def apply(value: Aggregate) = value match {
+      case Aggregate.Sum => Protocol.SUM
+      case Aggregate.Min => Protocol.MIN
+      case Aggregate.Max => Protocol.MAX
+    }
+  }
 }
 
 trait Parse[A] {

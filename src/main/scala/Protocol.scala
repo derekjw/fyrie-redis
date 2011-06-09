@@ -4,8 +4,10 @@ import akka.util.ByteString
 
 object Protocol {
   val AFTER = ByteString("AFTER")
+  val AGGREGATE = ByteString("AGGREGATE")
   val ALLKEYS = ByteString("*")
   val APPEND = ByteString("APPEND")
+  val ASC = ByteString("ASC")
   val AUTH = ByteString("AUTH")
   val BEFORE = ByteString("BEFORE")
   val BGREWRITEAOF = ByteString("BGREWRITEAOF")
@@ -19,6 +21,7 @@ object Protocol {
   val DECR = ByteString("DECR")
   val DECRBY = ByteString("DECRBY")
   val DEL = ByteString("DEL")
+  val DESC = ByteString("DESC")
   val DISCARD = ByteString("DISCARD")
   val ECHO = ByteString("ECHO")
   val EOL = ByteString("\r\n")
@@ -47,8 +50,11 @@ object Protocol {
   val INCR = ByteString("INCR")
   val INCRBY = ByteString("INCRBY")
   val INFO = ByteString("INFO")
+  val INFPOS = ByteString("+inf")
+  val INFNEG = ByteString("-inf")
   val KEYS = ByteString("KEYS")
   val LASTSAVE = ByteString("LASTSAVE")
+  val LIMIT = ByteString("LIMIT")
   val LINDEX = ByteString("LINDEX")
   val LINSERT = ByteString("LINSERT")
   val LLEN = ByteString("LLEN")
@@ -59,7 +65,9 @@ object Protocol {
   val LREM = ByteString("LREM")
   val LSET = ByteString("LSET")
   val LTRIM = ByteString("LTRIM")
+  val MAX = ByteString("MAX")
   val MGET = ByteString("MGET")
+  val MIN = ByteString("MIN")
   val MONITOR = ByteString("MONITOR")
   val MOVE = ByteString("MOVE")
   val MSET = ByteString("MSET")
@@ -105,6 +113,7 @@ object Protocol {
   val SREM = ByteString("SREM")
   val STRLEN = ByteString("STRLEN")
   val SUBSCRIBE = ByteString("SUBSCRIBE")
+  val SUM = ByteString("SUM")
   val SUNION = ByteString("SUNION")
   val SUNIONSTORE = ByteString("SUNIONSTORE")
   val SYNC = ByteString("SYNC")
@@ -113,6 +122,7 @@ object Protocol {
   val UNSUBSCRIBE = ByteString("UNSUBSCRIBE")
   val UNWATCH = ByteString("UNWATCH")
   val WATCH = ByteString("WATCH")
+  val WEIGHTS = ByteString("WEIGHTS")
   val WITHSCORES = ByteString("WITHSCORES")
   val ZADD = ByteString("ZADD")
   val ZCARD = ByteString("ZCARD")
@@ -130,17 +140,4 @@ object Protocol {
   val ZREVRANK = ByteString("ZREVRANK")
   val ZSCORE = ByteString("ZSCORE")
   val ZUNIONSTORE = ByteString("ZUNIONSTORE")
-}
-
-sealed trait SortOrder
-object SortOrder {
-  case object Asc extends SortOrder
-  case object Desc extends SortOrder
-}
-
-sealed trait Aggregate
-object Aggregate {
-  case object Sum extends Aggregate
-  case object Min extends Aggregate
-  case object Max extends Aggregate
 }
