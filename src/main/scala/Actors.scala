@@ -27,6 +27,8 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) ext
     case Request(bytes) =>
       socket write bytes
       worker forward Run
+    case Disconnect =>
+      self.stop()
   }
 
 }
@@ -42,6 +44,9 @@ final class RedisClientWorker extends Actor with IO {
     case Run =>
       val result = readResult
       self reply_? result
+    case Disconnect =>
+      socket.close
+      self.stop()
   }
 
   def readResult: RedisType @cps[IO.IOSuspendable[Any]] = {

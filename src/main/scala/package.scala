@@ -1,11 +1,11 @@
 package net.fyrie
 
 import akka.util.ByteString
-import akka.dispatch.Future
+import akka.dispatch.{Future, Promise}
 import redis.serialization.Parse
 
 package object redis {
-  implicit def DoubleToRedisScore(value: Double): RedisScore = InclusiveScore(value)
+  implicit def doubleToRedisScore(value: Double): RedisScore = InclusiveScore(value)
 
   implicit def parseBulkFuture(future: Future[Option[ByteString]]) = new ParseBulkFuture(future)
   implicit def parseMultiBulkFuture(future: Future[Option[List[Option[ByteString]]]]) = new ParseMultiBulkFuture(future)
@@ -24,6 +24,16 @@ package object redis {
   implicit def parseMultiBulkSet(value: Set[ByteString]) = new ParseMultiBulkSet(value)
   implicit def parseMultiBulkMap(value: Map[ByteString, ByteString]) = new ParseMultiBulkMap(value)
   implicit def parseMultiBulkScored(value: List[(ByteString, Double)]) = new ParseMultiBulkScored(value)
+
+  implicit def parseBulkQueued(queued: Queued[Option[ByteString]]) = new ParseBulkQueued(queued)
+  implicit def parseMultiBulkQueued(queued: Queued[Option[List[Option[ByteString]]]]) = new ParseMultiBulkQueued(queued)
+  implicit def parseMultiBulkListQueued(queued: Queued[List[Option[ByteString]]]) = new ParseMultiBulkListQueued(queued)
+  implicit def parseMultiBulkFlatQueued(queued: Queued[Option[List[ByteString]]]) = new ParseMultiBulkFlatQueued(queued)
+  implicit def parseMultiBulkFlatListQueued(queued: Queued[List[ByteString]]) = new ParseMultiBulkFlatListQueued(queued)
+  implicit def parseMultiBulkSetQueued(queued: Queued[Set[ByteString]]) = new ParseMultiBulkSetQueued(queued)
+  implicit def parseMultiBulkMapQueued(queued: Queued[Map[ByteString, ByteString]]) = new ParseMultiBulkMapQueued(queued)
+  implicit def parseMultiBulkScoredQueued(queued: Queued[List[(ByteString, Double)]]) = new ParseMultiBulkScoredQueued(queued)
+
 }
 
 package redis {
@@ -113,5 +123,30 @@ package redis {
   }
   private[redis] class ParseMultiBulkScored(value: List[(ByteString, Double)]) {
     def parse[A: Parse]: List[(A, Double)] = value.map(kv => (Parse(kv._1), kv._2))
+  }
+
+  private[redis] class ParseBulkQueued(queued: Queued[Option[ByteString]]) {
+    def parse[A: Parse]: Queued[Option[A]] = queued.map(_.map(Parse(_)))
+  }
+  private[redis] class ParseMultiBulkQueued(queued: Queued[Option[List[Option[ByteString]]]]) {
+    def parse[A: Parse]: Queued[Option[List[Option[A]]]] = queued.map(_.map(_.map(_.map(Parse(_)))))
+  }
+  private[redis] class ParseMultiBulkListQueued(queued: Queued[List[Option[ByteString]]]) {
+    def parse[A: Parse]: Queued[List[Option[A]]] = queued.map(_.map(_.map(Parse(_))))
+  }
+  private[redis] class ParseMultiBulkFlatQueued(queued: Queued[Option[List[ByteString]]]) {
+    def parse[A: Parse]: Queued[Option[List[A]]] = queued.map(_.map(_.map(Parse(_))))
+  }
+  private[redis] class ParseMultiBulkFlatListQueued(queued: Queued[List[ByteString]]) {
+    def parse[A: Parse]: Queued[List[A]] = queued.map(_.map(Parse(_)))
+  }
+  private[redis] class ParseMultiBulkSetQueued(queued: Queued[Set[ByteString]]) {
+    def parse[A: Parse]: Queued[Set[A]] = queued.map(_.map(Parse(_)))
+  }
+  private[redis] class ParseMultiBulkMapQueued(queued: Queued[Map[ByteString, ByteString]]) {
+    def parse[K: Parse, V: Parse]: Queued[Map[K, V]] = queued.map(_.map(kv => (Parse[K](kv._1), Parse[V](kv._2))))
+  }
+  private[redis] class ParseMultiBulkScoredQueued(queued: Queued[List[(ByteString, Double)]]) {
+    def parse[A: Parse]: Queued[List[(A, Double)]] = queued.map(_.map(kv => (Parse(kv._1), kv._2)))
   }
 }

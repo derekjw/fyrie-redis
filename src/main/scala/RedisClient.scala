@@ -2,29 +2,31 @@ package net.fyrie
 package redis
 
 import actors._
-import messages.{Request}
+import messages.{Request, Disconnect}
 import Protocol.EOL
 import types._
 import serialization.Parse
 
-import akka.actor.{Actor,ActorRef,IOManager}
+import akka.actor.{Actor,ActorRef,IOManager,PoisonPill}
 import Actor.{actorOf}
 import akka.util.ByteString
-import akka.dispatch.Future
+import akka.dispatch.{Future, Promise}
 
 object RedisClient {
   def connect(host: String = "localhost", port: Int = 6379, ioManager: ActorRef = actorOf(new IOManager()).start) =
     new RedisClient(host, port, ioManager)
 }
 
-class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync {
+class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync with FlexibleRedisClient {
   client =>
 
   val actor = actorOf(new RedisClientSession(ioManager, host, port)).start
 
+  def disconnect = actor ! Disconnect
+
   val async = this
 
-  val sync: RedisClientSync = new RedisClientSync {
+  val sync: RedisClientSync = new RedisClientSync with FlexibleRedisClient {
     val actor = client.actor
 
     val async: RedisClientAsync = client
@@ -32,16 +34,34 @@ class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: A
     val quiet: RedisClientQuiet = client.quiet
   }
 
-  val quiet: RedisClientQuiet = new RedisClientQuiet {
+  val quiet: RedisClientQuiet = new RedisClientQuiet with FlexibleRedisClient {
     val actor = client.actor
 
     val async: RedisClientAsync = client
     val sync: RedisClientSync = client.sync
     val quiet: RedisClientQuiet = this
   }
+
+  def multi[T](block: (RedisClientQueued) => Unit): Unit = {
+    val rq = new RedisClientQueued {
+      val actor = actorOf(new RedisClientSession(ioManager, host, port)).start
+    }
+    rq.multi()
+    block(rq)
+    rq.exec()
+    rq.actor ! Disconnect
+  }
 }
 
-trait RedisClientAsync extends AbstractRedisClient {
+sealed trait FlexibleRedisClient {
+
+  def sync: RedisClientSync
+  def async: RedisClientAsync
+  def quiet: RedisClientQuiet
+
+}
+
+trait RedisClientAsync extends Commands {
   type RawResult = Future[RedisType]
   type Result[A] = Future[A]
 
@@ -68,7 +88,7 @@ trait RedisClientAsync extends AbstractRedisClient {
 
 }
 
-trait RedisClientSync extends AbstractRedisClient {
+trait RedisClientSync extends Commands {
   type RawResult = RedisType
   type Result[A] = A
 
@@ -95,7 +115,7 @@ trait RedisClientSync extends AbstractRedisClient {
 
 }
 
-trait RedisClientQuiet extends AbstractRedisClient {
+trait RedisClientQuiet extends Commands {
   type RawResult = Unit
   type Result[_] = Unit
 
@@ -121,12 +141,85 @@ trait RedisClientQuiet extends AbstractRedisClient {
   protected implicit def resultAsOkStatus(raw: Unit): Unit = ()
 }
 
-trait AbstractRedisClient extends Commands {
+object Queued {
+  def apply(promise: Promise[RedisType]) = new Queued(promise,promise)
+}
+
+class Queued[A](val promise: Promise[RedisType], val result: Future[A]) {
+  def map[B](f: A => B): Queued[B] = new Queued[B](promise, result map f)
+  def <-:(that: Promise[A]): Queued[A] = {
+    result.onComplete(f => that.complete(f.value.get))
+    this
+  }
+}
+
+trait RedisClientQueued extends Commands {
+  type RawResult = Queued[RedisType]
+  type Result[A] = Queued[A]
+
+  var requests: collection.mutable.Queue[Queued[RedisType]] = collection.mutable.Queue.empty
+
+  protected def send(in: List[ByteString]): Queued[RedisType] = {
+    val status = ((actor !!! Request(format(in))): Future[RedisType]) map toStatus
+    val queued = Queued(Promise())
+    status.onComplete(f => if (f.exception.isDefined) queued.promise.completeWithException(f.exception.get))
+    requests enqueue queued
+    queued
+  }
+
+  def multi(): Unit = actor ! Request(format(List(Protocol.MULTI)))
+
+  def exec(): Unit = {
+    actor !!! Request(format(List(Protocol.EXEC))) foreach {
+      (_: RedisType) match {
+        case RedisMulti(m) =>
+          for {
+            list <- m
+            rtype <- list
+          } {
+            while (requests.head.promise.isCompleted) { requests.dequeue }
+            requests.dequeue.promise.completeWithResult(rtype)
+          }
+        case RedisError(e) =>
+          val re = RedisErrorException(e)
+          while (requests.nonEmpty) { requests.dequeue.promise.completeWithException(re) }
+        case _ =>
+          val re = RedisProtocolException("Unexpected response")
+          while (requests.nonEmpty) { requests.dequeue.promise.completeWithException(re) }
+      }
+    }
+  }
+
+  protected implicit def resultAsMultiBulk(queued: Queued[RedisType]): Queued[Option[List[Option[ByteString]]]] = queued map toMultiBulk
+  protected implicit def resultAsMultiBulkList(queued: Queued[RedisType]): Queued[List[Option[ByteString]]] = queued map toMultiBulkList
+  protected implicit def resultAsMultiBulkFlat(queued: Queued[RedisType]): Queued[Option[List[ByteString]]] = queued map toMultiBulkFlat
+  protected implicit def resultAsMultiBulkFlatList(queued: Queued[RedisType]): Queued[List[ByteString]] = queued map toMultiBulkFlatList
+  protected implicit def resultAsMultiBulkSet(queued: Queued[RedisType]): Queued[Set[ByteString]] = queued map toMultiBulkSet
+  protected implicit def resultAsMultiBulkMap(queued: Queued[RedisType]): Queued[Map[ByteString, ByteString]] = queued map toMultiBulkMap
+  protected implicit def resultAsMultiBulkScored(queued: Queued[RedisType]): Queued[List[(ByteString, Double)]] = queued map toMultiBulkScored
+  protected implicit def resultAsMultiBulkSinglePair(queued: Queued[RedisType]): Queued[Option[(ByteString, ByteString)]] = queued map toMultiBulkSinglePair
+  protected implicit def resultAsMultiBulkSinglePairK[K: Parse](queued: Queued[RedisType]): Queued[Option[(K, ByteString)]] = queued map (toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2)))
+  protected implicit def resultAsBulk(queued: Queued[RedisType]): Queued[Option[ByteString]] = queued map toBulk
+  protected implicit def resultAsDouble(queued: Queued[RedisType]): Queued[Double] = queued map toDouble
+  protected implicit def resultAsDoubleOption(queued: Queued[RedisType]): Queued[Option[Double]] = queued map toDoubleOption
+  protected implicit def resultAsLong(queued: Queued[RedisType]): Queued[Long] = queued map toLong
+  protected implicit def resultAsInt(queued: Queued[RedisType]): Queued[Int] = queued map (toLong(_).toInt)
+  protected implicit def resultAsIntOption(queued: Queued[RedisType]): Queued[Option[Int]] = queued map toIntOption
+  protected implicit def resultAsBool(queued: Queued[RedisType]): Queued[Boolean] = queued map toBool
+  protected implicit def resultAsStatus(queued: Queued[RedisType]): Queued[String] = queued map toStatus
+  protected implicit def resultAsOkStatus(queued: Queued[RedisType]): Queued[Unit] = queued map toOkStatus
+
+}
+
+
+import commands._
+trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
+  type RawResult
+  type Result[_]
 
   def actor: ActorRef
-  def sync: RedisClientSync
-  def async: RedisClientAsync
-  def quiet: RedisClientQuiet
+
+  protected def send(in: List[ByteString]): RawResult
 
   protected def format(in: List[ByteString]): ByteString = {
     var count = 0
@@ -137,15 +230,6 @@ trait AbstractRedisClient extends Commands {
     }
     ByteString("*"+count) ++ EOL ++ cmd
   }
-
-}
-
-import commands._
-trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
-  type RawResult
-  type Result[_]
-
-  protected def send(in: List[ByteString]): RawResult
 
   protected implicit def resultAsMultiBulk(raw: RawResult): Result[Option[List[Option[ByteString]]]]
   protected implicit def resultAsMultiBulkList(raw: RawResult): Result[List[Option[ByteString]]]

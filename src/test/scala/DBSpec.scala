@@ -3,6 +3,8 @@ package net.fyrie.redis
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
+import akka.dispatch.Promise
+
 class OperationsSpec extends Spec
     with ShouldMatchers
     with RedisTestServer {
@@ -92,29 +94,46 @@ class OperationsSpec extends Spec
     }
   }
 
-/*  describe("Multi exec commands") {
+  describe("Multi exec commands") {
     it("should work with single commands") {
-      r.multiexec(Seq(set("testkey1", "testvalue1"))) should be(Some(List(())))
+      val p = Promise[Unit]()
+      r.multi{ rq =>
+        p <-: rq.set("testkey1", "testvalue1")
+      }
+      p.get should be(())
     }
     it("should work with several commands") {
-      r.multiexec(Seq(
-        set("testkey1", "testvalue1"),
-        dbsize,
-        set("testkey2", "testvalue2"),
-        dbsize,
-        mget(Seq("testkey1", "testkey2")))) should be(Some(List((), 1, (), 2, Some(List(Some("testvalue1"), Some("testvalue2"))))))
+      val p = Promise[List[Option[String]]]()
+      r.multi{ rq =>
+        rq.set("testkey1", "testvalue1")
+        rq.set("testkey2", "testvalue2")
+        p <-: rq.mget(List("testkey1", "testkey2")).parse[String]
+      }
+      p.get should be(List(Some("testvalue1"), Some("testvalue2")))
     }
     it("should throw an error") {
-      val thrown = evaluating {
-        (r.multiexec(Seq(
-          set("a", "abc"),
-          lpop("a"),
-          get("a")))).map(_.force)
-      } should produce[Exception]
-      thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
+      val p1, p2 = Promise[Option[String]]()
+      r.multi{ rq =>
+        rq.set("a", "abc")
+        p1 <-: rq.lpop("a").parse[String]
+        p2 <-: rq.get("a").parse[String]
+      }
+      evaluating { p1.get } should produce[RedisErrorException]
+      p2.get should be(Some("abc"))
+    }
+    it("should handle invalid requests") {
+      val p1, p2 = Promise[List[Option[String]]]()
+      r.multi{ rq =>
+        rq.set("testkey1", "testvalue1")
+        rq.set("testkey2", "testvalue2")
+        p1 <-: rq.mget(List[String]()).parse[String]
+        p2 <-: rq.mget(List("testkey1", "testkey2")).parse[String]
+      }
+      evaluating { p1.get } should produce[RedisErrorException]
+      p2.get should be(List(Some("testvalue1"), Some("testvalue2")))
     }
   }
-
+/*
   describe("sort") {
     it("should do a simple sort") {
       List(6, 3, 5, 47, 1, 1, 4, 9) foreach (r.lpush("sortlist", _))
