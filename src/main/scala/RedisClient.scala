@@ -12,21 +12,36 @@ import Actor.{actorOf}
 import akka.util.ByteString
 import akka.dispatch.Future
 
+object RedisClient {
+  def connect(host: String = "localhost", port: Int = 6379, ioManager: ActorRef = actorOf(new IOManager()).start) =
+    new RedisClient(host, port, ioManager)
+}
+
 class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync {
   client =>
 
   val actor = actorOf(new RedisClientSession(ioManager, host, port)).start
 
-  val sync = new RedisClientSync {
+  val async = this
+
+  val sync: RedisClientSync = new RedisClientSync {
     val actor = client.actor
+
+    val async: RedisClientAsync = client
+    val sync: RedisClientSync = this
+    val quiet: RedisClientQuiet = client.quiet
   }
 
-  val quiet = new RedisClientQuiet {
+  val quiet: RedisClientQuiet = new RedisClientQuiet {
     val actor = client.actor
+
+    val async: RedisClientAsync = client
+    val sync: RedisClientSync = client.sync
+    val quiet: RedisClientQuiet = this
   }
 }
 
-trait RedisClientAsync extends Commands {
+trait RedisClientAsync extends AbstractRedisClient {
   type RawResult = Future[RedisType]
   type Result[A] = Future[A]
 
@@ -53,7 +68,7 @@ trait RedisClientAsync extends Commands {
 
 }
 
-trait RedisClientSync extends Commands {
+trait RedisClientSync extends AbstractRedisClient {
   type RawResult = RedisType
   type Result[A] = A
 
@@ -80,7 +95,7 @@ trait RedisClientSync extends Commands {
 
 }
 
-trait RedisClientQuiet extends Commands {
+trait RedisClientQuiet extends AbstractRedisClient {
   type RawResult = Unit
   type Result[_] = Unit
 
@@ -106,14 +121,12 @@ trait RedisClientQuiet extends Commands {
   protected implicit def resultAsOkStatus(raw: Unit): Unit = ()
 }
 
-import commands._
-trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
-  type RawResult
-  type Result[_]
+trait AbstractRedisClient extends Commands {
 
-  val actor: ActorRef
-
-  protected def send(in: List[ByteString]): RawResult
+  def actor: ActorRef
+  def sync: RedisClientSync
+  def async: RedisClientAsync
+  def quiet: RedisClientQuiet
 
   protected def format(in: List[ByteString]): ByteString = {
     var count = 0
@@ -124,6 +137,15 @@ trait Commands extends Keys with Servers with Strings with Lists with Sets with 
     }
     ByteString("*"+count) ++ EOL ++ cmd
   }
+
+}
+
+import commands._
+trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
+  type RawResult
+  type Result[_]
+
+  protected def send(in: List[ByteString]): RawResult
 
   protected implicit def resultAsMultiBulk(raw: RawResult): Result[Option[List[Option[ByteString]]]]
   protected implicit def resultAsMultiBulkList(raw: RawResult): Result[List[Option[ByteString]]]
