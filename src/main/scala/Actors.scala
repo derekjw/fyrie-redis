@@ -27,6 +27,13 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) ext
     case Request(bytes) =>
       socket write bytes
       worker forward Run
+    case MultiRequest(multi, cmds, exec) =>
+      socket write multi
+      cmds foreach {cmd =>
+        socket write cmd._1
+      }
+      socket write exec
+      worker forward MultiRun(cmds.map(_._2))
     case Disconnect =>
       self.stop()
   }
@@ -44,6 +51,17 @@ final class RedisClientWorker extends Actor with IO {
     case Run =>
       val result = readResult
       self reply_? result
+    case msg: MultiRun =>
+      val multi = readResult
+      var promises = msg.promises
+      whileC(promises.nonEmpty) {
+        val promise = promises.head
+        promises = promises.tail
+        promise completeWithResult readResult
+        () // TODO: fix this in akka.util.cps.whileC
+      }
+      val exec = readResult
+      self reply_? exec
     case Disconnect =>
       socket.close
       self.stop()
