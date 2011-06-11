@@ -157,8 +157,8 @@ trait RedisClientMulti extends Commands {
     }
   }
 
-  var requests: List[(ByteString, Promise[RedisType])] = Nil
-  val responses: Queue[Queued[RedisType]] = Queue.empty
+  private var requests: List[(ByteString, Promise[RedisType])] = Nil
+  private val responses: Queue[Queued[RedisType]] = Queue.empty
 
   protected def send(in: List[ByteString]): Queued[RedisType] = {
     val status = Promise[RedisType]()
