@@ -44,7 +44,7 @@ class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: A
     val quiet: RedisClientQuiet = this
   }
 
-  def multi[T](block: (RedisClientMulti) => Unit): Unit = {
+  def multi(block: (RedisClientMulti) => Unit): Unit = {
     val rq = new RedisClientMulti { val actor = client.actor }
     block(rq)
     rq.exec()
