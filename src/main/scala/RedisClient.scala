@@ -143,11 +143,13 @@ trait RedisClientMulti extends Commands {
   type RawResult = Queued[RedisType]
   type Result[A] = Queued[A]
 
-  object Queued {
+  private object Queued {
     def apply(promise: Promise[RedisType]) = new Queued(promise,promise)
+    def complete[A](queued: Queued[A], value: Either[Throwable, RedisType]): Unit = queued.promise.complete(value)
+    def isCompleted(queued: Queued[_]): Boolean = queued.promise.isCompleted
   }
 
-  class Queued[A](val promise: Promise[RedisType], val result: Future[A]) {
+  class Queued[A] private (private val promise: Promise[RedisType], private val result: Future[A]) {
     def map[B](f: A => B): Queued[B] = new Queued[B](promise, result map f)
     def <-:(that: Promise[A]): Queued[A] = {
       result.onComplete(f => that.complete(f.value.get))
@@ -164,7 +166,7 @@ trait RedisClientMulti extends Commands {
     val bytes = format(in)
     requests ::= ((bytes, status))
     val queued = Queued(Promise())
-    statusFuture.onComplete(f => if (f.exception.isDefined) queued.promise.completeWithException(f.exception.get))
+    statusFuture.onComplete(f => if (f.exception.isDefined) Queued.complete(queued, Left(f.exception.get)))
     responses enqueue queued
     queued
   }
@@ -177,15 +179,15 @@ trait RedisClientMulti extends Commands {
             list <- m
             rtype <- list
           } {
-            while (responses.head.promise.isCompleted) { responses.dequeue }
-            responses.dequeue.promise.completeWithResult(rtype)
+            while (Queued.isCompleted(responses.head)) { responses.dequeue }
+            Queued.complete(responses.dequeue, Right(rtype))
           }
         case RedisError(e) =>
           val re = RedisErrorException(e)
-          while (responses.nonEmpty) { responses.dequeue.promise.completeWithException(re) }
+          while (responses.nonEmpty) { Queued.complete(responses.dequeue, Left(re)) }
         case _ =>
           val re = RedisProtocolException("Unexpected response")
-          while (responses.nonEmpty) { responses.dequeue.promise.completeWithException(re) }
+          while (responses.nonEmpty) { Queued.complete(responses.dequeue, Left(re)) }
       }
     }
   }
