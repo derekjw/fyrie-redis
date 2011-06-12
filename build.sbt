@@ -4,6 +4,8 @@ scalaVersion := "2.9.0"
 
 name := "fyrie-redis"
 
+organization := "net.fyrie"
+
 version := "2.0-SNAPSHOT"
 
 libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-SNAPSHOT" % "compile",
