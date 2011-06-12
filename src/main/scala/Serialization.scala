@@ -48,6 +48,12 @@ trait StoreDefaults {
       case Aggregate.Max => Protocol.MAX
     }
   }
+  implicit val storeSortOrder = new Store[SortOrder] {
+    def apply(value: SortOrder) = value match {
+      case SortOrder.Asc => Protocol.ASC
+      case SortOrder.Desc => Protocol.DESC
+    }
+  }
 }
 
 trait Parse[A] {

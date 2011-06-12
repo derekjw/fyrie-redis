@@ -133,36 +133,39 @@ class OperationsSpec extends Spec
       p2.get should be(List(Some("testvalue1"), Some("testvalue2")))
     }
   }
-/*
+
   describe("sort") {
     it("should do a simple sort") {
       List(6, 3, 5, 47, 1, 1, 4, 9) foreach (r.lpush("sortlist", _))
-      (r.sort("sortlist")).map(_.flatMap(_.map(_.toInt))) should be(Some(List(1, 1, 3, 4, 5, 6, 9, 47)))
+      r.sync.sort("sortlist").parse[Int].flatten should be(List(1, 1, 3, 4, 5, 6, 9, 47))
     }
     it("should do a lexical sort") {
-      List("lorem", "ipsum", "dolor", "sit", "amet", 3, 7) foreach (r.lpush("sortlist", _))
-      r.sort[String]("sortlist", alpha = true) map (_.flatten) should be(Some(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit")))
+      List("lorem", "ipsum", "dolor", "sit", "amet") foreach (r.lpush("sortlist", _))
+      List(3, 7) foreach (r.lpush("sortlist", _))
+      r.sync.sort("sortlist", alpha = true).parse[String].flatten should be(List("3", "7", "amet", "dolor", "ipsum", "lorem", "sit"))
+    }
+    it("should return an empty list if key not found") {
+      r.sync.sort("sortnotfound") should be(Nil)
     }
     it("should return multiple items") {
-      import serialization.Parse.Implicits._
       val list = List(("item1", "data1", 1, 4),
                       ("item2", "data2", 2, 8),
                       ("item3", "data3", 3, 1),
                       ("item4", "data4", 4, 6),
                       ("item5", "data5", 5, 3))
       for ((key, data, num, rank) <- list) {
-        r.sadd("items", key)
-        r.set("data::"+key, data)
-        r.set("num::"+key, num)
-        r.set("rank::"+key, rank)
+        r.quiet.sadd("items", key)
+        r.quiet.set("data::"+key, data)
+        r.quiet.set("num::"+key, num)
+        r.quiet.set("rank::"+key, rank)
       }
-      r.del(List("num::item1"))
-      r.sort3[String, String, Int]("items",
-                                        get = ("#", "data::*", "num::*"),
-                                        by = Some("rank::*"),
-                                        limit = Some((1,3))) should be(Some(List((Some("item5"), Some("data5"), Some(5)),
-                                                                                 (Some("item1"), Some("data1"), None),
-                                                                                 (Some("item4"), Some("data4"), Some(4)))))
+      r.quiet.del(List("num::item1"))
+      r.sync.sort("items",
+                  get = Seq("#", "data::*", "num::*"),
+                  by = Some("rank::*"),
+                  limit = Limit(1,3)).parse[String] should be(List(Some("item5"), Some("data5"), Some("5"),
+                                                                   Some("item1"), Some("data1"), None,
+                                                                   Some("item4"), Some("data4"), Some("4")))
     }
-  }*/
+  }
 }

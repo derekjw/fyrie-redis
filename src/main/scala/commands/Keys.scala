@@ -212,37 +212,19 @@ trait Keys {
    *
    * @see <a href="http://code.google.com/p/redis/wiki/SortCommand">Redis Command Reference</a>
    */
-  /*case class sort[A](key: Any,
-                     by: Option[Any] = None,
-                     limit: Option[(Int, Int)] = None,
-                     get: Seq[Any] = Nil,
-                     order: Option[SortOrder] = None,
-                     alpha: Boolean = false)(implicit
-                                             format: Format,
-                                             parse: Parse[A]) extends Command(MultiBulk[A]()(implicitly, parse.manifest)) {
-    override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get) ++
-                        argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None))
-  }*/
-
-  /**
-   * Executes a list of commands atomically. Returns a list of each command's response. If an
-   * error is found while reading the responses the exception will be returned in the list.
-   *
-   * Returns: `Result[Seq[Any]]`
-   *
-   * @param commands List of commands to send.
-   *
-   * @see <a href="http://code.google.com/p/redis/wiki/MultiExecCommand">Redis Command Reference</a>
-   */
-  /*case class multiexec(commands: Seq[Command[_]]) extends Command(MultiExec(commands.map(_.handler))) {
-    override def toBytes = {
-      val b = new ArrayBuilder.ofByte
-      b ++= create(Seq("MULTI".getBytes))
-      commands.foreach(b ++= _.toBytes)
-      b ++= create(Seq("EXEC".getBytes))
-      b.result
+  def sort[K: Store, B: Store, G: Store](key: K, by: Option[B] = Option.empty[ByteString], limit: RedisLimit = NoLimit, get: Seq[G] = List.empty[ByteString], order: Option[SortOrder] = None, alpha: Boolean = false): Result[List[Option[ByteString]]] = {
+    var cmd: List[ByteString] = Nil
+    if (alpha) cmd ::= ALPHA
+    order foreach (o => cmd ::= Store(o))
+    get.reverse foreach (g => cmd = GET :: Store(g) :: cmd)
+    limit match {
+      case Limit(o,c) => cmd = LIMIT :: Store(o) :: Store(c) :: cmd
+      case NoLimit =>
     }
-  }*/
+    by foreach (b => cmd = BY :: Store(b) :: cmd)
+    send(SORT :: Store(key) :: cmd)
+  }
+
 }
 /*
 trait SortTupled {
