@@ -226,17 +226,4 @@ trait Keys {
   }
 
 }
-/*
-trait SortTupled {
-  self: Command[_] =>
-  val key: Any
-  val by: Option[Any]
-  val limit: Option[(Int, Int)]
-  val get: Product
-  val order: Option[SortOrder]
-  val alpha: Boolean
-  override def name = "SORT"
-  override def args = arg1(key) ++ argN1("BY", by) ++ argN2("LIMIT", limit) ++ argN1("GET", get.productIterator.toStream) ++ argN1(order) ++ argN1(if (alpha) (Some("ALPHA")) else (None))
-}
-*/
 
