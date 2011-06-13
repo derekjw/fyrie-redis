@@ -166,6 +166,12 @@ class OperationsSpec extends Spec
                   limit = Limit(1,3)).parse[String] should be(List(Some("item5"), Some("data5"), Some("5"),
                                                                    Some("item1"), Some("data1"), None,
                                                                    Some("item4"), Some("data4"), Some("4")))
+      r.sync.sort("items",
+                  get = Seq("#", "data::*", "num::*"),
+                  by = Some("rank::*"),
+                  limit = Limit(1,3)).parse[String,String,Int] should be(List((Some("item5"), Some("data5"), Some(5)),
+                                                                              (Some("item1"), Some("data1"), None),
+                                                                              (Some("item4"), Some("data4"), Some(4))))
     }
   }
 }
