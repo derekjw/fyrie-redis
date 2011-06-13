@@ -11,7 +11,7 @@ trait Keys {
   /**
    * Request keys matching `pattern`.
    *
-   * Returns: `Result[Stream[A]]`
+   * Returns: `Set[ByteString]`
    *
    * @param pattern Use "*" as wildcard
    *
@@ -23,7 +23,7 @@ trait Keys {
   /**
    * Request a random key.
    *
-   * Returns: `Result[A]`
+   * Returns: `Option[ByteString]`
    *
    * @see <a href="http://code.google.com/p/redis/wiki/RandomkeyCommand">Redis Command Reference</a>
    */
@@ -197,7 +197,7 @@ trait Keys {
   /**
    * Sorts the elements contained in a List, Set, or Sorted Set value at `key`.
    *
-   * Returns: `Result[Stream[Option[A]]]`
+   * Returns: `List[Option[A]]`
    *
    * @param key   The key of the List, Set, or Sorted Set to sort.
    * @param by    Optional pattern used to generate the key names of the weights used for sorting.
@@ -206,7 +206,6 @@ trait Keys {
    * @param limit Optional zero-based start-index and count of items to return.
    * @param get   List of patterns used to generate key names of values to return.
    *              Use "#" to include the elements of the sorted list as well.
-   *              If different parsers are required for different values, see `SortTupleCommands`.
    * @param order Optional `SortOrder`
    * @param alpha If `true`, sort lexicalgraphically.
    *
