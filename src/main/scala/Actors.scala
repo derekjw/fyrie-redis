@@ -19,7 +19,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) ext
 
   override def preStart = {
     worker = self startLink actorOf(new RedisClientWorker)
-    socket = IO.connect(ioManager, host, port)(Some(worker))
+    socket = IO.connect(ioManager, host, port, worker)
     worker ! Socket(socket)
   }
 
