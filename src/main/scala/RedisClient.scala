@@ -87,29 +87,29 @@ trait RedisClientAsync extends Commands {
 }
 
 trait RedisClientSync extends Commands {
-  type RawResult = RedisType
+  type RawResult = Any
   type Result[A] = A
 
-  protected def send(in: List[ByteString]): RedisType = (actor ? Request(format(in))).get match { case x: RedisType => x }
+  protected def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
 
-  protected implicit def resultAsMultiBulk(raw: RedisType): Option[List[Option[ByteString]]] = toMultiBulk(raw)
-  protected implicit def resultAsMultiBulkList(raw: RedisType): List[Option[ByteString]] = toMultiBulkList(raw)
-  protected implicit def resultAsMultiBulkFlat(raw: RedisType): Option[List[ByteString]] = toMultiBulkFlat(raw)
-  protected implicit def resultAsMultiBulkFlatList(raw: RedisType): List[ByteString] = toMultiBulkFlatList(raw)
-  protected implicit def resultAsMultiBulkSet(raw: RedisType): Set[ByteString] = toMultiBulkSet(raw)
-  protected implicit def resultAsMultiBulkMap(raw: RedisType): Map[ByteString, ByteString] = toMultiBulkMap(raw)
-  protected implicit def resultAsMultiBulkScored(raw: RedisType): List[(ByteString, Double)] = toMultiBulkScored(raw)
-  protected implicit def resultAsMultiBulkSinglePair(raw: RedisType): Option[(ByteString, ByteString)] = toMultiBulkSinglePair(raw)
-  protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: RedisType): Option[(K, ByteString)] = toMultiBulkSinglePair(raw).map(kv => (Parse(kv._1), kv._2))
-  protected implicit def resultAsBulk(raw: RedisType): Option[ByteString] = toBulk(raw)
-  protected implicit def resultAsDouble(raw: RedisType): Double = toDouble(raw)
-  protected implicit def resultAsDoubleOption(raw: RedisType): Option[Double] = toDoubleOption(raw)
-  protected implicit def resultAsLong(raw: RedisType): Long = toLong(raw)
-  protected implicit def resultAsInt(raw: RedisType): Int = toLong(raw).toInt
-  protected implicit def resultAsIntOption(raw: RedisType): Option[Int] = toIntOption(raw)
-  protected implicit def resultAsBool(raw: RedisType): Boolean = toBool(raw)
-  protected implicit def resultAsStatus(raw: RedisType): String = toStatus(raw)
-  protected implicit def resultAsOkStatus(raw: RedisType): Unit = toOkStatus(raw)
+  protected implicit def resultAsMultiBulk(raw: Any): Option[List[Option[ByteString]]] = toMultiBulk(raw)
+  protected implicit def resultAsMultiBulkList(raw: Any): List[Option[ByteString]] = toMultiBulkList(raw)
+  protected implicit def resultAsMultiBulkFlat(raw: Any): Option[List[ByteString]] = toMultiBulkFlat(raw)
+  protected implicit def resultAsMultiBulkFlatList(raw: Any): List[ByteString] = toMultiBulkFlatList(raw)
+  protected implicit def resultAsMultiBulkSet(raw: Any): Set[ByteString] = toMultiBulkSet(raw)
+  protected implicit def resultAsMultiBulkMap(raw: Any): Map[ByteString, ByteString] = toMultiBulkMap(raw)
+  protected implicit def resultAsMultiBulkScored(raw: Any): List[(ByteString, Double)] = toMultiBulkScored(raw)
+  protected implicit def resultAsMultiBulkSinglePair(raw: Any): Option[(ByteString, ByteString)] = toMultiBulkSinglePair(raw)
+  protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Any): Option[(K, ByteString)] = toMultiBulkSinglePair(raw).map(kv => (Parse(kv._1), kv._2))
+  protected implicit def resultAsBulk(raw: Any): Option[ByteString] = toBulk(raw)
+  protected implicit def resultAsDouble(raw: Any): Double = toDouble(raw)
+  protected implicit def resultAsDoubleOption(raw: Any): Option[Double] = toDoubleOption(raw)
+  protected implicit def resultAsLong(raw: Any): Long = toLong(raw)
+  protected implicit def resultAsInt(raw: Any): Int = toLong(raw).toInt
+  protected implicit def resultAsIntOption(raw: Any): Option[Int] = toIntOption(raw)
+  protected implicit def resultAsBool(raw: Any): Boolean = toBool(raw)
+  protected implicit def resultAsStatus(raw: Any): String = toStatus(raw)
+  protected implicit def resultAsOkStatus(raw: Any): Unit = toOkStatus(raw)
 
 }
 
