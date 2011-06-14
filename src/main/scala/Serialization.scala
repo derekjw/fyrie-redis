@@ -7,25 +7,12 @@ trait Store[A] {
   def apply(value: A): ByteString
 }
 
-object Store extends StoreDefaults {
+object Store {
 
   def apply[A](value: A)(implicit store: Store[A]): ByteString = store(value)
 
   def asString[A]: Store[A] = new Store[A] { def apply(value: A) = ByteString(value.toString) }
 
-  def asDouble(d: Double, inclusive: Boolean = true): Array[Byte] = {
-    (if (inclusive) ("") else ("(")) + {
-      if (d.isInfinity) {
-        if (d > 0.0) "+inf" else "-inf"
-      } else {
-        d.toString
-      }
-    }
-  }.getBytes
-
-}
-
-trait StoreDefaults {
   implicit val storeByteString = new Store[ByteString] { def apply(value: ByteString) = value }
   implicit val storeByteArray = new Store[Array[Byte]] { def apply(value: Array[Byte]) = ByteString(value) }
   implicit val storeString = new Store[String] { def apply(value: String) = ByteString(value) }
