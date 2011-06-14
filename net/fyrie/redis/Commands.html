@@ -28,7 +28,7 @@
       </span>
       </h4>
       
-          <div class="fullcommenttop" id="comment"><div class="toggleContainer block">
+          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a>, <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a>, <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a>, <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a>, <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a>, <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a>, <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
@@ -61,7 +61,7 @@
 
         <div class="types members" id="types">
               <h3>Type Members</h3>
-              <ol><li visbl="pub" name="net.fyrie.redis.Commands#RawResult" data-isabs="true">
+              <ol><li visbl="prt" name="net.fyrie.redis.Commands#RawResult" data-isabs="true">
       <a id="RawResult:RawResult"></a>
       <h4 class="signature">
       <span class="kind">type</span>
@@ -71,8 +71,8 @@
         
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.Commands#Result" data-isabs="true">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#Result" data-isabs="true">
       <a id="Result:Result[_]"></a>
       <h4 class="signature">
       <span class="kind">type</span>
@@ -82,13 +82,13 @@
         
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
     </li></ol>
             </div>
         
         <div class="values members" id="values">
               <h3>Abstract Value Members</h3>
-              <ol><li visbl="pub" name="net.fyrie.redis.Commands#actor" data-isabs="true">
+              <ol><li visbl="prt" name="net.fyrie.redis.Commands#actor" data-isabs="true">
       <a id="actor:ActorRef"></a>
       <h4 class="signature">
       <span class="kind">def</span>
@@ -98,7 +98,7 @@
         <span class="result">: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>abstract </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsBool" data-isabs="true">
       <a id="resultAsBool(RawResult):Result[Boolean]"></a>
       <h4 class="signature">
@@ -652,7 +652,7 @@ automatically deleted. Returns 'true' if the expire command is successful.</p><p
         <span class="params">(<span name="in">in: List[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: <span name="akka.util.ByteString" class="extype">ByteString</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Strings#get" data-isabs="false">
       <a id="get[K](K)(Store[K]):Result[Option[ByteString]]"></a>
       <h4 class="signature">
@@ -1515,7 +1515,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toBulk" data-isabs="false">
       <a id="toBulk:(Any) ⇒ Option[ByteString]"></a>
       <h4 class="signature">
@@ -1526,7 +1526,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toDouble" data-isabs="false">
       <a id="toDouble:(Any) ⇒ Double"></a>
       <h4 class="signature">
@@ -1537,7 +1537,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Double" class="extype">Double</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toDoubleOption" data-isabs="false">
       <a id="toDoubleOption:(Any) ⇒ Option[Double]"></a>
       <h4 class="signature">
@@ -1548,7 +1548,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Option" class="extype">Option</span>[<span name="scala.Double" class="extype">Double</span>]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toIntOption" data-isabs="false">
       <a id="toIntOption:(Any) ⇒ Option[Int]"></a>
       <h4 class="signature">
@@ -1559,7 +1559,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Option" class="extype">Option</span>[<span name="scala.Int" class="extype">Int</span>]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toLong" data-isabs="false">
       <a id="toLong:(Any) ⇒ Long"></a>
       <h4 class="signature">
@@ -1570,7 +1570,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Long" class="extype">Long</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulk" data-isabs="false">
       <a id="toMultiBulk:(Any) ⇒ Option[List[Option[ByteString]]]"></a>
       <h4 class="signature">
@@ -1581,7 +1581,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Option" class="extype">Option</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkFlat" data-isabs="false">
       <a id="toMultiBulkFlat:(Any) ⇒ Option[List[ByteString]]"></a>
       <h4 class="signature">
@@ -1592,7 +1592,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Option" class="extype">Option</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkFlatList" data-isabs="false">
       <a id="toMultiBulkFlatList:(Any) ⇒ List[ByteString]"></a>
       <h4 class="signature">
@@ -1603,7 +1603,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ List[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkList" data-isabs="false">
       <a id="toMultiBulkList:(Any) ⇒ List[Option[ByteString]]"></a>
       <h4 class="signature">
@@ -1614,7 +1614,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkMap" data-isabs="false">
       <a id="toMultiBulkMap:(Any) ⇒ Map[ByteString, ByteString]"></a>
       <h4 class="signature">
@@ -1625,7 +1625,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ Map[<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkScored" data-isabs="false">
       <a id="toMultiBulkScored:(Any) ⇒ List[(ByteString, Double)]"></a>
       <h4 class="signature">
@@ -1636,7 +1636,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ List[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="scala.Double" class="extype">Double</span>)]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkSet" data-isabs="false">
       <a id="toMultiBulkSet:(Any) ⇒ Set[ByteString]"></a>
       <h4 class="signature">
@@ -1647,7 +1647,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ Set[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toMultiBulkSinglePair" data-isabs="false">
       <a id="toMultiBulkSinglePair:(Any) ⇒ Option[(ByteString, ByteString)]"></a>
       <h4 class="signature">
@@ -1658,7 +1658,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Option" class="extype">Option</span>[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>)]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toOkStatus" data-isabs="false">
       <a id="toOkStatus:(Any) ⇒ Unit"></a>
       <h4 class="signature">
@@ -1669,7 +1669,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#toStatus" data-isabs="false">
       <a id="toStatus:(Any) ⇒ String"></a>
       <h4 class="signature">
@@ -1680,7 +1680,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
         <span class="result">: (<span name="scala.Any" class="extype">Any</span>) ⇒ String</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected final </dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
       <a id="toString():String"></a>
       <h4 class="signature">
