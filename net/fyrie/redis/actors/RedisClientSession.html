@@ -5,36 +5,34 @@
           <title>net.fyrie.redis.actors.RedisClientSession</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
-      <link href="../../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../../lib/template.css" />
       <script type="text/javascript" src="../../../../lib/jquery.js"></script>
       <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
       <script type="text/javascript" src="../../../../lib/template.js"></script>
       <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
     
         </head>
-        <body class="type" onload="windowTitle();">
-
-      <p id="owner"><a href="../../../package.html" class="extype" name="net">net</a>.<a href="../../package.html" class="extype" name="net.fyrie">fyrie</a>.<a href="../package.html" class="extype" name="net.fyrie.redis">redis</a>.<a href="package.html" class="extype" name="net.fyrie.redis.actors">actors</a></p>
-
+        <body class="type">
       <div id="definition">
         <img src="../../../../lib/class_big.png" />
+        <p id="owner"><a name="net" class="extype" href="../../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../../package.html">fyrie</a>.<a name="net.fyrie.redis" class="extype" href="../package.html">redis</a>.<a name="net.fyrie.redis.actors" class="extype" href="package.html">actors</a></p>
         <h1>RedisClientSession</h1>
       </div>
 
       <h4 class="signature" id="signature">
       <span class="kind">class</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">RedisClientSession</span>
         
-        
-        <span class="result"> extends <span class="extype" name="se.scalablesolutions.akka.actor.Actor">Actor</span></span>
+        <span class="result"> extends <span name="akka.actor.Actor" class="extype">Actor</span></span>
       </span>
       </h4>
-      <div class="fullcomment" id="comment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-            linear super types: <span class="extype" name="se.scalablesolutions.akka.actor.Actor">Actor</span>, <span class="extype" name="se.scalablesolutions.akka.util.Logging">Logging</span>, AnyRef, <span class="extype" name="scala.Any">Any</span>
-          </div></div>
+      
+          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span name="akka.actor.Actor" class="extype">Actor</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+        </div></div>
+        
 
       <div id="template">
 
@@ -42,34 +40,30 @@
           <div id="textfilter"><span class="pre"></span><span class="input"><input accesskey="/" type="text" /></span><span class="post"></span></div>
           <div id="order">
                 <span class="filtertype">Ordering</span>
-                <ol><li class="alpha in">Alphabetic</li><li class="inherit out">By inheritance</li></ol>
+                <ol><li class="alpha in"><span>Alphabetic</span></li><li class="inherit out"><span>By inheritance</span></li></ol>
               </div>
           <div id="ancestors">
                 <span class="filtertype">Inherited</span>
-                <ol><li class="hideall">Hide All</li><li class="showall">Show all</li></ol>
-                <ol id="linearization"><li class="in" name="net.fyrie.redis.actors.RedisClientSession">RedisClientSession</li><li class="in" name="se.scalablesolutions.akka.actor.Actor">Actor</li><li class="in" name="se.scalablesolutions.akka.util.Logging">Logging</li><li class="in" name="scala.AnyRef">AnyRef</li><li class="in" name="scala.Any">Any</li></ol>
+                <ol><li class="hideall out"><span>Hide All</span></li>
+                <li class="showall in"><span>Show all</span></li></ol>
+                <ol id="linearization"><li name="net.fyrie.redis.actors.RedisClientSession" class="in"><span>RedisClientSession</span></li><li name="akka.actor.Actor" class="in"><span>Actor</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
               </div>
           <div id="visbl">
               <span class="filtertype">Visibility</span>
-              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
-            </div>
-          <div id="impl">
-              <span class="filtertype">Impl.</span>
-              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
             </div>
         </div>
 
         <div class="members" id="constructors">
-              <h3>Instance constructors</h3>
-              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#this">
+              <h3>Instance Constructors</h3>
+              <ol><li visbl="pub" name="net.fyrie.redis.actors.RedisClientSession#this" data-isabs="false">
       <a id="this:RedisClientSession"></a>
       <h4 class="signature">
       <span class="kind">new</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">RedisClientSession</span>
         
-        <span class="params">(<span name="host">host: String</span>, <span name="port">port: <span class="extype" name="scala.Int">Int</span></span>)</span>
-        
+        <span class="params">(<span name="ioManager">ioManager: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>, <span name="host">host: String</span>, <span name="port">port: <span name="scala.Int" class="extype">Int</span></span>)</span>
       </span>
       </h4>
       
@@ -78,1207 +72,422 @@
 
         <div class="types members" id="types">
               <h3>Type Members</h3>
-              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadBulkData">
-      <a id="ReadBulkData:ReadBulkData"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadBulkData.html">
-      <span class="kind">class</span>
-      <span class="symbol">
-        <span class="name">ReadBulkData</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">
-      <a id="ReadHandler:ReadHandler"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadHandler.html">
-      <span class="kind">class</span>
-      <span class="symbol">
-        <span class="name">ReadHandler</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: abstract 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#Receive">
+              <ol><li visbl="pub" name="akka.actor.Actor#Receive" data-isabs="false">
       <a id="Receive:Receive"></a>
       <h4 class="signature">
       <span class="kind">type</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">Receive</span>
         
-        
-        <span class="result"> = <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+        <span class="result"> = <span name="scala.PartialFunction" class="extype">PartialFunction</span>[<span name="scala.Any" class="extype">Any</span>, <span name="scala.Unit" class="extype">Unit</span>]</span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li></ol>
             </div>
+        
+        
 
         <div class="values members" id="values">
               <h3>Value Members</h3>
-              <ol><li visbl="pub" data-isabs="false" name="scala.AnyRef#!=">
+              <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
       <a id="!=(AnyRef):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">!=</span>
         
-        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.Any#!=">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#!=" data-isabs="false">
       <a id="!=(Any):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">!=</span>
         
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt"><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.</p>
-            <div class="fullcomment"><div class="comment cmt"><p><code>o != arg0</code> is the same as <code>!(o == (arg0))</code>.
-</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the receiver object is equivalent to the argument; <code>true</code> otherwise.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef###">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef###" data-isabs="false">
       <a id="##():Int"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">##</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef → Any
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$asInstanceOf">
-      <a id="$asInstanceOf[T0]():T0"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">$asInstanceOf</span>
-        <span class="tparams">[<span name="T0">T0</span>]</span>
-        <span class="params">()</span>
-        <span class="result">: T0</span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#$isInstanceOf">
-      <a id="$isInstanceOf[T0]():Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">$isInstanceOf</span>
-        <span class="tparams">[<span name="T0">T0</span>]</span>
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#==">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#==" data-isabs="false">
       <a id="==(AnyRef):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">==</span>
         
-        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.</p>
-            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>if (o eq null) arg0 eq null else o.equals(arg0)</code>.
-</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.Any#==">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#==" data-isabs="false">
       <a id="==(Any):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">==</span>
         
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt"><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.</p>
-            <div class="fullcomment"><div class="comment cmt"><p><code>o == arg0</code> is the same as <code>o.equals(arg0)</code>.
-</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#EOL">
-      <a id="EOL:Array[Byte]"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">EOL</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.Idle">
-      <a id="Idle:Idle"></a>
-      <h4 class="signature"><a href="RedisClientSession$Idle$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">Idle</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadBulk">
-      <a id="ReadBulk:ReadBulk"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadBulk$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">ReadBulk</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadEOL">
-      <a id="ReadEOL:ReadEOL"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadEOL$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">ReadEOL</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadError">
-      <a id="ReadError:ReadError"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadError$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">ReadError</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadInteger">
-      <a id="ReadInteger:ReadInteger"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadInteger$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">ReadInteger</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadMultiBulk">
-      <a id="ReadMultiBulk:ReadMultiBulk"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadMultiBulk$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">ReadMultiBulk</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession.ReadString">
-      <a id="ReadString:ReadString"></a>
-      <h4 class="signature"><a href="RedisClientSession$ReadString$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">ReadString</span>
-        
-        
-        <span class="result"> extends ReadHandler</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="scala.Any#asInstanceOf">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
       <a id="asInstanceOf[T0]:T0"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">asInstanceOf</span>
         <span class="tparams">[<span name="T0">T0</span>]</span>
-        
         <span class="result">: T0</span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">This method is used to cast the receiver object to be of type <code>T0</code>.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>This method is used to cast the receiver object to be of type <code>T0</code>.</p><p>Note that the success of a cast at runtime is modulo Scala's erasure semantics.  Therefore the expression<code>1.asInstanceOf[String]</code> will throw a <code>ClassCastException</code> at runtime, while the expression<code>List(1).asInstanceOf[List[String]]</code> will not.  In the latter example, because the type argument is erased as
-part of compilation it is not possible to check whether the contents of the list are of the requested typed.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the receiver object.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#become">
-      <a id="become(Receive):Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#become" data-isabs="false">
+      <a id="become(Receive,Boolean):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">become</span>
         
-        <span class="params">(<span name="behavior">behavior: Receive</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">(<span name="behavior">behavior: Receive</span>, <span name="discardOld">discardOld: <span name="scala.Boolean" class="extype">Boolean</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#catchio">
-      <a id="catchio(⇒ Unit):Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">catchio</span>
-        
-        <span class="params">(<span name="f">f: ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#channel">
-      <a id="channel:SocketChannel"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">channel</span>
-        
-        
-        <span class="result">: <span class="extype" name="java.nio.channels.SocketChannel">SocketChannel</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#clone">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#clone" data-isabs="false">
       <a id="clone():AnyRef"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">clone</span>
         
-        <span class="params">()</span>
-        <span class="result">: AnyRef</span>
+        <span class="params">()</span><span class="result">: AnyRef</span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">This method creates and returns a copy of the receiver object.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>This method creates and returns a copy of the receiver object.</p><p>The default implementation of the <code>clone</code> method is platform dependent.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a copy of the receiver object.</p></dd></dl><div class="block">
-          attributes: protected 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#close">
-      <a id="close():Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">close</span>
-        
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#closed">
-      <a id="closed:Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">closed</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#eq">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
       <a id="eq(AnyRef):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">eq</span>
         
-        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">This method is used to test whether the argument (<code>arg0</code>) is a reference to the
-receiver object (<code>this</code>).</p>
-            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the argument (<code>arg0</code>) is a reference to the
-receiver object (<code>this</code>).</p><p>The <code>eq</code> method implements an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence relation] on
-non-null instances of <code>AnyRef</code>:
- * It is reflexive: for any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(x)</code> returns <code>true</code>.
- * It is symmetric: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, <code>x.eq(y)</code> returns <code>true</code> if and
-   only if <code>y.eq(x)</code> returns <code>true</code>.
- * It is transitive: for any non-null instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.eq(y)</code> returns <code>true</code>   and <code>y.eq(z)</code> returns <code>true</code>, then <code>x.eq(z)</code> returns <code>true</code>.</p><p>Additionally, the <code>eq</code> method has three other properties.
- * It is consistent: for any non-null instances <code>x</code> and <code>y</code> of type <code>AnyRef</code>, multiple invocations of
-   <code>x.eq(y)</code> consistently returns <code>true</code> or consistently returns <code>false</code>.
- * For any non-null instance <code>x</code> of type <code>AnyRef</code>, <code>x.eq(null)</code> and <code>null.eq(x)</code> returns <code>false</code>.
- * <code>null.eq(null)</code> returns <code>true</code>.</p><p>When overriding the <code>equals</code> or <code>hashCode</code> methods, it is important to ensure that their behavior is
-consistent with reference equality.  Therefore, if two objects are references to each other (<code>o1 eq o2</code>), they
-should be equal to each other (<code>o1 == o2</code>) and they should hash to the same value (<code>o1.hashCode == o2.hashCode</code>).
-</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the argument is a reference to the receiver object; <code>false</code> otherwise.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#equals">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#equals" data-isabs="false">
       <a id="equals(Any):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">equals</span>
         
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>This method is used to compare the receiver object (<code>this</code>) with the argument object (<code>arg0</code>) for equivalence.</p><p>The default implementations of this method is an [http://en.wikipedia.org/wiki/Equivalence_relation equivalence
-relation]:
- * It is reflexive: for any instance <code>x</code> of type <code>Any</code>, <code>x.equals(x)</code> should return <code>true</code>.
- * It is symmetric: for any instances <code>x</code> and <code>y</code> of type <code>Any</code>, <code>x.equals(y)</code> should return <code>true</code> if and
-   only if <code>y.equals(x)</code> returns <code>true</code>.
- * It is transitive: for any instances <code>x</code>, <code>y</code>, and <code>z</code> of type <code>AnyRef</code> if <code>x.equals(y)</code> returns <code>true</code> and
-   <code>y.equals(z)</code> returns <code>true</code>, then <code>x.equals(z)</code> should return <code>true</code>.</p><p>If you override this method, you should verify that your implementation remains an equivalence relation.
-Additionally, when overriding this method it is often necessary to override <code>hashCode</code> to ensure that objects
-that are &quot;equal&quot; (<code>o1.equals(o2)</code> returns <code>true</code>) hash to the same 
-scala.Int
-(<code>o1.hashCode.equals(o2.hashCode)</code>).
-</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is equivalent to the argument; <code>false</code> otherwise.</p></dd></dl><div class="block">
-          definition classes: AnyRef → Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="prt" data-isabs="false" name="scala.AnyRef#finalize">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
       <a id="finalize():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">finalize</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">This method is called by the garbage collector on the receiver object when garbage collection determines that
-there are no more references to the object.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>This method is called by the garbage collector on the receiver object when garbage collection determines that
-there are no more references to the object.</p><p>The details of when and if the <code>finalize</code> method are invoked, as well as the interaction between <code>finalize</code>and non-local returns and exceptions, are all platform dependent.</p></div><div class="block">
-          attributes: protected 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#getClass">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
       <a id="getClass():java.lang.Class[_]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">getClass</span>
         
-        <span class="params">()</span>
-        <span class="result">: java.lang.Class[_]</span>
+        <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">Returns a representation that corresponds to the dynamic class of the receiver object.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Returns a representation that corresponds to the dynamic class of the receiver object.</p><p>The nature of the representation is platform dependent.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a representation that corresponds to the dynamic class of the receiver object.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#hashCode">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#hashCode" data-isabs="false">
       <a id="hashCode():Int"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">hashCode</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">Returns a hash code value for the object.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Returns a hash code value for the object.</p><p>The default hashing algorithm is platform dependent.</p><p>Note that it is allowed for two objects to have identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>) yet
-not be equal (<code>o1.equals(o2)</code> returns <code>false</code>).  A degenerate implementation could always return <code>0</code>.
-However, it is required that if two objects are equal (<code>o1.equals(o2)</code> returns <code>true</code>) that they have
-identical hash codes (<code>o1.hashCode.equals(o2.hashCode)</code>).  Therefore, when overriding this method, be sure
-to verify that the behavior is consistent with the <code>equals</code> method.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the hash code value for the object.</p></dd></dl><div class="block">
-          definition classes: AnyRef → Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#hawtPin">
-      <a id="hawtPin:Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">hawtPin</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#isDefinedAt">
-      <a id="isDefinedAt(Any):Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">isDefinedAt</span>
-        
-        <span class="params">(<span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.Any#isInstanceOf">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">isInstanceOf</span>
         <span class="tparams">[<span name="T0">T0</span>]</span>
-        
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>This method is used to test whether the dynamic type of the receiver object is <code>T0</code>.</p><p>Note that the test result of the test is modulo Scala's erasure semantics.  Therefore the expression<code>1.isInstanceOf[String]</code> will return <code>false</code>, while the expression <code>List(1).isInstanceOf[List[String]]</code> will
-return <code>true</code>.  In the latter example, because the type argument is erased as part of compilation it is not
-possible to check whether the contents of the list are of the requested typed.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><code>true</code> if the receiver object is an instance of erasure of type <code>T0</code>; <code>false</code> otherwise.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.util.Logging#log">
-      <a id="log:Logger"></a>
-      <h4 class="signature">
-      <span class="kind">lazy val</span>
-      <span class="symbol">
-        <span class="name">log</span>
-        
-        
-        <span class="result">: <span class="extype" name="se.scalablesolutions.akka.util.Logger">Logger</span></span>
-      </span>
-      </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Logging
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#ne">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">ne</span>
         
-        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="params">(<span name="arg0">arg0: AnyRef</span>)</span><span class="result">: <span name="scala.Boolean" class="extype">Boolean</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt"><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.</p>
-            <div class="fullcomment"><div class="comment cmt"><p><code>o.ne(arg0)</code> is the same as <code>!(o.eq(arg0))</code>.
-</p></div><dl class="paramcmts block"><dt class="param">arg0</dt><dd class="cmt"><p>the object to compare against this object for reference dis-equality.</p></dd><dt>returns</dt><dd class="cmt"><p><code>false</code> if the argument is not a reference to the receiver object; <code>true</code> otherwise.</p></dd></dl><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notify">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notify" data-isabs="false">
       <a id="notify():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">notify</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">Wakes up a single thread that is waiting on the receiver object's monitor.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Wakes up a single thread that is waiting on the receiver object's monitor.</p></div><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#notifyAll">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#notifyAll" data-isabs="false">
       <a id="notifyAll():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">notifyAll</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">Wakes up all threads that are waiting on the receiver object's monitor.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Wakes up all threads that are waiting on the receiver object's monitor.</p></div><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#optionSelf">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#optionSelf" data-isabs="false">
       <a id="optionSelf:Option[ActorRef]"></a>
       <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol">
+      <span class="kind">def</span>
+      <span class="symbol"> 
         <span class="name">optionSelf</span>
         
-        
-        <span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="se.scalablesolutions.akka.actor.ActorRef">ActorRef</span>]</span>
+        <span class="result">: <span name="scala.Option" class="extype">Option</span>[<span name="akka.actor.ActorRef" class="extype">ActorRef</span>]</span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: implicit 
-        </div><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#postRestart">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#postRestart" data-isabs="false">
       <a id="postRestart(Throwable):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">postRestart</span>
         
-        <span class="params">(<span name="reason">reason: Throwable</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">(<span name="reason">reason: Throwable</span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#postStop">
-      <a id="postStop:Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#postStop" data-isabs="false">
+      <a id="postStop():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">postStop</span>
         
-        
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.actors.RedisClientSession">RedisClientSession</a> → Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#preRestart">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#preRestart" data-isabs="false">
       <a id="preRestart(Throwable):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">preRestart</span>
         
-        <span class="params">(<span name="reason">reason: Throwable</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">(<span name="reason">reason: Throwable</span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#preStart">
-      <a id="preStart:Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.actors.RedisClientSession#preStart" data-isabs="false">
+      <a id="preStart():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">preStart</span>
         
-        
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.actors.RedisClientSession">RedisClientSession</a> → Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#read">
-      <a id="read():Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">read</span>
-        
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readBuf">
-      <a id="readBuf:ByteBuffer"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">readBuf</span>
-        
-        
-        <span class="result">: <span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readBufDirect">
-      <a id="readBufDirect:Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">readBufDirect</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readBufOverflowStream">
-      <a id="readBufOverflowStream:Stream[ByteBuffer]"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">readBufOverflowStream</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.collection.immutable.Stream">Stream</span>[<span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span>]</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readBufSize">
-      <a id="readBufSize:Int"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">readBufSize</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readBufStream">
-      <a id="readBufStream:Stream[ByteBuffer]"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">readBufStream</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.collection.immutable.Stream">Stream</span>[<span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span>]</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readHandler">
-      <a id="readHandler:ReadHandler"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">readHandler</span>
-        
-        
-        <span class="result">: <a href="RedisClientSession$ReadHandler.html" class="extype" name="net.fyrie.redis.actors.RedisClientSession.ReadHandler">ReadHandler</a></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readSingleLine">
-      <a id="readSingleLine:Option[Array[Byte]]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">readSingleLine</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#readSource">
-      <a id="readSource:DispatchSource"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">readSource</span>
-        
-        
-        <span class="result">: <span class="extype" name="org.fusesource.hawtdispatch.DispatchSource">DispatchSource</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#receive">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.actors.RedisClientSession" class="extype" href="">RedisClientSession</a> → Actor</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.actors.RedisClientSession#receive" data-isabs="false">
       <a id="receive:PartialFunction[Any, Unit]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">receive</span>
         
-        
-        <span class="result">: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+        <span class="result">: <span name="scala.PartialFunction" class="extype">PartialFunction</span>[<span name="scala.Any" class="extype">Any</span>, <span name="scala.Unit" class="extype">Unit</span>]</span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: <a href="" class="extype" name="net.fyrie.redis.actors.RedisClientSession">RedisClientSession</a> → Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#respond">
-      <a id="respond[T&lt;:RedisType](T)(Manifest[T]):Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">respond</span>
-        <span class="tparams">[<span name="T">T &lt;: <a href="../RedisType.html" class="extype" name="net.fyrie.redis.RedisType">RedisType</a></span>]</span>
-        <span class="params">(<span name="data">data: T</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: Manifest[T]</span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#responseQueue">
-      <a id="responseQueue:Queue[Responder]"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">responseQueue</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.collection.mutable.Queue">Queue</span>[<a href="../Responder.html" class="extype" name="net.fyrie.redis.Responder">Responder</a>]</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#self">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.actors.RedisClientSession" class="extype" href="">RedisClientSession</a> → Actor</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#self" data-isabs="false">
       <a id="self:ScalaActorRef"></a>
       <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
+      <span class="kind">implicit val</span>
+      <span class="symbol"> 
         <span class="name">self</span>
         
+        <span class="result">: <span name="akka.actor.ScalaActorRef" class="extype">ScalaActorRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.actors.RedisClientSession#socket" data-isabs="false">
+      <a id="socket:SocketHandle"></a>
+      <h4 class="signature">
+      <span class="kind">var</span>
+      <span class="symbol"> 
+        <span class="name">socket</span>
         
-        <span class="result">: <span class="extype" name="se.scalablesolutions.akka.actor.ScalaActorRef">ScalaActorRef</span></span>
+        <span class="result">: <span name="akka.actor.IO.SocketHandle" class="extype">SocketHandle</span></span>
       </span>
       </h4>
       
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#someSelf">
+    </li><li visbl="pub" name="akka.actor.Actor#someSelf" data-isabs="false">
       <a id="someSelf:Some[ActorRef]"></a>
       <h4 class="signature">
-      <span class="kind">implicit val</span>
-      <span class="symbol">
+      <span class="kind">val</span>
+      <span class="symbol"> 
         <span class="name">someSelf</span>
         
-        
-        <span class="result">: <span class="extype" name="scala.Some">Some</span>[<span class="extype" name="se.scalablesolutions.akka.actor.ActorRef">ActorRef</span>]</span>
+        <span class="result">: <span name="scala.Some" class="extype">Some</span>[<span name="akka.actor.ActorRef" class="extype">ActorRef</span>]</span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: implicit 
-        </div><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#synchronized">
-      <a id="synchronized[T0](T0):T0"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
+      <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">synchronized</span>
         <span class="tparams">[<span name="T0">T0</span>]</span>
-        <span class="params">(<span name="arg0">arg0: T0</span>)</span>
-        <span class="result">: T0</span>
+        <span class="params">(<span name="arg0">arg0: ⇒ T0</span>)</span><span class="result">: T0</span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#toString">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#toString" data-isabs="false">
       <a id="toString():String"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">toString</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="params">()</span><span class="result">: <span name="java.lang.String" class="extype">String</span></span>
       </span>
       </h4>
-      
-            <p class="shortcomment cmt">Returns a string representation of the object.</p>
-            <div class="fullcomment"><div class="comment cmt"><p>Returns a string representation of the object.</p><p>The default representation is platform dependent.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a string representation of the object.</p></dd></dl><div class="block">
-          definition classes: AnyRef → Any
-        </div>
-            
-            
-            
-          </div>
-          
-    </li><li visbl="pub" data-isabs="false" name="se.scalablesolutions.akka.actor.Actor#unbecome">
-      <a id="unbecome:Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#unbecome" data-isabs="false">
+      <a id="unbecome():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">unbecome</span>
         
-        
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          definition classes: Actor
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#unhandled" data-isabs="false">
+      <a id="unhandled(Any):Unit"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">unhandled</span>
+        
+        <span class="params">(<span name="msg">msg: <span name="scala.Any" class="extype">Any</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
       <a id="wait():Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">wait</span>
         
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
       <a id="wait(Long,Int):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">wait</span>
         
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>, <span name="arg1">arg1: <span name="scala.Int" class="extype">Int</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="scala.AnyRef#wait">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
       <a id="wait(Long):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">wait</span>
         
-        <span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="params">(<span name="arg0">arg0: <span name="scala.Long" class="extype">Long</span></span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div><div class="block">
-          definition classes: AnyRef
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#write">
-      <a id="write():Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">write</span>
-        
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeBuf">
-      <a id="writeBuf:(ByteBuffer, ByteBuffer)"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.actors.RedisClientSession#worker" data-isabs="false">
+      <a id="worker:ActorRef"></a>
       <h4 class="signature">
       <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">writeBuf</span>
+      <span class="symbol"> 
+        <span class="name">worker</span>
         
-        
-        <span class="result">: (<span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span>, <span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span>)</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeBufAllocate">
-      <a id="writeBufAllocate:ByteBuffer"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">writeBufAllocate</span>
-        
-        
-        <span class="result">: <span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeBufDirect">
-      <a id="writeBufDirect:Boolean"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">writeBufDirect</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeBufFill">
-      <a id="writeBufFill():Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">writeBufFill</span>
-        
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeBufFlip">
-      <a id="writeBufFlip():Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol">
-        <span class="name">writeBufFlip</span>
-        
-        <span class="params">()</span>
-        <span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeBufSize">
-      <a id="writeBufSize:Int"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">writeBufSize</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeQueue">
-      <a id="writeQueue:Queue[ByteBuffer]"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol">
-        <span class="name">writeQueue</span>
-        
-        
-        <span class="result">: <span class="extype" name="scala.collection.mutable.Queue">Queue</span>[<span class="extype" name="java.nio.ByteBuffer">ByteBuffer</span>]</span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors.RedisClientSession#writeSource">
-      <a id="writeSource:DispatchSource"></a>
-      <h4 class="signature">
-      <span class="kind">var</span>
-      <span class="symbol">
-        <span class="name">writeSource</span>
-        
-        
-        <span class="result">: <span class="extype" name="org.fusesource.hawtdispatch.DispatchSource">DispatchSource</span></span>
+        <span class="result">: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>
       </span>
       </h4>
       
     </li></ol>
             </div>
 
-        <div class="parent" name="se.scalablesolutions.akka.actor.Actor">
-              <h3>Inherited from <span class="extype" name="se.scalablesolutions.akka.actor.Actor">Actor</span></h3>
-            </div><div class="parent" name="se.scalablesolutions.akka.util.Logging">
-              <h3>Inherited from <span class="extype" name="se.scalablesolutions.akka.util.Logging">Logging</span></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div name="akka.actor.Actor" class="parent">
+              <h3>Inherited from <span name="akka.actor.Actor" class="extype">Actor</span></h3>
+            </div><div name="scala.AnyRef" class="parent">
               <h3>Inherited from AnyRef</h3>
-            </div><div class="parent" name="scala.Any">
-              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div><div name="scala.Any" class="parent">
+              <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>
             </div>
 
       </div>

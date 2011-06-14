@@ -5,32 +5,31 @@
           <title>net.fyrie.redis.messages</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
-      <link href="../../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../../lib/template.css" />
       <script type="text/javascript" src="../../../../lib/jquery.js"></script>
       <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
       <script type="text/javascript" src="../../../../lib/template.js"></script>
       <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
     
         </head>
-        <body class="value" onload="windowTitle();">
-
-      <p id="owner"><a href="../../../package.html" class="extype" name="net">net</a>.<a href="../../package.html" class="extype" name="net.fyrie">fyrie</a>.<a href="../package.html" class="extype" name="net.fyrie.redis">redis</a></p>
-
+        <body class="value">
       <div id="definition">
         <img src="../../../../lib/package_big.png" />
+        <p id="owner"><a name="net" class="extype" href="../../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../../package.html">fyrie</a>.<a name="net.fyrie.redis" class="extype" href="../package.html">redis</a></p>
         <h1>messages</h1>
       </div>
 
       <h4 class="signature" id="signature">
       <span class="kind">package</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">messages</span>
-        
         
         
       </span>
       </h4>
-      <div class="fullcomment" id="comment"></div>
+      
+          <div class="fullcommenttop" id="comment"></div>
+        
 
       <div id="template">
 
@@ -40,11 +39,7 @@
           
           <div id="visbl">
               <span class="filtertype">Visibility</span>
-              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
-            </div>
-          <div id="impl">
-              <span class="filtertype">Impl.</span>
-              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
             </div>
         </div>
 
@@ -52,34 +47,92 @@
 
         <div class="types members" id="types">
               <h3>Type Members</h3>
-              <ol><li visbl="pub" data-isabs="true" name="net.fyrie.redis.messages.Message">
+              <ol><li visbl="pub" name="net.fyrie.redis.messages.Message" data-isabs="true">
       <a id="Message:Message"></a>
-      <h4 class="signature"><a href="Message.html">
+      <h4 class="signature">
       <span class="kind">trait</span>
-      <span class="symbol">
-        <span class="name">Message</span>
-        
+      <span class="symbol"> 
+        <a href="Message.html"><span class="name">Message</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.messages.Request">
-      <a id="Request:Request[T]"></a>
-      <h4 class="signature"><a href="Request.html">
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.messages.MultiRequest" data-isabs="false">
+      <a id="MultiRequest:MultiRequest"></a>
+      <h4 class="signature">
       <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">Request</span>
-        <span class="tparams">[<span name="T">T</span>]</span>
-        <span class="params">(<span name="bytes">bytes: Array[Byte]</span>, <span name="handler">handler: Handler[T]</span>)</span>
-        <span class="result"> extends Message with Product</span>
+      <span class="symbol"> 
+        <a href="MultiRequest.html"><span class="name">MultiRequest</span></a>
+        
+        <span class="params">(<span name="multi">multi: ByteString</span>, <span name="cmds">cmds: List[(ByteString, Promise[RedisType])]</span>, <span name="exec">exec: ByteString</span>)</span><span class="result"> extends Message with Product with Serializable</span>
       </span>
-      </a></h4>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.messages.MultiRun" data-isabs="false">
+      <a id="MultiRun:MultiRun"></a>
+      <h4 class="signature">
+      <span class="kind">case class</span>
+      <span class="symbol"> 
+        <a href="MultiRun.html"><span class="name">MultiRun</span></a>
+        
+        <span class="params">(<span name="promises">promises: List[Promise[RedisType]]</span>)</span><span class="result"> extends Message with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.messages.Request" data-isabs="false">
+      <a id="Request:Request"></a>
+      <h4 class="signature">
+      <span class="kind">case class</span>
+      <span class="symbol"> 
+        <a href="Request.html"><span class="name">Request</span></a>
+        
+        <span class="params">(<span name="bytes">bytes: ByteString</span>)</span><span class="result"> extends Message with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.messages.Socket" data-isabs="false">
+      <a id="Socket:Socket"></a>
+      <h4 class="signature">
+      <span class="kind">case class</span>
+      <span class="symbol"> 
+        <a href="Socket.html"><span class="name">Socket</span></a>
+        
+        <span class="params">(<span name="handle">handle: SocketHandle</span>)</span><span class="result"> extends Message with Product with Serializable</span>
+      </span>
+      </h4>
       
     </li></ol>
             </div>
-
         
+        
+
+        <div class="values members" id="values">
+              <h3>Value Members</h3>
+              <ol><li visbl="pub" name="net.fyrie.redis.messages.Disconnect" data-isabs="false">
+      <a id="Disconnect:Disconnect"></a>
+      <h4 class="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <a href="Disconnect$.html"><span class="name">Disconnect</span></a>
+        
+        <span class="result"> extends Message with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.messages.Run" data-isabs="false">
+      <a id="Run:Run"></a>
+      <h4 class="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <a href="Run$.html"><span class="name">Run</span></a>
+        
+        <span class="result"> extends Message with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
 
         
 

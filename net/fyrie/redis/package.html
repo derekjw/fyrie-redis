@@ -5,32 +5,31 @@
           <title>net.fyrie.redis</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
-      <link href="../../../lib/template.css" rel="stylesheet" type="text/css" media="screen" />
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
       <script type="text/javascript" src="../../../lib/jquery.js"></script>
       <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
       <script type="text/javascript" src="../../../lib/template.js"></script>
       <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
     
         </head>
-        <body class="value" onload="windowTitle();">
-
-      <p id="owner"><a href="../../package.html" class="extype" name="net">net</a>.<a href="../package.html" class="extype" name="net.fyrie">fyrie</a></p>
-
+        <body class="value">
       <div id="definition">
         <img src="../../../lib/package_big.png" />
+        <p id="owner"><a name="net" class="extype" href="../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../package.html">fyrie</a></p>
         <h1>redis</h1>
       </div>
 
       <h4 class="signature" id="signature">
       <span class="kind">package</span>
-      <span class="symbol">
+      <span class="symbol"> 
         <span class="name">redis</span>
-        
         
         
       </span>
       </h4>
-      <div class="fullcomment" id="comment"></div>
+      
+          <div class="fullcommenttop" id="comment"></div>
+        
 
       <div id="template">
 
@@ -40,11 +39,7 @@
           
           <div id="visbl">
               <span class="filtertype">Visibility</span>
-              <ol><li class="public in">Public</li><li class="all out">All</li></ol>
-            </div>
-          <div id="impl">
-              <span class="filtertype">Impl.</span>
-              <ol><li class="concrete in">Concrete</li><li class="abstract in">Abstract</li></ol>
+              <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
             </div>
         </div>
 
@@ -52,545 +47,595 @@
 
         <div class="types members" id="types">
               <h3>Type Members</h3>
-              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.ActorResponder">
-      <a id="ActorResponder:ActorResponder"></a>
-      <h4 class="signature"><a href="ActorResponder.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">ActorResponder</span>
-        
-        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_]</span>, <span name="target">target: ActorRef</span>)</span>
-        <span class="result"> extends Responder with Product</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.AggregateScore">
-      <a id="AggregateScore:AggregateScore"></a>
-      <h4 class="signature"><a href="AggregateScore.html">
+              <ol><li visbl="pub" name="net.fyrie.redis.Aggregate" data-isabs="true">
+      <a id="Aggregate:Aggregate"></a>
+      <h4 class="signature">
       <span class="kind">trait</span>
-      <span class="symbol">
-        <span class="name">AggregateScore</span>
-        
+      <span class="symbol"> 
+        <a href="Aggregate.html"><span class="name">Aggregate</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.Command">
-      <a id="Command:Command[A]"></a>
-      <h4 class="signature"><a href="Command.html">
-      <span class="kind">class</span>
-      <span class="symbol">
-        <span class="name">Command</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.Commands" data-isabs="true">
+      <a id="Commands:Commands"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="Commands.html"><span class="name">Commands</span></a>
         
-        <span class="result"> extends Product</span>
+        <span class="result"> extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes</span>
       </span>
-      </a></h4>
-      <p class="comment cmt">Creates commands to send to a Redis server, performing any needed
-serialization with the given <code>Format</code> and provides a Handler for
-the server's response.</p>
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Error">
-      <a id="Error:Error[A]"></a>
-      <h4 class="signature"><a href="Error.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">Error</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="exception">exception: Throwable</span>, <span name="manifest">manifest: Manifest[A]</span>)</span>
-        <span class="result"> extends Response[A] with Product</span>
-      </span>
-      </a></h4>
+      </h4>
       
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.FutureResponder">
-      <a id="FutureResponder:FutureResponder"></a>
-      <h4 class="signature"><a href="FutureResponder.html">
+    </li><li visbl="pub" name="net.fyrie.redis.ExclusiveScore" data-isabs="false">
+      <a id="ExclusiveScore:ExclusiveScore"></a>
+      <h4 class="signature">
       <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">FutureResponder</span>
+      <span class="symbol"> 
+        <a href="ExclusiveScore.html"><span class="name">ExclusiveScore</span></a>
         
-        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_]</span>, <span name="future">future: CompletableFuture[Any]</span>)</span>
-        <span class="result"> extends Responder with Product</span>
+        <span class="params">(<span name="value">value: Double</span>)</span><span class="result"> extends RedisScore with Product with Serializable</span>
       </span>
-      </a></h4>
+      </h4>
       
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.NoResponder">
-      <a id="NoResponder:NoResponder"></a>
-      <h4 class="signature"><a href="NoResponder.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">NoResponder</span>
+    </li><li visbl="pub" name="net.fyrie.redis.FlexibleRedisClient" data-isabs="true">
+      <a id="FlexibleRedisClient:FlexibleRedisClient"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="FlexibleRedisClient.html"><span class="name">FlexibleRedisClient</span></a>
         
-        <span class="params">(<span name="handler">handler: net.fyrie.redis.handlers.Handler[_]</span>)</span>
-        <span class="result"> extends Responder with Product</span>
+        <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisBulk">
-      <a id="RedisBulk:RedisBulk"></a>
-      <h4 class="signature"><a href="RedisBulk.html">
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.InclusiveScore" data-isabs="false">
+      <a id="InclusiveScore:InclusiveScore"></a>
+      <h4 class="signature">
       <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisBulk</span>
+      <span class="symbol"> 
+        <a href="InclusiveScore.html"><span class="name">InclusiveScore</span></a>
         
-        <span class="params">(<span name="value">value: Option[Array[Byte]]</span>)</span>
-        <span class="result"> extends RedisType with Product</span>
+        <span class="params">(<span name="value">value: Double</span>)</span><span class="result"> extends RedisScore with Product with Serializable</span>
       </span>
-      </a></h4>
+      </h4>
       
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisClient">
+    </li><li visbl="pub" name="net.fyrie.redis.Limit" data-isabs="false">
+      <a id="Limit:Limit"></a>
+      <h4 class="signature">
+      <span class="kind">case class</span>
+      <span class="symbol"> 
+        <a href="Limit.html"><span class="name">Limit</span></a>
+        
+        <span class="params">(<span name="offset">offset: Int</span>, <span name="count">count: Int</span>)</span><span class="result"> extends RedisLimit with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClient" data-isabs="false">
       <a id="RedisClient:RedisClient"></a>
-      <h4 class="signature"><a href="RedisClient.html">
+      <h4 class="signature">
       <span class="kind">class</span>
-      <span class="symbol">
-        <span class="name">RedisClient</span>
+      <span class="symbol"> 
+        <a href="RedisClient.html"><span class="name">RedisClient</span></a>
         
-        
-        <span class="result"> extends AnyRef</span>
+        <span class="result"> extends RedisClientAsync with FlexibleRedisClient</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisConnectionException">
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClientAsync" data-isabs="true">
+      <a id="RedisClientAsync:RedisClientAsync"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="RedisClientAsync.html"><span class="name">RedisClientAsync</span></a>
+        
+        <span class="result"> extends Commands</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClientMulti" data-isabs="true">
+      <a id="RedisClientMulti:RedisClientMulti"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="RedisClientMulti.html"><span class="name">RedisClientMulti</span></a>
+        
+        <span class="result"> extends Commands</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClientQuiet" data-isabs="true">
+      <a id="RedisClientQuiet:RedisClientQuiet"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="RedisClientQuiet.html"><span class="name">RedisClientQuiet</span></a>
+        
+        <span class="result"> extends Commands</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClientSync" data-isabs="true">
+      <a id="RedisClientSync:RedisClientSync"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="RedisClientSync.html"><span class="name">RedisClientSync</span></a>
+        
+        <span class="result"> extends Commands</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.RedisConnectionException" data-isabs="false">
       <a id="RedisConnectionException:RedisConnectionException"></a>
-      <h4 class="signature"><a href="RedisConnectionException.html">
+      <h4 class="signature">
       <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisConnectionException</span>
+      <span class="symbol"> 
+        <a href="RedisConnectionException.html"><span class="name">RedisConnectionException</span></a>
         
-        <span class="params">(<span name="message">message: String</span>)</span>
-        <span class="result"> extends RuntimeException with Product</span>
+        <span class="params">(<span name="message">message: String</span>)</span><span class="result"> extends RuntimeException with Product with Serializable</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisError">
-      <a id="RedisError:RedisError"></a>
-      <h4 class="signature"><a href="RedisError.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisError</span>
-        
-        <span class="params">(<span name="value">value: Exception</span>)</span>
-        <span class="result"> extends RedisType with Product</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisErrorException">
+    </li><li visbl="pub" name="net.fyrie.redis.RedisErrorException" data-isabs="false">
       <a id="RedisErrorException:RedisErrorException"></a>
-      <h4 class="signature"><a href="RedisErrorException.html">
+      <h4 class="signature">
       <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisErrorException</span>
+      <span class="symbol"> 
+        <a href="RedisErrorException.html"><span class="name">RedisErrorException</span></a>
         
-        <span class="params">(<span name="message">message: String</span>)</span>
-        <span class="result"> extends RuntimeException with Product</span>
+        <span class="params">(<span name="message">message: String</span>)</span><span class="result"> extends RuntimeException with Product with Serializable</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisInteger">
-      <a id="RedisInteger:RedisInteger"></a>
-      <h4 class="signature"><a href="RedisInteger.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisInteger</span>
+    </li><li visbl="pub" name="net.fyrie.redis.RedisLimit" data-isabs="true">
+      <a id="RedisLimit:RedisLimit"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="RedisLimit.html"><span class="name">RedisLimit</span></a>
         
-        <span class="params">(<span name="value">value: Long</span>)</span>
-        <span class="result"> extends RedisType with Product</span>
+        <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisMulti">
-      <a id="RedisMulti:RedisMulti"></a>
-      <h4 class="signature"><a href="RedisMulti.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisMulti</span>
-        
-        <span class="params">(<span name="value">value: Option[Int]</span>)</span>
-        <span class="result"> extends RedisType with Product</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisProtocolException">
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.RedisProtocolException" data-isabs="false">
       <a id="RedisProtocolException:RedisProtocolException"></a>
-      <h4 class="signature"><a href="RedisProtocolException.html">
+      <h4 class="signature">
       <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisProtocolException</span>
+      <span class="symbol"> 
+        <a href="RedisProtocolException.html"><span class="name">RedisProtocolException</span></a>
         
-        <span class="params">(<span name="message">message: String</span>)</span>
-        <span class="result"> extends RuntimeException with Product</span>
+        <span class="params">(<span name="message">message: String</span>)</span><span class="result"> extends RuntimeException with Product with Serializable</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisString">
-      <a id="RedisString:RedisString"></a>
-      <h4 class="signature"><a href="RedisString.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">RedisString</span>
-        
-        <span class="params">(<span name="value">value: String</span>)</span>
-        <span class="result"> extends RedisType with Product</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.RedisType">
-      <a id="RedisType:RedisType"></a>
-      <h4 class="signature"><a href="RedisType.html">
+    </li><li visbl="pub" name="net.fyrie.redis.RedisScore" data-isabs="true">
+      <a id="RedisScore:RedisScore"></a>
+      <h4 class="signature">
       <span class="kind">trait</span>
-      <span class="symbol">
-        <span class="name">RedisType</span>
-        
+      <span class="symbol"> 
+        <a href="RedisScore.html"><span class="name">RedisScore</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: sealed 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.Responder">
-      <a id="Responder:Responder"></a>
-      <h4 class="signature"><a href="Responder.html">
-      <span class="kind">trait</span>
-      <span class="symbol">
-        <span class="name">Responder</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: sealed 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.Response">
-      <a id="Response:Response[A]"></a>
-      <h4 class="signature"><a href="Response.html">
-      <span class="kind">class</span>
-      <span class="symbol">
-        <span class="name">Response</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        
-        <span class="result"> extends Product</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: sealed abstract 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.ResponseFuture">
-      <a id="ResponseFuture:ResponseFuture[A]"></a>
-      <h4 class="signature"><a href="ResponseFuture.html">
-      <span class="kind">class</span>
-      <span class="symbol">
-        <span class="name">ResponseFuture</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        
-        <span class="result"> extends DefaultCompletableFuture[A]</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Result">
-      <a id="Result:Result[A]"></a>
-      <h4 class="signature"><a href="Result.html">
-      <span class="kind">case class</span>
-      <span class="symbol">
-        <span class="name">Result</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="value">value: A</span>, <span name="manifest">manifest: Manifest[A]</span>)</span>
-        <span class="result"> extends Response[A] with Product</span>
-      </span>
-      </a></h4>
-      
-            
-            <div class="fullcomment"><div class="block">
-          attributes: final 
-        </div></div>
-          
-    </li><li visbl="pub" data-isabs="true" name="net.fyrie.redis.SortOrder">
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.SortOrder" data-isabs="true">
       <a id="SortOrder:SortOrder"></a>
-      <h4 class="signature"><a href="SortOrder.html">
+      <h4 class="signature">
       <span class="kind">trait</span>
-      <span class="symbol">
-        <span class="name">SortOrder</span>
-        
+      <span class="symbol"> 
+        <a href="SortOrder.html"><span class="name">SortOrder</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
-      
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
     </li></ol>
             </div>
+        
+        
 
         <div class="values members" id="values">
               <h3>Value Members</h3>
-              <ol><li visbl="pub" data-isabs="false" name="net.fyrie.redis.AggregateScore">
-      <a id="AggregateScore:AggregateScore"></a>
-      <h4 class="signature"><a href="AggregateScore$.html">
+              <ol><li visbl="pub" name="net.fyrie.redis.Aggregate" data-isabs="false">
+      <a id="Aggregate:Aggregate"></a>
+      <h4 class="signature">
       <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">AggregateScore</span>
-        
+      <span class="symbol"> 
+        <a href="Aggregate$.html"><span class="name">Aggregate</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Command">
-      <a id="Command:Command"></a>
-      <h4 class="signature"><a href="Command$.html">
+    </li><li visbl="pub" name="net.fyrie.redis.NoLimit" data-isabs="false">
+      <a id="NoLimit:NoLimit"></a>
+      <h4 class="signature">
       <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">Command</span>
+      <span class="symbol"> 
+        <a href="NoLimit$.html"><span class="name">NoLimit</span></a>
         
+        <span class="result"> extends RedisLimit with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.Protocol" data-isabs="false">
+      <a id="Protocol:Protocol"></a>
+      <h4 class="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <a href="Protocol$.html"><span class="name">Protocol</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Commands">
-      <a id="Commands:Commands"></a>
-      <h4 class="signature"><a href="Commands$.html">
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClient" data-isabs="false">
+      <a id="RedisClient:RedisClient"></a>
+      <h4 class="signature">
       <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">Commands</span>
-        
-        
-        <span class="result"> extends StringCommands with ListCommands with SetCommands with SortedSetCommands with HashCommands with GenericCommands with NodeCommands with SortTupleCommands</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.FutureResponder">
-      <a id="FutureResponder:FutureResponder"></a>
-      <h4 class="signature"><a href="FutureResponder$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">FutureResponder</span>
-        
+      <span class="symbol"> 
+        <a href="RedisClient$.html"><span class="name">RedisClient</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisBulk">
-      <a id="RedisBulk:RedisBulk"></a>
-      <h4 class="signature"><a href="RedisBulk$.html">
+    </li><li visbl="pub" name="net.fyrie.redis.RedisScore" data-isabs="false">
+      <a id="RedisScore:RedisScore"></a>
+      <h4 class="signature">
       <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">RedisBulk</span>
-        
+      <span class="symbol"> 
+        <a href="RedisScore$.html"><span class="name">RedisScore</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisError">
-      <a id="RedisError:RedisError"></a>
-      <h4 class="signature"><a href="RedisError$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">RedisError</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisInteger">
-      <a id="RedisInteger:RedisInteger"></a>
-      <h4 class="signature"><a href="RedisInteger$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">RedisInteger</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisMulti">
-      <a id="RedisMulti:RedisMulti"></a>
-      <h4 class="signature"><a href="RedisMulti$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">RedisMulti</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.RedisString">
-      <a id="RedisString:RedisString"></a>
-      <h4 class="signature"><a href="RedisString$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">RedisString</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Responder">
-      <a id="Responder:Responder"></a>
-      <h4 class="signature"><a href="Responder$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">Responder</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.Response">
-      <a id="Response:Response"></a>
-      <h4 class="signature"><a href="Response$.html">
-      <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">Response</span>
-        
-        
-        <span class="result"> extends AnyRef</span>
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.SortOrder">
+    </li><li visbl="pub" name="net.fyrie.redis.SortOrder" data-isabs="false">
       <a id="SortOrder:SortOrder"></a>
-      <h4 class="signature"><a href="SortOrder$.html">
+      <h4 class="signature">
       <span class="kind">object</span>
-      <span class="symbol">
-        <span class="name">SortOrder</span>
-        
+      <span class="symbol"> 
+        <a href="SortOrder$.html"><span class="name">SortOrder</span></a>
         
         <span class="result"> extends AnyRef</span>
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.actors">
+    </li><li visbl="pub" name="net.fyrie.redis.actors" data-isabs="false">
       <a id="actors:actors"></a>
-      <h4 class="signature"><a href="actors/package.html">
+      <h4 class="signature">
       <span class="kind">package</span>
-      <span class="symbol">
-        <span class="name">actors</span>
-        
+      <span class="symbol"> 
+        <a href="actors/package.html"><span class="name">actors</span></a>
         
         
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.collection">
-      <a id="collection:collection"></a>
-      <h4 class="signature"><a href="collection/package.html">
-      <span class="kind">package</span>
-      <span class="symbol">
-        <span class="name">collection</span>
-        
-        
-        
-      </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.commands">
+    </li><li visbl="pub" name="net.fyrie.redis.commands" data-isabs="false">
       <a id="commands:commands"></a>
-      <h4 class="signature"><a href="commands/package.html">
+      <h4 class="signature">
       <span class="kind">package</span>
-      <span class="symbol">
-        <span class="name">commands</span>
-        
+      <span class="symbol"> 
+        <a href="commands/package.html"><span class="name">commands</span></a>
         
         
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.handlers">
-      <a id="handlers:handlers"></a>
-      <h4 class="signature"><a href="handlers/package.html">
-      <span class="kind">package</span>
-      <span class="symbol">
-        <span class="name">handlers</span>
+    </li><li visbl="pub" name="net.fyrie.redis.package#doubleToRedisScore" data-isabs="false">
+      <a id="doubleToRedisScore(Double):RedisScore"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">doubleToRedisScore</span>
         
-        
-        
+        <span class="params">(<span name="value">value: <span name="scala.Double" class="extype">Double</span></span>)</span><span class="result">: <a name="net.fyrie.redis.RedisScore" class="extype" href="RedisScore.html">RedisScore</a></span>
       </span>
-      </a></h4>
-      
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.messages">
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.messages" data-isabs="false">
       <a id="messages:messages"></a>
-      <h4 class="signature"><a href="messages/package.html">
+      <h4 class="signature">
       <span class="kind">package</span>
-      <span class="symbol">
-        <span class="name">messages</span>
-        
+      <span class="symbol"> 
+        <a href="messages/package.html"><span class="name">messages</span></a>
         
         
       </span>
-      </a></h4>
+      </h4>
       
-    </li><li visbl="pub" data-isabs="false" name="net.fyrie.redis.serialization">
-      <a id="serialization:serialization"></a>
-      <h4 class="signature"><a href="serialization/package.html">
-      <span class="kind">package</span>
-      <span class="symbol">
-        <span class="name">serialization</span>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseBulk" data-isabs="false">
+      <a id="parseBulk(Option[ByteString]):ParseBulk"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseBulk</span>
         
+        <span class="params">(<span name="value">value: <span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseBulk" class="extype">ParseBulk</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseBulkFuture" data-isabs="false">
+      <a id="parseBulkFuture(Future[Option[ByteString]]):ParseBulkFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseBulkFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseBulkFuture" class="extype">ParseBulkFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseBulkQueued" data-isabs="false">
+      <a id="parseBulkQueued(Queued[Option[ByteString]]):ParseBulkQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseBulkQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseBulkQueued" class="extype">ParseBulkQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulk" data-isabs="false">
+      <a id="parseMultiBulk(Option[List[Option[ByteString]]]):ParseMultiBulk"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulk</span>
+        
+        <span class="params">(<span name="value">value: <span name="scala.Option" class="extype">Option</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulk" class="extype">ParseMultiBulk</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFlat" data-isabs="false">
+      <a id="parseMultiBulkFlat(Option[List[ByteString]]):ParseMultiBulkFlat"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFlat</span>
+        
+        <span class="params">(<span name="value">value: <span name="scala.Option" class="extype">Option</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFlat" class="extype">ParseMultiBulkFlat</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFlatFuture" data-isabs="false">
+      <a id="parseMultiBulkFlatFuture(Future[Option[List[ByteString]]]):ParseMultiBulkFlatFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFlatFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[<span name="scala.Option" class="extype">Option</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFlatFuture" class="extype">ParseMultiBulkFlatFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFlatList" data-isabs="false">
+      <a id="parseMultiBulkFlatList(List[ByteString]):ParseMultiBulkFlatList"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFlatList</span>
+        
+        <span class="params">(<span name="value">value: List[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFlatList" class="extype">ParseMultiBulkFlatList</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFlatListFuture" data-isabs="false">
+      <a id="parseMultiBulkFlatListFuture(Future[List[ByteString]]):ParseMultiBulkFlatListFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFlatListFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFlatListFuture" class="extype">ParseMultiBulkFlatListFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFlatListQueued" data-isabs="false">
+      <a id="parseMultiBulkFlatListQueued(Queued[List[ByteString]]):ParseMultiBulkFlatListQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFlatListQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFlatListQueued" class="extype">ParseMultiBulkFlatListQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFlatQueued" data-isabs="false">
+      <a id="parseMultiBulkFlatQueued(Queued[Option[List[ByteString]]]):ParseMultiBulkFlatQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFlatQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[<span name="scala.Option" class="extype">Option</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFlatQueued" class="extype">ParseMultiBulkFlatQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkFuture" data-isabs="false">
+      <a id="parseMultiBulkFuture(Future[Option[List[Option[ByteString]]]]):ParseMultiBulkFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[<span name="scala.Option" class="extype">Option</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkFuture" class="extype">ParseMultiBulkFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkList" data-isabs="false">
+      <a id="parseMultiBulkList(List[Option[ByteString]]):ParseMultiBulkList"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkList</span>
+        
+        <span class="params">(<span name="value">value: List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkList" class="extype">ParseMultiBulkList</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkListFuture" data-isabs="false">
+      <a id="parseMultiBulkListFuture(Future[List[Option[ByteString]]]):ParseMultiBulkListFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkListFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkListFuture" class="extype">ParseMultiBulkListFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkListQueued" data-isabs="false">
+      <a id="parseMultiBulkListQueued(Queued[List[Option[ByteString]]]):ParseMultiBulkListQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkListQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkListQueued" class="extype">ParseMultiBulkListQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkMap" data-isabs="false">
+      <a id="parseMultiBulkMap(Map[ByteString, ByteString]):ParseMultiBulkMap"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkMap</span>
+        
+        <span class="params">(<span name="value">value: Map[<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkMap" class="extype">ParseMultiBulkMap</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkMapFuture" data-isabs="false">
+      <a id="parseMultiBulkMapFuture(Future[Map[ByteString, ByteString]]):ParseMultiBulkMapFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkMapFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[Map[<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkMapFuture" class="extype">ParseMultiBulkMapFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkMapQueued" data-isabs="false">
+      <a id="parseMultiBulkMapQueued(Queued[Map[ByteString, ByteString]]):ParseMultiBulkMapQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkMapQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[Map[<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkMapQueued" class="extype">ParseMultiBulkMapQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkQueued" data-isabs="false">
+      <a id="parseMultiBulkQueued(Queued[Option[List[Option[ByteString]]]]):ParseMultiBulkQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[<span name="scala.Option" class="extype">Option</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkQueued" class="extype">ParseMultiBulkQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkScored" data-isabs="false">
+      <a id="parseMultiBulkScored(List[(ByteString, Double)]):ParseMultiBulkScored"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkScored</span>
+        
+        <span class="params">(<span name="value">value: List[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="scala.Double" class="extype">Double</span>)]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkScored" class="extype">ParseMultiBulkScored</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkScoredFuture" data-isabs="false">
+      <a id="parseMultiBulkScoredFuture(Future[List[(ByteString, Double)]]):ParseMultiBulkScoredFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkScoredFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[List[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="scala.Double" class="extype">Double</span>)]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkScoredFuture" class="extype">ParseMultiBulkScoredFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkScoredQueued" data-isabs="false">
+      <a id="parseMultiBulkScoredQueued(Queued[List[(ByteString, Double)]]):ParseMultiBulkScoredQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkScoredQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[List[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="scala.Double" class="extype">Double</span>)]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkScoredQueued" class="extype">ParseMultiBulkScoredQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkSet" data-isabs="false">
+      <a id="parseMultiBulkSet(Set[ByteString]):ParseMultiBulkSet"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkSet</span>
+        
+        <span class="params">(<span name="value">value: Set[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkSet" class="extype">ParseMultiBulkSet</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkSetFuture" data-isabs="false">
+      <a id="parseMultiBulkSetFuture(Future[Set[ByteString]]):ParseMultiBulkSetFuture"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkSetFuture</span>
+        
+        <span class="params">(<span name="future">future: <span name="akka.dispatch.Future" class="extype">Future</span>[Set[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkSetFuture" class="extype">ParseMultiBulkSetFuture</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.package#parseMultiBulkSetQueued" data-isabs="false">
+      <a id="parseMultiBulkSetQueued(Queued[Set[ByteString]]):ParseMultiBulkSetQueued"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">parseMultiBulkSetQueued</span>
+        
+        <span class="params">(<span name="queued">queued: <a name="net.fyrie.redis.RedisClientMulti.Queued" class="extype" href="RedisClientMulti$Queued.html">Queued</a>[Set[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>)</span><span class="result">: <span name="net.fyrie.redis.ParseMultiBulkSetQueued" class="extype">ParseMultiBulkSetQueued</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>implicit </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.package" class="extype" href="package$.html">package</a></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.serialization" data-isabs="false">
+      <a id="serialization:serialization"></a>
+      <h4 class="signature">
+      <span class="kind">package</span>
+      <span class="symbol"> 
+        <a href="serialization/package.html"><span class="name">serialization</span></a>
         
         
       </span>
-      </a></h4>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.types" data-isabs="false">
+      <a id="types:types"></a>
+      <h4 class="signature">
+      <span class="kind">package</span>
+      <span class="symbol"> 
+        <a href="types/package.html"><span class="name">types</span></a>
+        
+        
+      </span>
+      </h4>
       
     </li></ol>
             </div>
