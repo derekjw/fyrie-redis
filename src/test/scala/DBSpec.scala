@@ -3,7 +3,7 @@ package net.fyrie.redis
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-import akka.dispatch.Promise
+import akka.dispatch.Future
 
 class OperationsSpec extends Spec
     with ShouldMatchers
@@ -110,6 +110,14 @@ class OperationsSpec extends Spec
         } yield x
       }
       result.get should be(List(Some("testvalue1"), Some("testvalue2")))
+    }
+    it("should work with a list of commands") {
+      val values = List.range(1, 100)
+      val result = r.multi { rq =>
+        val setq = (Queued[Any](()) /: values)((q, v) => q flatMap (_ => rq.set(v, v * 2)))
+        (setq.map(_ => List[Future[Option[Int]]]()) /: values)((q, v) => q flatMap (l => rq.get(v).parse[Int].map(_ :: l))).map(_.reverse)
+      }
+      Future.sequence(result).get.flatten should be(values.map(2*))
     }
     it("should throw an error") {
       val result = r.multi{ rq =>
