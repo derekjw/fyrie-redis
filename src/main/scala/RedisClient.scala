@@ -44,10 +44,9 @@ final class RedisClient(host: String = "localhost", port: Int = 6379, val ioMana
     val quiet: RedisClientQuiet = this
   }
 
-  def multi(block: (RedisClientMulti) => Unit): Unit = {
+  def multi[T](block: (RedisClientMulti) => Queued[T]): T = {
     val rq = new RedisClientMulti { val actor = client.actor }
-    block(rq)
-    rq.exec()
+    rq.exec(block(rq))
   }
 }
 
@@ -139,77 +138,69 @@ sealed trait RedisClientQuiet extends Commands {
   final protected implicit def resultAsOkStatus(raw: Unit): Unit = ()
 }
 
+case class Queued[+A] (value: A, requests: List[(ByteString, Promise[RedisType])], responses: List[Promise[RedisType]]) {
+  def flatMap[B](f: A => Queued[B]): Queued[B] = {
+    val result = f(value)
+    result.copy(result.value, this.requests ::: result.requests, this.responses ::: result.responses) // optimize?
+  }
+  def map[B](f: A => B): Queued[B] = Queued(f(value), requests, responses)
+}
+
 sealed trait RedisClientMulti extends Commands {
-  protected type RawResult = Queued[RedisType]
-  type Result[A] = Queued[A]
+  protected type RawResult = Queued[Future[RedisType]]
+  type Result[A] = Queued[Future[A]]
 
-  private object Queued {
-    def apply(promise: Promise[RedisType]) = new Queued(promise,promise)
-    def complete[A](queued: Queued[A], value: Either[Throwable, RedisType]): Unit = queued.promise.complete(value)
-    def isCompleted(queued: Queued[_]): Boolean = queued.promise.isCompleted
-  }
-
-  class Queued[A] private (private val promise: Promise[RedisType], private val result: Future[A]) {
-    def map[B](f: A => B): Queued[B] = new Queued[B](promise, result map f)
-    def <-:(that: Promise[A]): Queued[A] = {
-      result.onComplete(f => that.complete(f.value.get))
-      this
-    }
-  }
-
-  private var requests: List[(ByteString, Promise[RedisType])] = Nil
-  private val responses: Queue[Queued[RedisType]] = Queue.empty
-
-  final protected def send(in: List[ByteString]): Queued[RedisType] = {
+  final protected def send(in: List[ByteString]): Queued[Future[RedisType]] = {
     val status = Promise[RedisType]()
     val statusFuture = status map toStatus
     val bytes = format(in)
-    requests ::= ((bytes, status))
-    val queued = Queued(Promise())
-    statusFuture.onComplete(f => if (f.exception.isDefined) Queued.complete(queued, Left(f.exception.get)))
-    responses enqueue queued
-    queued
+    val result = Promise[RedisType]()
+    statusFuture onException { case e => result.complete(Left(e)) }
+    Queued(result, List((bytes, status)), List(result))
   }
 
-  def exec(): Unit = {
-    actor ? MultiRequest(format(List(Protocol.MULTI)), requests.reverse, format(List(Protocol.EXEC))) foreach {
+  def exec[T](q: Queued[T]): T = {
+    actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
       _ match {
         case RedisMulti(m) =>
+          var responses = q.responses
           for {
             list <- m
             rtype <- list
           } {
-            while (Queued.isCompleted(responses.head)) { responses.dequeue }
-            Queued.complete(responses.dequeue, Right(rtype))
+            while (responses.head.isCompleted) { responses = responses.tail }
+            responses.head complete Right(rtype)
+            responses = responses.tail
           }
         case RedisError(e) =>
           val re = RedisErrorException(e)
-          while (responses.nonEmpty) { Queued.complete(responses.dequeue, Left(re)) }
+          q.responses foreach (_.complete(Left(re)))
         case _ =>
           val re = RedisProtocolException("Unexpected response")
-          while (responses.nonEmpty) { Queued.complete(responses.dequeue, Left(re)) }
+          q.responses foreach (_.complete(Left(re)))
       }
     }
+    q.value
   }
 
-  final protected implicit def resultAsMultiBulk(queued: Queued[RedisType]): Queued[Option[List[Option[ByteString]]]] = queued map toMultiBulk
-  final protected implicit def resultAsMultiBulkList(queued: Queued[RedisType]): Queued[List[Option[ByteString]]] = queued map toMultiBulkList
-  final protected implicit def resultAsMultiBulkFlat(queued: Queued[RedisType]): Queued[Option[List[ByteString]]] = queued map toMultiBulkFlat
-  final protected implicit def resultAsMultiBulkFlatList(queued: Queued[RedisType]): Queued[List[ByteString]] = queued map toMultiBulkFlatList
-  final protected implicit def resultAsMultiBulkSet(queued: Queued[RedisType]): Queued[Set[ByteString]] = queued map toMultiBulkSet
-  final protected implicit def resultAsMultiBulkMap(queued: Queued[RedisType]): Queued[Map[ByteString, ByteString]] = queued map toMultiBulkMap
-  final protected implicit def resultAsMultiBulkScored(queued: Queued[RedisType]): Queued[List[(ByteString, Double)]] = queued map toMultiBulkScored
-  final protected implicit def resultAsMultiBulkSinglePair(queued: Queued[RedisType]): Queued[Option[(ByteString, ByteString)]] = queued map toMultiBulkSinglePair
-  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](queued: Queued[RedisType]): Queued[Option[(K, ByteString)]] = queued map (toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2)))
-  final protected implicit def resultAsBulk(queued: Queued[RedisType]): Queued[Option[ByteString]] = queued map toBulk
-  final protected implicit def resultAsDouble(queued: Queued[RedisType]): Queued[Double] = queued map toDouble
-  final protected implicit def resultAsDoubleOption(queued: Queued[RedisType]): Queued[Option[Double]] = queued map toDoubleOption
-  final protected implicit def resultAsLong(queued: Queued[RedisType]): Queued[Long] = queued map toLong
-  final protected implicit def resultAsInt(queued: Queued[RedisType]): Queued[Int] = queued map (toLong(_).toInt)
-  final protected implicit def resultAsIntOption(queued: Queued[RedisType]): Queued[Option[Int]] = queued map toIntOption
-  final protected implicit def resultAsBool(queued: Queued[RedisType]): Queued[Boolean] = queued map toBool
-  final protected implicit def resultAsStatus(queued: Queued[RedisType]): Queued[String] = queued map toStatus
-  final protected implicit def resultAsOkStatus(queued: Queued[RedisType]): Queued[Unit] = queued map toOkStatus
+  final protected implicit def resultAsMultiBulk(queued: Queued[Future[RedisType]]): Queued[Future[Option[List[Option[ByteString]]]]] = queued map (_ map toMultiBulk)
+  final protected implicit def resultAsMultiBulkList(queued: Queued[Future[RedisType]]): Queued[Future[List[Option[ByteString]]]] = queued map (_ map toMultiBulkList)
+  final protected implicit def resultAsMultiBulkFlat(queued: Queued[Future[RedisType]]): Queued[Future[Option[List[ByteString]]]] = queued map (_ map toMultiBulkFlat)
+  final protected implicit def resultAsMultiBulkFlatList(queued: Queued[Future[RedisType]]): Queued[Future[List[ByteString]]] = queued map (_ map toMultiBulkFlatList)
+  final protected implicit def resultAsMultiBulkSet(queued: Queued[Future[RedisType]]): Queued[Future[Set[ByteString]]] = queued map (_ map toMultiBulkSet)
+  final protected implicit def resultAsMultiBulkMap(queued: Queued[Future[RedisType]]): Queued[Future[Map[ByteString, ByteString]]] = queued map (_ map toMultiBulkMap)
+  final protected implicit def resultAsMultiBulkScored(queued: Queued[Future[RedisType]]): Queued[Future[List[(ByteString, Double)]]] = queued map (_ map toMultiBulkScored)
+  final protected implicit def resultAsMultiBulkSinglePair(queued: Queued[Future[RedisType]]): Queued[Future[Option[(ByteString, ByteString)]]] = queued map (_ map toMultiBulkSinglePair)
+  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](queued: Queued[Future[RedisType]]): Queued[Future[Option[(K, ByteString)]]] = queued map (_ map (toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2))))
+  final protected implicit def resultAsBulk(queued: Queued[Future[RedisType]]): Queued[Future[Option[ByteString]]] = queued map (_ map toBulk)
+  final protected implicit def resultAsDouble(queued: Queued[Future[RedisType]]): Queued[Future[Double]] = queued map (_ map toDouble)
+  final protected implicit def resultAsDoubleOption(queued: Queued[Future[RedisType]]): Queued[Future[Option[Double]]] = queued map (_ map toDoubleOption)
+  final protected implicit def resultAsLong(queued: Queued[Future[RedisType]]): Queued[Future[Long]] = queued map (_ map toLong)
+  final protected implicit def resultAsInt(queued: Queued[Future[RedisType]]): Queued[Future[Int]] = queued map (_ map (toLong(_).toInt))
+  final protected implicit def resultAsIntOption(queued: Queued[Future[RedisType]]): Queued[Future[Option[Int]]] = queued map (_ map toIntOption)
+  final protected implicit def resultAsBool(queued: Queued[Future[RedisType]]): Queued[Future[Boolean]] = queued map (_ map toBool)
+  final protected implicit def resultAsStatus(queued: Queued[Future[RedisType]]): Queued[Future[String]] = queued map (_ map toStatus)
+  final protected implicit def resultAsOkStatus(queued: Queued[Future[RedisType]]): Queued[Future[Unit]] = queued map (_ map toOkStatus)
 
 }
 

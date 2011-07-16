@@ -96,41 +96,43 @@ class OperationsSpec extends Spec
 
   describe("Multi exec commands") {
     it("should work with single commands") {
-      val p = Promise[Unit]()
-      r.multi{ rq =>
-        p <-: rq.set("testkey1", "testvalue1")
+      val result = r.multi{ rq =>
+        rq.set("testkey1", "testvalue1")
       }
-      p.get should be(())
+      result.get should be(())
     }
     it("should work with several commands") {
-      val p = Promise[List[Option[String]]]()
-      r.multi{ rq =>
-        rq.set("testkey1", "testvalue1")
-        rq.set("testkey2", "testvalue2")
-        p <-: rq.mget(List("testkey1", "testkey2")).parse[String]
+      val result = r.multi{ rq =>
+        for {
+          _ <- rq.set("testkey1", "testvalue1")
+          _ <- rq.set("testkey2", "testvalue2")
+          x <- rq.mget(List("testkey1", "testkey2")).parse[String]
+        } yield x
       }
-      p.get should be(List(Some("testvalue1"), Some("testvalue2")))
+      result.get should be(List(Some("testvalue1"), Some("testvalue2")))
     }
     it("should throw an error") {
-      val p1, p2 = Promise[Option[String]]()
-      r.multi{ rq =>
-        rq.set("a", "abc")
-        p1 <-: rq.lpop("a").parse[String]
-        p2 <-: rq.get("a").parse[String]
+      val result = r.multi{ rq =>
+        for {
+          _ <- rq.set("a", "abc")
+          x <- rq.lpop("a").parse[String]
+          y <- rq.get("a").parse[String]
+        } yield (x, y)
       }
-      evaluating { p1.get } should produce[RedisErrorException]
-      p2.get should be(Some("abc"))
+      evaluating { result._1.get } should produce[RedisErrorException]
+      result._2.get should be(Some("abc"))
     }
     it("should handle invalid requests") {
-      val p1, p2 = Promise[List[Option[String]]]()
-      r.multi{ rq =>
-        rq.set("testkey1", "testvalue1")
-        rq.set("testkey2", "testvalue2")
-        p1 <-: rq.mget(List[String]()).parse[String]
-        p2 <-: rq.mget(List("testkey1", "testkey2")).parse[String]
+      val result = r.multi{ rq =>
+        for {
+          _ <- rq.set("testkey1", "testvalue1")
+          _ <- rq.set("testkey2", "testvalue2")
+          x <- rq.mget(List[String]()).parse[String]
+          y <- rq.mget(List("testkey1", "testkey2")).parse[String]
+        } yield (x, y)
       }
-      evaluating { p1.get } should produce[RedisErrorException]
-      p2.get should be(List(Some("testvalue1"), Some("testvalue2")))
+      evaluating { result._1.get } should produce[RedisErrorException]
+      result._2.get should be(List(Some("testvalue1"), Some("testvalue2")))
     }
   }
 
