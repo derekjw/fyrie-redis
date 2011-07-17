@@ -6,9 +6,11 @@ name := "fyrie-redis"
 
 organization := "net.fyrie"
 
-version := "2.0-SNAPSHOT"
+version := "1.1-SNAPSHOT"
 
-libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-SNAPSHOT" % "compile",
+resolvers += "Akka Repo" at "http://akka.io/repository"
+
+libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.1.3" % "compile",
                             "org.scalatest" % "scalatest_2.9.0" % "1.6.1" % "test")
 
 autoCompilerPlugins := true

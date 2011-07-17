@@ -10,7 +10,7 @@ import serialization.Parse
 import akka.actor.{Actor,ActorRef,IOManager,PoisonPill}
 import Actor.{actorOf}
 import akka.util.ByteString
-import akka.dispatch.{Future, Promise}
+import akka.dispatch.{Future, DefaultCompletableFuture}
 
 object RedisClient {
   def connect(host: String = "localhost", port: Int = 6379, ioManager: ActorRef = actorOf(new IOManager()).start) =
@@ -60,7 +60,7 @@ sealed trait RedisClientAsync extends Commands {
   protected type RawResult = Future[Any]
   type Result[A] = Future[A]
 
-  final protected def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
+  final protected def send(in: List[ByteString]): Future[Any] = actor !!! Request(format(in))
 
   final protected implicit def resultAsMultiBulk(future: Future[Any]): Future[Option[List[Option[ByteString]]]] = future map toMultiBulk
   final protected implicit def resultAsMultiBulkList(future: Future[Any]): Future[List[Option[ByteString]]] = future map toMultiBulkList
@@ -87,7 +87,7 @@ sealed trait RedisClientSync extends Commands {
   protected type RawResult = Any
   type Result[A] = A
 
-  final protected def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
+  final protected def send(in: List[ByteString]): Any = (actor !!! Request(format(in))).get
 
   final protected implicit def resultAsMultiBulk(raw: Any): Option[List[Option[ByteString]]] = toMultiBulk(raw)
   final protected implicit def resultAsMultiBulkList(raw: Any): List[Option[ByteString]] = toMultiBulkList(raw)
@@ -137,7 +137,7 @@ sealed trait RedisClientQuiet extends Commands {
 }
 
 object Queued {
-  def apply[A](value: A, request: (ByteString, Promise[RedisType]), response: Promise[RedisType]): Queued[A] =
+  def apply[A](value: A, request: (ByteString, DefaultCompletableFuture[RedisType]), response: DefaultCompletableFuture[RedisType]): Queued[A] =
     new QueuedSingle(value, request, response)
   def apply[A](value: A): Queued[A] = new QueuedValue(value)
 
@@ -148,7 +148,7 @@ object Queued {
     def map[B](f: A => B): Queued[B] = new QueuedValue(f(value))
   }
 
-  final class QueuedSingle[+A] (val value: A, val request: (ByteString, Promise[RedisType]), val response: Promise[RedisType]) extends Queued[A] {
+  final class QueuedSingle[+A] (val value: A, val request: (ByteString, DefaultCompletableFuture[RedisType]), val response: DefaultCompletableFuture[RedisType]) extends Queued[A] {
     def requests = Vector(request)
     def responses = Vector(response)
     def flatMap[B](f: A => Queued[B]): Queued[B] = {
@@ -158,7 +158,7 @@ object Queued {
     def map[B](f: A => B): Queued[B] = new QueuedSingle(f(value), request, response)
   }
 
-  final class QueuedList[+A] (val value: A, val requests: Vector[(ByteString, Promise[RedisType])], val responses: Vector[Promise[RedisType]]) extends Queued[A] {
+  final class QueuedList[+A] (val value: A, val requests: Vector[(ByteString, DefaultCompletableFuture[RedisType])], val responses: Vector[DefaultCompletableFuture[RedisType]]) extends Queued[A] {
     def flatMap[B](f: A => Queued[B]): Queued[B] = {
       f(value) match {
         case that: QueuedList[_] =>
@@ -175,8 +175,8 @@ object Queued {
 
 sealed trait Queued[+A] {
   def value: A
-  def requests: Vector[(ByteString, Promise[RedisType])]
-  def responses: Vector[Promise[RedisType]]
+  def requests: Vector[(ByteString, DefaultCompletableFuture[RedisType])]
+  def responses: Vector[DefaultCompletableFuture[RedisType]]
   def flatMap[B](f: A => Queued[B]): Queued[B]
   def map[B](f: A => B): Queued[B]
 }
@@ -186,17 +186,17 @@ sealed trait RedisClientMulti extends Commands {
   type Result[A] = Queued[Future[A]]
 
   final protected def send(in: List[ByteString]): Queued[Future[RedisType]] = {
-    val status = Promise[RedisType]()
+    val status = Future.empty[RedisType]()
     val statusFuture = status map toStatus
     val bytes = format(in)
-    val result = Promise[RedisType]()
-    statusFuture onException { case e => result.complete(Left(e)) }
+    val result = Future.empty[RedisType]()
+    statusFuture onComplete { _.value.get match { case Left(e) => result.complete(Left(e)); case _ => } }
     Queued(result, (bytes, status), result)
   }
 
   def exec[T](q: Queued[T]): T = {
-    actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
-      _ match {
+    actor !!! MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
+      (_: Any) match {
         case RedisMulti(m) =>
           var responses = q.responses
           for {
