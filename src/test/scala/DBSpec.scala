@@ -94,6 +94,26 @@ class OperationsSpec extends Spec
     }
   }
 
+  describe("quit") {
+    it("should reconnect") {
+      r.quit
+      r.set("key1", "value1")
+      r.quit
+      r.sync.get("key1").parse[String] should be(Some("value1"))
+    }
+    it("should reconnect with many commands") {
+      (1 to 1000) foreach (_ => r.incr("incKey"))
+      val result1 = r.get("incKey").parse[Int]
+      r.quit
+      (1001 to 2000) foreach (_ => r.incr("incKey"))
+      r.sync.get("incKey").parse[Int] should be(Some(2000))
+      result1.get should be(Some(1000))
+      /*r.quit
+      val results3 = list3 map (_ => r.incr("incKey"))
+      r.sync.get("incKey").parse[Int] should be(Some(300))*/
+    }
+  }
+
   describe("Multi exec commands") {
     it("should work with single commands") {
       val result = r.multi{ rq =>
