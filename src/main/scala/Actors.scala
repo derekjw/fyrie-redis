@@ -14,7 +14,7 @@ import scala.util.continuations._
 
 import scala.collection.mutable.Queue
 
-final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) extends Actor {
+final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
 
   var socket: IO.SocketHandle = _
   var worker: ActorRef = _
@@ -22,7 +22,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) ext
   val waiting = Queue.empty[RequestMessage]
 
   override def preStart = {
-    worker = actorOf(new RedisClientWorker(ioManager, host, port))
+    worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
     self startLink worker
     socket = IO.connect(ioManager, host, port, worker)
     worker ! Socket(socket)
@@ -32,19 +32,21 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) ext
     case req: Request =>
       socket write req.bytes
       worker forward Run
-      waiting enqueue req
+      if (config.retryOnReconnect) waiting enqueue req
     case req: MultiRequest =>
       sendMulti(req)
       worker forward MultiRun(req.cmds.map(_._2))
-      waiting enqueue req
+      if (config.retryOnReconnect) waiting enqueue req
     case Received =>
       waiting.dequeue
     case Socket(handle) =>
       //println("Retrying "+waiting.length+" commands")
       socket = handle
-      waiting foreach {
-        case req: Request      => socket write req.bytes
-        case req: MultiRequest => sendMulti(req)
+      if (config.retryOnReconnect) {
+        waiting foreach {
+          case req: Request      => socket write req.bytes
+          case req: MultiRequest => sendMulti(req)
+        }
       }
     case Disconnect =>
       worker ! Disconnect
@@ -61,7 +63,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) ext
 
 }
 
-final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int) extends Actor with IO {
+final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor with IO {
   import Protocol._
 
   var socket: IO.SocketHandle = _
@@ -71,13 +73,17 @@ final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int) exte
       socket = handle
     case IO.Closed(handle) if socket == handle =>
       //println("Connection closed, reconnecting...")
-      socket = IO.connect(ioManager, host, port, self)
-      self.supervisor foreach (_ ! Socket(socket))
-      retry
+      if (config.autoReconnect) {
+        socket = IO.connect(ioManager, host, port, self)
+        self.supervisor foreach (_ ! Socket(socket))
+        retry
+      } else {
+        self.supervisor foreach (_ ! Disconnect)
+      }
     case Run =>
       val result = readResult
       self reply_? result
-      self.supervisor foreach (_ ! Received)
+      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
     case msg: MultiRun =>
       val multi = readResult
       var promises = msg.promises
@@ -89,7 +95,7 @@ final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int) exte
       }
       val exec = readResult
       self reply_? exec
-      self.supervisor foreach (_ ! Received)
+      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
     case Disconnect =>
       socket.close
       self.stop()

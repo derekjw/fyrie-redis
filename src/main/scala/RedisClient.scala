@@ -12,15 +12,19 @@ import Actor.{actorOf}
 import akka.util.ByteString
 import akka.dispatch.{Future, DefaultCompletableFuture}
 
+case class RedisClientConfig(timeout: Long = 5000,
+                             autoReconnect: Boolean = true,
+                             retryOnReconnect: Boolean = true)
+
 object RedisClient {
-  def connect(host: String = "localhost", port: Int = 6379, ioManager: ActorRef = actorOf(new IOManager()).start) =
-    new RedisClient(host, port, ioManager)
+  def connect(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
+    new RedisClient(host, port, config, ioManager)
 }
 
-final class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync with FlexibleRedisClient {
+final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync with FlexibleRedisClient {
   client =>
 
-  final protected val actor = actorOf(new RedisClientSession(ioManager, host, port)).start
+  final protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
 
   def disconnect = actor ! Disconnect
 
