@@ -194,6 +194,10 @@ trait Keys {
    */
   def auth[A: Store](secret: A): Result[Unit] = send(AUTH :: Store(secret) :: Nil)
 
+  def ping(): Result[Unit] = send(PING :: Nil)
+
+  def echo[A: Store](value: A): Result[Option[ByteString]] = send(ECHO :: Store(value) :: Nil)
+
   /**
    * Sorts the elements contained in a List, Set, or Sorted Set value at `key`.
    *
