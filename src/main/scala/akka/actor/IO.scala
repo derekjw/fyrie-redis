@@ -372,7 +372,13 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
         case channel: ReadChannel ⇒ read(handle.asReadable, channel)
       }
       if (key.isWritable) key.channel match {
-        case channel: WriteChannel ⇒ write(handle.asWritable, channel)
+        case channel: WriteChannel ⇒
+          try {
+            write(handle.asWritable, channel)
+          } catch {
+            case e: IOException => // ignore, let it fail on read to ensure
+                                   // nothing left in read buffer.
+          }
       }
     } catch {
       case e: CancelledKeyException ⇒ cleanup(handle)
@@ -387,7 +393,6 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
     }
     channels.get(handle) match {
       case Some(channel) ⇒
-        channel.keyFor(selector).cancel
         channel.close
         channels -= handle
         handle.owner ! IO.Closed(handle)
