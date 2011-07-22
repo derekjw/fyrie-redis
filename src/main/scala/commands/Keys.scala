@@ -194,7 +194,7 @@ trait Keys {
    */
   def auth[A: Store](secret: A): Result[Unit] = send(AUTH :: Store(secret) :: Nil)
 
-  def ping(): Result[Unit] = send(PING :: Nil)
+  def ping(): Result[String] = send(PING :: Nil)
 
   def echo[A: Store](value: A): Result[Option[ByteString]] = send(ECHO :: Store(value) :: Nil)
 
