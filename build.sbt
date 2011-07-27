@@ -8,7 +8,9 @@ organization := "net.fyrie"
 
 version := "2.0-SNAPSHOT"
 
-libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-SNAPSHOT" % "compile",
+resolvers += "Akka Snapshots" at "http://repo.typesafe.com/typesafe/maven-timestamps"
+
+libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-20110727-000355" % "compile",
                             "org.scalatest" % "scalatest_2.9.0" % "1.6.1" % "test")
 
 autoCompilerPlugins := true

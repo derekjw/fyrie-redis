@@ -50,7 +50,7 @@ final class RedisClientWorker extends Actor with IO {
       socket = handle
     case Run =>
       val result = readResult
-      self reply_? result
+      self tryReply result
     case msg: MultiRun =>
       val multi = readResult
       var promises = msg.promises
@@ -61,7 +61,7 @@ final class RedisClientWorker extends Actor with IO {
         () // TODO: fix this in akka.util.cps.whileC
       }
       val exec = readResult
-      self reply_? exec
+      self tryReply exec
     case Disconnect =>
       socket.close
       self.stop()
