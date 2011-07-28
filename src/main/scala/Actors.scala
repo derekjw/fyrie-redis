@@ -57,7 +57,8 @@ final class RedisClientWorker extends Actor with IO {
       whileC(promises.nonEmpty) {
         val promise = promises.head
         promises = promises.tail
-        promise completeWithResult readResult
+        val result = readResult
+        promise completeWithResult result
         () // TODO: fix this in akka.util.cps.whileC
       }
       val exec = readResult
