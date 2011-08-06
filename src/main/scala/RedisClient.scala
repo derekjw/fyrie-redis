@@ -7,20 +7,24 @@ import Protocol.EOL
 import types._
 import serialization.Parse
 
-import akka.actor.{Actor,ActorRef,IOManager,PoisonPill}
+import akka.actor.{Actor,ActorRef,IOManager,PoisonPill,Timeout}
 import Actor.{actorOf}
 import akka.util.ByteString
 import akka.dispatch.{Future, Promise}
 
+case class RedisClientConfig(timeout: Timeout = implicitly,
+                             autoReconnect: Boolean = true,
+                             retryOnReconnect: Boolean = true)
+
 object RedisClient {
-  def connect(host: String = "localhost", port: Int = 6379, ioManager: ActorRef = actorOf(new IOManager()).start) =
-    new RedisClient(host, port, ioManager)
+  def connect(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
+    new RedisClient(host, port, config, ioManager)
 }
 
-final class RedisClient(host: String = "localhost", port: Int = 6379, val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync with FlexibleRedisClient {
+final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync with FlexibleRedisClient {
   client =>
 
-  final protected val actor = actorOf(new RedisClientSession(ioManager, host, port)).start
+  final protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
 
   def disconnect = actor ! Disconnect
 
@@ -190,13 +194,12 @@ sealed trait RedisClientMulti extends Commands {
     val statusFuture = status map toStatus
     val bytes = format(in)
     val result = Promise[RedisType]()
-    statusFuture onException { case e => result.complete(Left(e)) }
+    statusFuture onException { case e => result complete Left(e) }
     Queued(result, (bytes, status), result)
   }
 
   def exec[T](q: Queued[T]): T = {
     actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
-      _ match {
         case RedisMulti(m) =>
           var responses = q.responses
           for {
@@ -213,7 +216,6 @@ sealed trait RedisClientMulti extends Commands {
         case _ =>
           val re = RedisProtocolException("Unexpected response")
           q.responses foreach (_.complete(Left(re)))
-      }
     }
     q.value
   }

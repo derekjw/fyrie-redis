@@ -3,6 +3,8 @@ package serialization
 
 import akka.util.ByteString
 
+import java.util.Date
+
 trait Store[A] {
   def apply(value: A): ByteString
 }
@@ -20,6 +22,7 @@ object Store {
   implicit val storeLong = Store.asString[Long]
   implicit val storeFloat = Store.asString[Float]
   implicit val storeDouble = Store.asString[Double]
+  implicit val storeDate = new Store[Date] { def apply(value: Date) = storeLong(value.getTime) }
   implicit val storeScore = new Store[RedisScore] {
     def apply(score: RedisScore) = score match {
       case _ if score.value == Double.PositiveInfinity => Protocol.INFPOS
@@ -57,4 +60,5 @@ object Parse {
   implicit val parseLong = new Parse[Long] { def apply(bytes: ByteString) = bytes.utf8String.toLong }
   implicit val parseFloat = new Parse[Float] { def apply(bytes: ByteString) = bytes.utf8String.toFloat }
   implicit val parseDouble = new Parse[Double] { def apply(bytes: ByteString) = bytes.utf8String.toDouble }
+  implicit val parseDate = new Parse[Date] { def apply(bytes: ByteString) = new Date(parseLong(bytes)) }
 }

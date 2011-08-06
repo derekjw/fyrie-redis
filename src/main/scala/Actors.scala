@@ -12,35 +12,58 @@ import akka.util.cps._
 
 import scala.util.continuations._
 
-final class RedisClientSession(ioManager: ActorRef, host: String, port: Int) extends Actor {
+import scala.collection.mutable.Queue
+
+final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
 
   var socket: IO.SocketHandle = _
   var worker: ActorRef = _
 
+  val waiting = Queue.empty[RequestMessage]
+
   override def preStart = {
-    worker = self startLink actorOf(new RedisClientWorker)
+    worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
+    self startLink worker
     socket = IO.connect(ioManager, host, port, worker)
     worker ! Socket(socket)
   }
 
   def receive = {
-    case Request(bytes) =>
-      socket write bytes
+    case req: Request =>
+      socket write req.bytes
       worker forward Run
-    case MultiRequest(multi, cmds, exec) =>
-      socket write multi
-      cmds foreach {cmd =>
-        socket write cmd._1
+      if (config.retryOnReconnect) waiting enqueue req
+    case req: MultiRequest =>
+      sendMulti(req)
+      worker forward MultiRun(req.cmds.map(_._2))
+      if (config.retryOnReconnect) waiting enqueue req
+    case Received =>
+      waiting.dequeue
+    case Socket(handle) =>
+      //println("Retrying "+waiting.length+" commands")
+      socket = handle
+      if (config.retryOnReconnect) {
+        waiting foreach {
+          case req: Request      => socket write req.bytes
+          case req: MultiRequest => sendMulti(req)
+        }
       }
-      socket write exec
-      worker forward MultiRun(cmds.map(_._2))
     case Disconnect =>
+      worker ! Disconnect
       self.stop()
+  }
+
+  def sendMulti(req: MultiRequest): Unit = {
+    socket write req.multi
+    req.cmds foreach {cmd =>
+      socket write cmd._1
+    }
+    socket write req.exec
   }
 
 }
 
-final class RedisClientWorker extends Actor with IO {
+final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor with IO {
   import Protocol._
 
   var socket: IO.SocketHandle = _
@@ -48,9 +71,19 @@ final class RedisClientWorker extends Actor with IO {
   def receiveIO: ReceiveIO = {
     case Socket(handle) =>
       socket = handle
+    case IO.Closed(handle) if socket == handle =>
+      //println("Connection closed, reconnecting...")
+      if (config.autoReconnect) {
+        socket = IO.connect(ioManager, host, port, self)
+        self.supervisor foreach (_ ! Socket(socket))
+        retry
+      } else {
+        self.supervisor foreach (_ ! Disconnect)
+      }
     case Run =>
       val result = readResult
       self tryReply result
+      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
     case msg: MultiRun =>
       val multi = readResult
       var promises = msg.promises
@@ -59,10 +92,10 @@ final class RedisClientWorker extends Actor with IO {
         promises = promises.tail
         val result = readResult
         promise completeWithResult result
-        () // TODO: fix this in akka.util.cps.whileC
       }
       val exec = readResult
       self tryReply exec
+      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
     case Disconnect =>
       socket.close
       self.stop()
