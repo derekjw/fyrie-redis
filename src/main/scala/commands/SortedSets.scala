@@ -51,13 +51,13 @@ trait SortedSets {
   def zrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[ByteString]] =
     send(ZRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: (limit match {
       case NoLimit => Nil
-      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrangebyscoreWithScores[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[(ByteString, Double)]] =
     send(ZRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: WITHSCORES :: (limit match {
       case NoLimit => Nil
-      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrank[K: Store, M: Store](key: K, member: M): Result[Option[Int]] =
@@ -81,13 +81,13 @@ trait SortedSets {
   def zrevrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[ByteString]] =
     send(ZREVRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: (limit match {
       case NoLimit => Nil
-      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrevrangebyscoreWithScores[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[(ByteString, Double)]] =
     send(ZREVRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: WITHSCORES :: (limit match {
       case NoLimit => Nil
-      case Limit(o,c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrevrank[K: Store, M: Store](key: K, member: M): Result[Option[Int]] =

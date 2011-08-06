@@ -1,7 +1,7 @@
 package net.fyrie
 
 import akka.util.ByteString
-import akka.dispatch.{Future, Promise}
+import akka.dispatch.{ Future, Promise }
 import redis.serialization.Parse
 
 package object redis {

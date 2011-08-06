@@ -36,15 +36,15 @@ trait Strings {
     send(INCRBY :: Store(key) :: Store(increment) :: Nil)
 
   def mget[K: Store](keys: Seq[K]): Result[List[Option[ByteString]]] =
-    send(MGET :: (keys.map(Store(_))(collection.breakOut): List[ByteString]) )
+    send(MGET :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
 
   def mset[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Unit] =
-    send(MSET :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]) )
+    send(MSET :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]))
 
   def msetnx[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Boolean] =
-    send(MSETNX :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]) )
+    send(MSETNX :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]))
 
-  def set[K: Store,V: Store](key: K, value: V): Result[Unit] =
+  def set[K: Store, V: Store](key: K, value: V): Result[Unit] =
     send(SET :: Store(key) :: Store(value) :: Nil)
 
   def setbit[K: Store](key: K, offset: Int, value: Int): Result[Int] =

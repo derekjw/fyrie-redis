@@ -2,19 +2,19 @@ package net.fyrie
 package redis
 
 import actors._
-import messages.{Request, MultiRequest, Disconnect}
+import messages.{ Request, MultiRequest, Disconnect }
 import Protocol.EOL
 import types._
 import serialization.Parse
 
-import akka.actor.{Actor,ActorRef,IOManager,PoisonPill,Timeout}
-import Actor.{actorOf}
+import akka.actor.{ Actor, ActorRef, IOManager, PoisonPill, Timeout }
+import Actor.{ actorOf }
 import akka.util.ByteString
-import akka.dispatch.{Future, Promise}
+import akka.dispatch.{ Future, Promise }
 
 case class RedisClientConfig(timeout: Timeout = implicitly,
-                             autoReconnect: Boolean = true,
-                             retryOnReconnect: Boolean = true)
+  autoReconnect: Boolean = true,
+  retryOnReconnect: Boolean = true)
 
 object RedisClient {
   def connect(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
@@ -145,14 +145,14 @@ object Queued {
     new QueuedSingle(value, request, response)
   def apply[A](value: A): Queued[A] = new QueuedValue(value)
 
-  final class QueuedValue[+A] (val value: A) extends Queued[A] {
+  final class QueuedValue[+A](val value: A) extends Queued[A] {
     def requests = Vector.empty
     def responses = Vector.empty
     def flatMap[B](f: A => Queued[B]): Queued[B] = f(value)
     def map[B](f: A => B): Queued[B] = new QueuedValue(f(value))
   }
 
-  final class QueuedSingle[+A] (val value: A, val request: (ByteString, Promise[RedisType]), val response: Promise[RedisType]) extends Queued[A] {
+  final class QueuedSingle[+A](val value: A, val request: (ByteString, Promise[RedisType]), val response: Promise[RedisType]) extends Queued[A] {
     def requests = Vector(request)
     def responses = Vector(response)
     def flatMap[B](f: A => Queued[B]): Queued[B] = {
@@ -162,7 +162,7 @@ object Queued {
     def map[B](f: A => B): Queued[B] = new QueuedSingle(f(value), request, response)
   }
 
-  final class QueuedList[+A] (val value: A, val requests: Vector[(ByteString, Promise[RedisType])], val responses: Vector[Promise[RedisType]]) extends Queued[A] {
+  final class QueuedList[+A](val value: A, val requests: Vector[(ByteString, Promise[RedisType])], val responses: Vector[Promise[RedisType]]) extends Queued[A] {
     def flatMap[B](f: A => Queued[B]): Queued[B] = {
       f(value) match {
         case that: QueuedList[_] =>
@@ -200,22 +200,22 @@ sealed trait RedisClientMulti extends Commands {
 
   def exec[T](q: Queued[T]): T = {
     actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
-        case RedisMulti(m) =>
-          var responses = q.responses
-          for {
-            list <- m
-            rtype <- list
-          } {
-            while (responses.head.isCompleted) { responses = responses.tail }
-            responses.head complete Right(rtype)
-            responses = responses.tail
-          }
-        case RedisError(e) =>
-          val re = RedisErrorException(e)
-          q.responses foreach (_.complete(Left(re)))
-        case _ =>
-          val re = RedisProtocolException("Unexpected response")
-          q.responses foreach (_.complete(Left(re)))
+      case RedisMulti(m) =>
+        var responses = q.responses
+        for {
+          list <- m
+          rtype <- list
+        } {
+          while (responses.head.isCompleted) { responses = responses.tail }
+          responses.head complete Right(rtype)
+          responses = responses.tail
+        }
+      case RedisError(e) =>
+        val re = RedisErrorException(e)
+        q.responses foreach (_.complete(Left(re)))
+      case _ =>
+        val re = RedisProtocolException("Unexpected response")
+        q.responses foreach (_.complete(Left(re)))
     }
     q.value
   }
@@ -241,7 +241,6 @@ sealed trait RedisClientMulti extends Commands {
 
 }
 
-
 import commands._
 sealed trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
   protected type RawResult
@@ -256,9 +255,9 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
     var cmd = ByteString.empty
     in foreach { bytes =>
       count += 1
-      cmd ++= ByteString("$"+bytes.length) ++ EOL ++ bytes ++ EOL
+      cmd ++= ByteString("$" + bytes.length) ++ EOL ++ bytes ++ EOL
     }
-    ByteString("*"+count) ++ EOL ++ cmd
+    ByteString("*" + count) ++ EOL ++ cmd
   }
 
   protected implicit def resultAsMultiBulk(raw: RawResult): Result[Option[List[Option[ByteString]]]]
@@ -332,7 +331,7 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
   }
 
   final protected val toMultiBulkSinglePair: Any => Option[(ByteString, ByteString)] = _ match {
-    case RedisMulti(Some(List(RedisBulk(Some(a)),RedisBulk(Some(b))))) => Some((a,b))
+    case RedisMulti(Some(List(RedisBulk(Some(a)), RedisBulk(Some(b))))) => Some((a, b))
     case RedisMulti(_) => None
     case RedisError(e) => throw RedisErrorException(e)
     case _ => throw RedisProtocolException("Unexpected response")
@@ -389,7 +388,6 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
     case _ => throw RedisProtocolException("Unexpected response")
   }
 }
-
 
 case class RedisErrorException(message: String) extends RuntimeException(message)
 case class RedisProtocolException(message: String) extends RuntimeException(message)

@@ -42,7 +42,7 @@ trait Sets {
     send(SRANDMEMBER :: Store(key) :: Nil)
 
   def srem[K: Store, V: Store](key: K, value: V): Result[Boolean] =
-    send(SREM :: Store(key):: Store(value) :: Nil)
+    send(SREM :: Store(key) :: Store(value) :: Nil)
 
   def sunion[K: Store](keys: Iterable[K]): Result[Set[ByteString]] =
     send(SUNION :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))

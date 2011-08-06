@@ -221,7 +221,7 @@ trait Keys {
     order foreach (o => cmd ::= Store(o))
     get.reverse foreach (g => cmd = GET :: Store(g) :: cmd)
     limit match {
-      case Limit(o,c) => cmd = LIMIT :: Store(o) :: Store(c) :: cmd
+      case Limit(o, c) => cmd = LIMIT :: Store(o) :: Store(c) :: cmd
       case NoLimit =>
     }
     by foreach (b => cmd = BY :: Store(b) :: cmd)

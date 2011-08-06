@@ -44,7 +44,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, con
       socket = handle
       if (config.retryOnReconnect) {
         waiting foreach {
-          case req: Request      => socket write req.bytes
+          case req: Request => socket write req.bytes
           case req: MultiRequest => sendMulti(req)
         }
       }
@@ -55,7 +55,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, con
 
   def sendMulti(req: MultiRequest): Unit = {
     socket write req.multi
-    req.cmds foreach {cmd =>
+    req.cmds foreach { cmd =>
       socket write cmd._1
     }
     socket write req.exec
