@@ -3,9 +3,9 @@ package net.fyrie.redis
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class ListOperationsSpec extends Spec 
-                           with ShouldMatchers
-                           with RedisTestServer {
+class ListOperationsSpec extends Spec
+  with ShouldMatchers
+  with RedisTestServer {
 
   describe("lpush") {
     it("should add to the head of the list") {
@@ -14,7 +14,7 @@ class ListOperationsSpec extends Spec
     }
     it("should throw if the key has a non-list value") {
       r.set("anshin-1", "debasish")
-      val thrown = evaluating { r.sync.lpush("anshin-1", "bar") } should produce [Exception]
+      val thrown = evaluating { r.sync.lpush("anshin-1", "bar") } should produce[Exception]
       thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }
@@ -26,7 +26,7 @@ class ListOperationsSpec extends Spec
     }
     it("should throw if the key has a non-list value") {
       r.set("anshin-1", "debasish")
-      val thrown = evaluating { r.sync.rpush("anshin-1", "bar") } should produce [Exception]
+      val thrown = evaluating { r.sync.rpush("anshin-1", "bar") } should produce[Exception]
       thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }
@@ -42,7 +42,7 @@ class ListOperationsSpec extends Spec
     }
     it("should throw for a non-list key") {
       r.set("anshin-1", "debasish")
-      val thrown = evaluating { r.sync.llen("anshin-1") } should produce [Exception]
+      val thrown = evaluating { r.sync.llen("anshin-1") } should produce[Exception]
       thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }
@@ -138,7 +138,7 @@ class ListOperationsSpec extends Spec
       r.sync.lpush("list-1", "6") should equal(1)
       r.sync.lpush("list-1", "5") should equal(2)
       r.sync.lpush("list-1", "4") should equal(3)
-      val thrown = evaluating { r.sync.lset("list-1", 12, "30") } should produce [Exception]
+      val thrown = evaluating { r.sync.lset("list-1", 12, "30") } should produce[Exception]
       thrown.getMessage should equal("ERR index out of range")
     }
   }
@@ -260,13 +260,13 @@ class ListOperationsSpec extends Spec
   }
 
   /**
-  describe("blpop") {
-    it ("should do") {
-      r.sync.lpush("l1", "a") should equal(true)
-      r.sync.lpop("l1")
-      r.sync.llen("l1") should equal(Some(0))
-    }
-  }
-**/
+   * describe("blpop") {
+   * it ("should do") {
+   * r.sync.lpush("l1", "a") should equal(true)
+   * r.sync.lpop("l1")
+   * r.sync.llen("l1") should equal(Some(0))
+   * }
+   * }
+   */
 }
 

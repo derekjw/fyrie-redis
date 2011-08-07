@@ -3,9 +3,9 @@ package net.fyrie.redis
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class StringOperationsSpec extends Spec 
-                           with ShouldMatchers
-                           with RedisTestServer {
+class StringOperationsSpec extends Spec
+  with ShouldMatchers
+  with RedisTestServer {
 
   describe("set") {
     it("should set key/value pairs") {
@@ -104,22 +104,22 @@ class StringOperationsSpec extends Spec
   describe("mset") {
     it("should set all keys irrespective of whether they exist") {
       r.sync.mset(Map(
-        ("anshin-1", "debasish"), 
+        ("anshin-1", "debasish"),
         ("anshin-2", "maulindu"),
         ("anshin-3", "nilanjan")))
     }
 
     it("should set all keys only if none of them exist") {
       r.sync.msetnx(Map(
-        ("anshin-4", "debasish"), 
+        ("anshin-4", "debasish"),
         ("anshin-5", "maulindu"),
         ("anshin-6", "nilanjan"))) should equal(true)
       r.sync.msetnx(Map(
-        ("anshin-7", "debasish"), 
+        ("anshin-7", "debasish"),
         ("anshin-8", "maulindu"),
         ("anshin-6", "nilanjan"))) should equal(false)
       r.sync.msetnx(Map(
-        ("anshin-4", "debasish"), 
+        ("anshin-4", "debasish"),
         ("anshin-5", "maulindu"),
         ("anshin-6", "nilanjan"))) should equal(false)
     }
