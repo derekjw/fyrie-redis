@@ -65,8 +65,7 @@ sealed trait RedisClientAsync extends Commands {
 
   final protected def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
-  final protected def rawToResult[A](raw: Future[Any], f: Any => A): Future[A] = raw map f
-
+  final protected def mapResult[A, B](result: Result[A], f: A => B) = result map f
 }
 
 sealed trait RedisClientSync extends Commands {
@@ -74,8 +73,7 @@ sealed trait RedisClientSync extends Commands {
 
   final protected def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
 
-  final protected def rawToResult[A](raw: Any, f: Any => A): A = f(raw)
-
+  final protected def mapResult[A, B](result: Result[A], f: A => B) = f(result)
 }
 
 sealed trait RedisClientQuiet extends Commands {
@@ -83,8 +81,7 @@ sealed trait RedisClientQuiet extends Commands {
 
   final protected def send(in: List[ByteString]) = actor ! Request(format(in))
 
-  final protected def rawToResult[A](raw: Unit, f: Any => A): Unit = ()
-
+  final protected def mapResult[A, B](result: Result[A], f: A => B) = ()
 }
 
 object Queued {
@@ -166,7 +163,7 @@ sealed trait RedisClientMulti extends Commands {
     q.value
   }
 
-  final protected def rawToResult[A](raw: Queued[Future[Any]], f: Any => A): Queued[Future[A]] = raw map (_ map f)
+  final protected def mapResult[A, B](result: Result[A], f: A => B) = result map (_ map f)
 
 }
 
@@ -188,26 +185,26 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
     ByteString("*" + count) ++ EOL ++ cmd
   }
 
-  protected def rawToResult[A](raw: Result[Any], f: Any => A): Result[A]
+  protected def mapResult[A, B](result: Result[A], f: A => B): Result[B]
 
-  protected implicit def resultAsMultiBulk(raw: Result[Any]): Result[Option[List[Option[ByteString]]]] = rawToResult(raw, toMultiBulk)
-  protected implicit def resultAsMultiBulkList(raw: Result[Any]): Result[List[Option[ByteString]]] = rawToResult(raw, toMultiBulkList)
-  protected implicit def resultAsMultiBulkFlat(raw: Result[Any]): Result[Option[List[ByteString]]] = rawToResult(raw, toMultiBulkFlat)
-  protected implicit def resultAsMultiBulkFlatList(raw: Result[Any]): Result[List[ByteString]] = rawToResult(raw, toMultiBulkFlatList)
-  protected implicit def resultAsMultiBulkSet(raw: Result[Any]): Result[Set[ByteString]] = rawToResult(raw, toMultiBulkSet)
-  protected implicit def resultAsMultiBulkMap(raw: Result[Any]): Result[Map[ByteString, ByteString]] = rawToResult(raw, toMultiBulkMap)
-  protected implicit def resultAsMultiBulkScored(raw: Result[Any]): Result[List[(ByteString, Double)]] = rawToResult(raw, toMultiBulkScored)
-  protected implicit def resultAsMultiBulkSinglePair(raw: Result[Any]): Result[Option[(ByteString, ByteString)]] = rawToResult(raw, toMultiBulkSinglePair)
-  protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Result[Any]): Result[Option[(K, ByteString)]] = rawToResult(raw, toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2)))
-  protected implicit def resultAsBulk(raw: Result[Any]): Result[Option[ByteString]] = rawToResult(raw, toBulk)
-  protected implicit def resultAsDouble(raw: Result[Any]): Result[Double] = rawToResult(raw, toDouble)
-  protected implicit def resultAsDoubleOption(raw: Result[Any]): Result[Option[Double]] = rawToResult(raw, toDoubleOption)
-  protected implicit def resultAsLong(raw: Result[Any]): Result[Long] = rawToResult(raw, toLong)
-  protected implicit def resultAsInt(raw: Result[Any]): Result[Int] = rawToResult(raw, toLong(_).toInt)
-  protected implicit def resultAsIntOption(raw: Result[Any]): Result[Option[Int]] = rawToResult(raw, toIntOption)
-  protected implicit def resultAsBool(raw: Result[Any]): Result[Boolean] = rawToResult(raw, toBool)
-  protected implicit def resultAsStatus(raw: Result[Any]): Result[String] = rawToResult(raw, toStatus)
-  protected implicit def resultAsOkStatus(raw: Result[Any]): Result[Unit] = rawToResult(raw, toOkStatus)
+  final protected implicit def resultAsMultiBulk(raw: Result[Any]): Result[Option[List[Option[ByteString]]]] = mapResult(raw, toMultiBulk)
+  final protected implicit def resultAsMultiBulkList(raw: Result[Any]): Result[List[Option[ByteString]]] = mapResult(raw, toMultiBulkList)
+  final protected implicit def resultAsMultiBulkFlat(raw: Result[Any]): Result[Option[List[ByteString]]] = mapResult(raw, toMultiBulkFlat)
+  final protected implicit def resultAsMultiBulkFlatList(raw: Result[Any]): Result[List[ByteString]] = mapResult(raw, toMultiBulkFlatList)
+  final protected implicit def resultAsMultiBulkSet(raw: Result[Any]): Result[Set[ByteString]] = mapResult(raw, toMultiBulkSet)
+  final protected implicit def resultAsMultiBulkMap(raw: Result[Any]): Result[Map[ByteString, ByteString]] = mapResult(raw, toMultiBulkMap)
+  final protected implicit def resultAsMultiBulkScored(raw: Result[Any]): Result[List[(ByteString, Double)]] = mapResult(raw, toMultiBulkScored)
+  final protected implicit def resultAsMultiBulkSinglePair(raw: Result[Any]): Result[Option[(ByteString, ByteString)]] = mapResult(raw, toMultiBulkSinglePair)
+  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Result[Any]): Result[Option[(K, ByteString)]] = mapResult(raw, toMultiBulkSinglePair(_: Any).map(kv => (Parse(kv._1), kv._2)))
+  final protected implicit def resultAsBulk(raw: Result[Any]): Result[Option[ByteString]] = mapResult(raw, toBulk)
+  final protected implicit def resultAsDouble(raw: Result[Any]): Result[Double] = mapResult(raw, toDouble)
+  final protected implicit def resultAsDoubleOption(raw: Result[Any]): Result[Option[Double]] = mapResult(raw, toDoubleOption)
+  final protected implicit def resultAsLong(raw: Result[Any]): Result[Long] = mapResult(raw, toLong)
+  final protected implicit def resultAsInt(raw: Result[Any]): Result[Int] = mapResult(raw, toLong(_: Any).toInt)
+  final protected implicit def resultAsIntOption(raw: Result[Any]): Result[Option[Int]] = mapResult(raw, toIntOption)
+  final protected implicit def resultAsBool(raw: Result[Any]): Result[Boolean] = mapResult(raw, toBool)
+  final protected implicit def resultAsStatus(raw: Result[Any]): Result[String] = mapResult(raw, toStatus)
+  final protected implicit def resultAsOkStatus(raw: Result[Any]): Result[Unit] = mapResult(raw, toOkStatus)
 
   final protected val toMultiBulk: Any => Option[List[Option[ByteString]]] = _ match {
     case RedisMulti(m) => m map (_ map toBulk)
