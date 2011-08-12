@@ -65,7 +65,7 @@ sealed trait RedisClientAsync extends Commands {
 
   final protected def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
-  final protected def mapResult[A, B](result: Result[A], f: A => B) = result map f
+  final protected def resultFunctor = ResultFunctor.async
 }
 
 sealed trait RedisClientSync extends Commands {
@@ -73,7 +73,7 @@ sealed trait RedisClientSync extends Commands {
 
   final protected def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
 
-  final protected def mapResult[A, B](result: Result[A], f: A => B) = f(result)
+  final protected def resultFunctor = ResultFunctor.sync
 }
 
 sealed trait RedisClientQuiet extends Commands {
@@ -81,7 +81,7 @@ sealed trait RedisClientQuiet extends Commands {
 
   final protected def send(in: List[ByteString]) = actor ! Request(format(in))
 
-  final protected def mapResult[A, B](result: Result[A], f: A => B) = ()
+  final protected def resultFunctor = ResultFunctor.quiet
 }
 
 object Queued {
@@ -163,13 +163,12 @@ sealed trait RedisClientMulti extends Commands {
     q.value
   }
 
-  final protected def mapResult[A, B](result: Result[A], f: A => B) = result map (_ map f)
-
+  final protected def resultFunctor = ResultFunctor.multi
 }
 
 import commands._
 sealed trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
-  protected type Result[_]
+  type Result[_]
 
   protected def actor: ActorRef
 
@@ -185,7 +184,10 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
     ByteString("*" + count) ++ EOL ++ cmd
   }
 
-  protected def mapResult[A, B](result: Result[A], f: A => B): Result[B]
+  protected def resultFunctor: ResultFunctor[Result]
+
+  @inline
+  private def mapResult[A, B](result: Result[A], f: A => B): Result[B] = resultFunctor.fmap(result)(f)
 
   final protected implicit def resultAsMultiBulk(raw: Result[Any]): Result[Option[List[Option[ByteString]]]] = mapResult(raw, toMultiBulk)
   final protected implicit def resultAsMultiBulkList(raw: Result[Any]): Result[List[Option[ByteString]]] = mapResult(raw, toMultiBulkList)
@@ -319,3 +321,23 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
 case class RedisErrorException(message: String) extends RuntimeException(message)
 case class RedisProtocolException(message: String) extends RuntimeException(message)
 case class RedisConnectionException(message: String) extends RuntimeException(message)
+
+sealed trait ResultFunctor[R[_]] {
+  def fmap[A, B](a: R[A])(f: A => B): R[B]
+}
+
+object ResultFunctor {
+  implicit val async = new ResultFunctor[RedisClientAsync#Result] {
+    def fmap[A, B](a: Future[A])(f: A => B): Future[B] = a map f
+  }
+  implicit val sync = new ResultFunctor[RedisClientSync#Result] {
+    def fmap[A, B](a: A)(f: A => B): B = f(a)
+  }
+  implicit val quiet = new ResultFunctor[RedisClientQuiet#Result] {
+    def fmap[A, B](a: Unit)(f: A => B): Unit = ()
+  }
+  implicit val multi = new ResultFunctor[RedisClientMulti#Result] {
+    def fmap[A, B](a: Queued[Future[A]])(f: A => B): Queued[Future[B]] = a map (_ map f)
+  }
+
+}
