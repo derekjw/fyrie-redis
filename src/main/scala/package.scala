@@ -4,38 +4,25 @@ import akka.util.ByteString
 import akka.dispatch.{ Future, Promise }
 import redis.serialization.Parse
 
-package object redis {
+package object redis extends ImplicitParseLow {
   implicit def doubleToRedisScore(value: Double): RedisScore = InclusiveScore(value)
 
-  implicit def parseBulkFuture(value: Future[Option[ByteString]]): ParseBulk[Future] = new ParseBulk[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkFuture(value: Future[Option[List[Option[ByteString]]]]): ParseMultiBulk[Future] = new ParseMultiBulk[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkListFuture(value: Future[List[Option[ByteString]]]): ParseMultiBulkList[Future] = new ParseMultiBulkList[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkFlatFuture(value: Future[Option[List[ByteString]]]): ParseMultiBulkFlat[Future] = new ParseMultiBulkFlat[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkFlatListFuture(value: Future[List[ByteString]]): ParseMultiBulkFlatList[Future] = new ParseMultiBulkFlatList[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkSetFuture(value: Future[Set[ByteString]]): ParseMultiBulkSet[Future] = new ParseMultiBulkSet[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkMapFuture(value: Future[Map[ByteString, ByteString]]): ParseMultiBulkMap[Future] = new ParseMultiBulkMap[Future](value)(ResultFunctor.async)
-  implicit def parseMultiBulkScoredFuture(value: Future[List[(ByteString, Double)]]): ParseMultiBulkScored[Future] = new ParseMultiBulkScored[Future](value)(ResultFunctor.async)
+  implicit def parseMultiBulk[Result[_]: ResultFunctor](result: Result[Option[List[Option[ByteString]]]]): ParseMultiBulk[Result] = new ParseMultiBulk[Result](result)
+  implicit def parseMultiBulkList[Result[_]: ResultFunctor](result: Result[List[Option[ByteString]]]): ParseMultiBulkList[Result] = new ParseMultiBulkList[Result](result)
+  implicit def parseMultiBulkFlat[Result[_]: ResultFunctor](result: Result[Option[List[ByteString]]]): ParseMultiBulkFlat[Result] = new ParseMultiBulkFlat[Result](result)
+  implicit def parseMultiBulkSet[Result[_]: ResultFunctor](result: Result[Set[ByteString]]): ParseMultiBulkSet[Result] = new ParseMultiBulkSet[Result](result)
+  implicit def parseMultiBulkMap[Result[_]: ResultFunctor](result: Result[Map[ByteString, ByteString]]): ParseMultiBulkMap[Result] = new ParseMultiBulkMap[Result](result)
+  implicit def parseMultiBulkScored[Result[_]: ResultFunctor](result: Result[List[(ByteString, Double)]]): ParseMultiBulkScored[Result] = new ParseMultiBulkScored[Result](result)
 
-  implicit def parseBulk(value: Option[ByteString]) = new ParseBulk[RedisClientSync#Result](value)
-  implicit def parseMultiBulk(value: Option[List[Option[ByteString]]]) = new ParseMultiBulk[RedisClientSync#Result](value)
-  implicit def parseMultiBulkList(value: List[Option[ByteString]]) = new ParseMultiBulkList[RedisClientSync#Result](value)
-  implicit def parseMultiBulkFlat(value: Option[List[ByteString]]) = new ParseMultiBulkFlat[RedisClientSync#Result](value)
-  implicit def parseMultiBulkFlatList(value: List[ByteString]) = new ParseMultiBulkFlatList[RedisClientSync#Result](value)
-  implicit def parseMultiBulkSet(value: Set[ByteString]) = new ParseMultiBulkSet[RedisClientSync#Result](value)
-  implicit def parseMultiBulkMap(value: Map[ByteString, ByteString]) = new ParseMultiBulkMap[RedisClientSync#Result](value)
-  implicit def parseMultiBulkScored(value: List[(ByteString, Double)]) = new ParseMultiBulkScored[RedisClientSync#Result](value)
-
-  implicit def parseBulkQueued(value: Queued[Future[Option[ByteString]]]): ParseBulk[RedisClientMulti#Result] = new ParseBulk[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkQueued(value: Queued[Future[Option[List[Option[ByteString]]]]]): ParseMultiBulk[RedisClientMulti#Result] = new ParseMultiBulk[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkListQueued(value: Queued[Future[List[Option[ByteString]]]]): ParseMultiBulkList[RedisClientMulti#Result] = new ParseMultiBulkList[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkFlatQueued(value: Queued[Future[Option[List[ByteString]]]]): ParseMultiBulkFlat[RedisClientMulti#Result] = new ParseMultiBulkFlat[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkFlatListQueued(value: Queued[Future[List[ByteString]]]): ParseMultiBulkFlatList[RedisClientMulti#Result] = new ParseMultiBulkFlatList[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkSetQueued(value: Queued[Future[Set[ByteString]]]): ParseMultiBulkSet[RedisClientMulti#Result] = new ParseMultiBulkSet[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkMapQueued(value: Queued[Future[Map[ByteString, ByteString]]]): ParseMultiBulkMap[RedisClientMulti#Result] = new ParseMultiBulkMap[RedisClientMulti#Result](value)(ResultFunctor.multi)
-  implicit def parseMultiBulkScoredQueued(value: Queued[Future[List[(ByteString, Double)]]]): ParseMultiBulkScored[RedisClientMulti#Result] = new ParseMultiBulkScored[RedisClientMulti#Result](value)(ResultFunctor.multi)
 }
 
 package redis {
+
+  trait ImplicitParseLow {
+    implicit def parseBulk[Result[_]: ResultFunctor](result: Result[Option[ByteString]]): ParseBulk[Result] = new ParseBulk[Result](result)
+    implicit def parseMultiBulkFlatList[Result[_]: ResultFunctor](result: Result[List[ByteString]]): ParseMultiBulkFlatList[Result] = new ParseMultiBulkFlatList[Result](result)
+  }
+
   object RedisScore {
     val default: RedisScore = InclusiveScore(1.0)
     val max: RedisScore = InclusiveScore(Double.PositiveInfinity)

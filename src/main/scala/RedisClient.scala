@@ -327,16 +327,16 @@ sealed trait ResultFunctor[R[_]] {
 }
 
 object ResultFunctor {
-  implicit val async = new ResultFunctor[RedisClientAsync#Result] {
+  implicit val async = new ResultFunctor[Future] {
     def fmap[A, B](a: Future[A])(f: A => B): Future[B] = a map f
   }
-  implicit val sync = new ResultFunctor[RedisClientSync#Result] {
+  implicit val sync = new ResultFunctor[({ type λ[α] = α })#λ] {
     def fmap[A, B](a: A)(f: A => B): B = f(a)
   }
-  implicit val quiet = new ResultFunctor[RedisClientQuiet#Result] {
+  implicit val quiet = new ResultFunctor[({ type λ[_] = Unit })#λ] {
     def fmap[A, B](a: Unit)(f: A => B): Unit = ()
   }
-  implicit val multi = new ResultFunctor[RedisClientMulti#Result] {
+  implicit val multi = new ResultFunctor[({ type λ[α] = Queued[Future[α]] })#λ] {
     def fmap[A, B](a: Queued[Future[A]])(f: A => B): Queued[Future[B]] = a map (_ map f)
   }
 
