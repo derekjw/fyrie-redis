@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait SortedSets {
-  this: Commands =>
+trait SortedSets[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   def zadd[K: Store, M: Store](key: K, member: M, score: Double = 1.0): Result[Boolean] =

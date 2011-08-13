@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Hashes {
-  this: Commands =>
+trait Hashes[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   def hdel[K: Store, F: Store](key: K, field: F): Result[Boolean] =

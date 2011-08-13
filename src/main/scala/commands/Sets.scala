@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Sets {
-  this: Commands =>
+trait Sets[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   def sadd[K: Store, V: Store](key: K, value: V): Result[Boolean] =

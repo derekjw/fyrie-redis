@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Servers {
-  this: Commands =>
+trait Servers[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   def save(): Result[Unit] = send(SAVE :: Nil)

@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Strings {
-  this: Commands =>
+trait Strings[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   def append[K: Store, V: Store](key: K, value: V): Result[Int] =

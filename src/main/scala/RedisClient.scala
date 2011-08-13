@@ -60,28 +60,36 @@ sealed trait FlexibleRedisClient {
 
 }
 
-sealed trait RedisClientAsync extends Commands {
-  type Result[A] = Future[A]
+sealed abstract class ResultFunctor[R[_]] {
+  def fmap[A, B](a: R[A])(f: A => B): R[B]
+}
 
+object ResultFunctor {
+  implicit val async: ResultFunctor[Future] = new ResultFunctor[Future] {
+    def fmap[A, B](a: Future[A])(f: A => B): Future[B] = a map f
+  }
+  implicit val sync: ResultFunctor[({ type λ[α] = α })#λ] = new ResultFunctor[({ type λ[α] = α })#λ] {
+    def fmap[A, B](a: A)(f: A => B): B = f(a)
+  }
+  implicit val quiet: ResultFunctor[({ type λ[_] = Unit })#λ] = new ResultFunctor[({ type λ[_] = Unit })#λ] {
+    def fmap[A, B](a: Unit)(f: A => B): Unit = ()
+  }
+  implicit val multi: ResultFunctor[({ type λ[α] = Queued[Future[α]] })#λ] = new ResultFunctor[({ type λ[α] = Queued[Future[α]] })#λ] {
+    def fmap[A, B](a: Queued[Future[A]])(f: A => B): Queued[Future[B]] = a map (_ map f)
+  }
+
+}
+
+sealed abstract class RedisClientAsync extends Commands[Future] {
   final protected def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
-
-  final protected def resultFunctor = ResultFunctor.async
 }
 
-sealed trait RedisClientSync extends Commands {
-  type Result[A] = A
-
+sealed abstract class RedisClientSync extends Commands[({ type λ[α] = α })#λ] {
   final protected def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
-
-  final protected def resultFunctor = ResultFunctor.sync
 }
 
-sealed trait RedisClientQuiet extends Commands {
-  type Result[_] = Unit
-
+sealed abstract class RedisClientQuiet extends Commands[({ type λ[_] = Unit })#λ] {
   final protected def send(in: List[ByteString]) = actor ! Request(format(in))
-
-  final protected def resultFunctor = ResultFunctor.quiet
 }
 
 object Queued {
@@ -129,9 +137,7 @@ sealed trait Queued[+A] {
   def map[B](f: A => B): Queued[B]
 }
 
-sealed trait RedisClientMulti extends Commands {
-  type Result[A] = Queued[Future[A]]
-
+sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
   final protected def send(in: List[ByteString]): Queued[Future[Any]] = {
     val status = Promise[RedisType]()
     val statusFuture = status map toStatus
@@ -162,13 +168,10 @@ sealed trait RedisClientMulti extends Commands {
     }
     q.value
   }
-
-  final protected def resultFunctor = ResultFunctor.multi
 }
 
 import commands._
-sealed trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
-  type Result[_]
+sealed abstract class Commands[Result[_]](implicit rf: ResultFunctor[Result]) extends Keys[Result] with Servers[Result] with Strings[Result] with Lists[Result] with Sets[Result] with SortedSets[Result] with Hashes[Result] {
 
   protected def actor: ActorRef
 
@@ -184,10 +187,8 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
     ByteString("*" + count) ++ EOL ++ cmd
   }
 
-  protected def resultFunctor: ResultFunctor[Result]
-
   @inline
-  private def mapResult[A, B](result: Result[A], f: A => B): Result[B] = resultFunctor.fmap(result)(f)
+  private def mapResult[A, B](result: Result[A], f: A => B): Result[B] = rf.fmap(result)(f)
 
   final protected implicit def resultAsMultiBulk(raw: Result[Any]): Result[Option[List[Option[ByteString]]]] = mapResult(raw, toMultiBulk)
   final protected implicit def resultAsMultiBulkList(raw: Result[Any]): Result[List[Option[ByteString]]] = mapResult(raw, toMultiBulkList)
@@ -321,23 +322,3 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
 case class RedisErrorException(message: String) extends RuntimeException(message)
 case class RedisProtocolException(message: String) extends RuntimeException(message)
 case class RedisConnectionException(message: String) extends RuntimeException(message)
-
-sealed trait ResultFunctor[R[_]] {
-  def fmap[A, B](a: R[A])(f: A => B): R[B]
-}
-
-object ResultFunctor {
-  implicit val async = new ResultFunctor[Future] {
-    def fmap[A, B](a: Future[A])(f: A => B): Future[B] = a map f
-  }
-  implicit val sync = new ResultFunctor[({ type λ[α] = α })#λ] {
-    def fmap[A, B](a: A)(f: A => B): B = f(a)
-  }
-  implicit val quiet = new ResultFunctor[({ type λ[_] = Unit })#λ] {
-    def fmap[A, B](a: Unit)(f: A => B): Unit = ()
-  }
-  implicit val multi = new ResultFunctor[({ type λ[α] = Queued[Future[α]] })#λ] {
-    def fmap[A, B](a: Queued[Future[A]])(f: A => B): Queued[Future[B]] = a map (_ map f)
-  }
-
-}

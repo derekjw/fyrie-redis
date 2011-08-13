@@ -4,24 +4,44 @@ import akka.util.ByteString
 import akka.dispatch.{ Future, Promise }
 import redis.serialization.Parse
 
-package object redis extends ImplicitParseLow {
+package object redis {
   implicit def doubleToRedisScore(value: Double): RedisScore = InclusiveScore(value)
 
-  implicit def parseMultiBulk[Result[_]: ResultFunctor](result: Result[Option[List[Option[ByteString]]]]): ParseMultiBulk[Result] = new ParseMultiBulk[Result](result)
-  implicit def parseMultiBulkList[Result[_]: ResultFunctor](result: Result[List[Option[ByteString]]]): ParseMultiBulkList[Result] = new ParseMultiBulkList[Result](result)
-  implicit def parseMultiBulkFlat[Result[_]: ResultFunctor](result: Result[Option[List[ByteString]]]): ParseMultiBulkFlat[Result] = new ParseMultiBulkFlat[Result](result)
-  implicit def parseMultiBulkSet[Result[_]: ResultFunctor](result: Result[Set[ByteString]]): ParseMultiBulkSet[Result] = new ParseMultiBulkSet[Result](result)
-  implicit def parseMultiBulkMap[Result[_]: ResultFunctor](result: Result[Map[ByteString, ByteString]]): ParseMultiBulkMap[Result] = new ParseMultiBulkMap[Result](result)
-  implicit def parseMultiBulkScored[Result[_]: ResultFunctor](result: Result[List[(ByteString, Double)]]): ParseMultiBulkScored[Result] = new ParseMultiBulkScored[Result](result)
+  implicit def parseBulk(result: Option[ByteString]) = new ParseBulk[({ type λ[α] = α })#λ](result)
+  implicit def parseBulk(result: Future[Option[ByteString]]) = new ParseBulk[Future](result)
+  implicit def parseBulk(result: Queued[Future[Option[ByteString]]]) = new ParseBulk[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulk(result: Option[List[Option[ByteString]]]) = new ParseMultiBulk[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulk(result: Future[Option[List[Option[ByteString]]]]) = new ParseMultiBulk[Future](result)
+  implicit def parseMultiBulk(result: Queued[Future[Option[List[Option[ByteString]]]]]) = new ParseMultiBulk[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulkList(result: List[Option[ByteString]]) = new ParseMultiBulkList[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulkList(result: Future[List[Option[ByteString]]]) = new ParseMultiBulkList[Future](result)
+  implicit def parseMultiBulkList(result: Queued[Future[List[Option[ByteString]]]]) = new ParseMultiBulkList[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulkFlat(result: Option[List[ByteString]]) = new ParseMultiBulkFlat[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulkFlat(result: Future[Option[List[ByteString]]]) = new ParseMultiBulkFlat[Future](result)
+  implicit def parseMultiBulkFlat(result: Queued[Future[Option[List[ByteString]]]]) = new ParseMultiBulkFlat[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulkFlatList(result: List[ByteString]) = new ParseMultiBulkFlatList[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulkFlatList(result: Future[List[ByteString]]) = new ParseMultiBulkFlatList[Future](result)
+  implicit def parseMultiBulkFlatList(result: Queued[Future[List[ByteString]]]) = new ParseMultiBulkFlatList[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulkSet(result: Set[ByteString]) = new ParseMultiBulkSet[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulkSet(result: Future[Set[ByteString]]) = new ParseMultiBulkSet[Future](result)
+  implicit def parseMultiBulkSet(result: Queued[Future[Set[ByteString]]]) = new ParseMultiBulkSet[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulkMap(result: Map[ByteString, ByteString]) = new ParseMultiBulkMap[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulkMap(result: Future[Map[ByteString, ByteString]]) = new ParseMultiBulkMap[Future](result)
+  implicit def parseMultiBulkMap(result: Queued[Future[Map[ByteString, ByteString]]]) = new ParseMultiBulkMap[({ type λ[α] = Queued[Future[α]] })#λ](result)
+
+  implicit def parseMultiBulkScored(result: List[(ByteString, Double)]) = new ParseMultiBulkScored[({ type λ[α] = α })#λ](result)
+  implicit def parseMultiBulkScored(result: Future[List[(ByteString, Double)]]) = new ParseMultiBulkScored[Future](result)
+  implicit def parseMultiBulkScored(result: Queued[Future[List[(ByteString, Double)]]]) = new ParseMultiBulkScored[({ type λ[α] = Queued[Future[α]] })#λ](result)
 
 }
 
 package redis {
-
-  trait ImplicitParseLow {
-    implicit def parseBulk[Result[_]: ResultFunctor](result: Result[Option[ByteString]]): ParseBulk[Result] = new ParseBulk[Result](result)
-    implicit def parseMultiBulkFlatList[Result[_]: ResultFunctor](result: Result[List[ByteString]]): ParseMultiBulkFlatList[Result] = new ParseMultiBulkFlatList[Result](result)
-  }
 
   object RedisScore {
     val default: RedisScore = InclusiveScore(1.0)

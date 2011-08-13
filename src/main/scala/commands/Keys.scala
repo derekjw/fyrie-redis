@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Keys {
-  this: Commands =>
+trait Keys[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   /**
