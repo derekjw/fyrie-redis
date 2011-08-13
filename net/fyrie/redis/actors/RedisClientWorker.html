@@ -63,7 +63,7 @@
       <span class="symbol"> 
         <span class="name">RedisClientWorker</span>
         
-        <span class="params">()</span>
+        <span class="params">(<span name="ioManager">ioManager: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>, <span name="host">host: String</span>, <span name="port">port: <span name="scala.Int" class="extype">Int</span></span>, <span name="config">config: <a name="net.fyrie.redis.RedisClientConfig" class="extype" href="../RedisClientConfig.html">RedisClientConfig</a></span>)</span>
       </span>
       </h4>
       
@@ -228,6 +228,20 @@
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.Actor#freshInstance" data-isabs="false">
+      <a id="freshInstance():Option[Actor]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">freshInstance</span>
+        
+        <span class="params">()</span><span class="result">: <span name="scala.Option" class="extype">Option</span>[<span name="akka.actor.Actor" class="extype">Actor</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@experimental</span><span class="args">()</span>
+              
+        </dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
       <a id="getClass():java.lang.Class[_]"></a>
       <h4 class="signature">
@@ -339,13 +353,13 @@
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li><li visbl="pub" name="akka.actor.Actor#preRestart" data-isabs="false">
-      <a id="preRestart(Throwable):Unit"></a>
+      <a id="preRestart(Throwable,Option[Any]):Unit"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol"> 
         <span class="name">preRestart</span>
         
-        <span class="params">(<span name="reason">reason: Throwable</span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
+        <span class="params">(<span name="reason">reason: Throwable</span>, <span name="message">message: <span name="scala.Option" class="extype">Option</span>[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
@@ -448,6 +462,17 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.actors.RedisClientWorker" class="extype" href="">RedisClientWorker</a> → IO</dd></dl></div>
+    </li><li visbl="pub" name="akka.actor.IO#retry" data-isabs="false">
+      <a id="retry():Any @util.continuations.package.cps[akka.actor.IO.IOSuspendable[Any]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">retry</span>
+        
+        <span class="params">()</span><span class="result">: Any @util.continuations.package.cps[akka.actor.IO.IOSuspendable[Any]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IO</dd></dl></div>
     </li><li visbl="pub" name="akka.actor.Actor#self" data-isabs="false">
       <a id="self:ScalaActorRef"></a>
       <h4 class="signature">

@@ -65,7 +65,7 @@
       <span class="symbol"> 
         <a href="MultiRequest.html"><span class="name">MultiRequest</span></a>
         
-        <span class="params">(<span name="multi">multi: ByteString</span>, <span name="cmds">cmds: List[(ByteString, Promise[RedisType])]</span>, <span name="exec">exec: ByteString</span>)</span><span class="result"> extends Message with Product with Serializable</span>
+        <span class="params">(<span name="multi">multi: ByteString</span>, <span name="cmds">cmds: Seq[(ByteString, Promise[RedisType])]</span>, <span name="exec">exec: ByteString</span>)</span><span class="result"> extends RequestMessage with Product with Serializable</span>
       </span>
       </h4>
       
@@ -76,7 +76,7 @@
       <span class="symbol"> 
         <a href="MultiRun.html"><span class="name">MultiRun</span></a>
         
-        <span class="params">(<span name="promises">promises: List[Promise[RedisType]]</span>)</span><span class="result"> extends Message with Product with Serializable</span>
+        <span class="params">(<span name="promises">promises: Seq[Promise[RedisType]]</span>)</span><span class="result"> extends Message with Product with Serializable</span>
       </span>
       </h4>
       
@@ -87,10 +87,21 @@
       <span class="symbol"> 
         <a href="Request.html"><span class="name">Request</span></a>
         
-        <span class="params">(<span name="bytes">bytes: ByteString</span>)</span><span class="result"> extends Message with Product with Serializable</span>
+        <span class="params">(<span name="bytes">bytes: ByteString</span>)</span><span class="result"> extends RequestMessage with Product with Serializable</span>
       </span>
       </h4>
       
+    </li><li visbl="pub" name="net.fyrie.redis.messages.RequestMessage" data-isabs="true">
+      <a id="RequestMessage:RequestMessage"></a>
+      <h4 class="signature">
+      <span class="kind">trait</span>
+      <span class="symbol"> 
+        <a href="RequestMessage.html"><span class="name">RequestMessage</span></a>
+        
+        <span class="result"> extends Message</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.messages.Socket" data-isabs="false">
       <a id="Socket:Socket"></a>
       <h4 class="signature">
@@ -115,6 +126,17 @@
       <span class="kind">object</span>
       <span class="symbol"> 
         <a href="Disconnect$.html"><span class="name">Disconnect</span></a>
+        
+        <span class="result"> extends Message with Product with Serializable</span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.messages.Received" data-isabs="false">
+      <a id="Received:Received"></a>
+      <h4 class="signature">
+      <span class="kind">object</span>
+      <span class="symbol"> 
+        <a href="Received$.html"><span class="name">Received</span></a>
         
         <span class="result"> extends Message with Product with Serializable</span>
       </span>

@@ -14,23 +14,23 @@
         </head>
         <body class="type">
       <div id="definition">
-        <img src="../../../lib/trait_big.png" />
+        <img src="../../../lib/class_big.png" />
         <p id="owner"><a name="net" class="extype" href="../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../package.html">fyrie</a>.<a name="net.fyrie.redis" class="extype" href="package.html">redis</a></p>
         <h1>Commands</h1>
       </div>
 
       <h4 class="signature" id="signature">
-      <span class="kind">trait</span>
+      <span class="kind">class</span>
       <span class="symbol"> 
         <span class="name">Commands</span>
-        
-        <span class="result"> extends <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a> with <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a> with <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a> with <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a> with <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a> with <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a> with <a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a></span>
+        <span class="tparams">[<span name="Result">Result<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
+        <span class="result"> extends <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a>[Result] with <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a>[Result] with <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a>[Result] with <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a>[Result] with <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a>[Result] with <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a>[Result] with <a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a>[Result]</span>
       </span>
       </h4>
       
-          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl><div class="toggleContainer block">
+          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed abstract </dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a>, <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a>, <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a>, <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a>, <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a>, <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a>, <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+          <div class="superTypes hiddenContent"><a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a>[Result], <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a>[Result], <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a>[Result], <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a>[Result], <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a>[Result], <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a>[Result], <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a>[Result], AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
           <span class="toggle">Known Subclasses</span>
           <div class="subClasses hiddenContent"><a name="net.fyrie.redis.RedisClient" class="extype" href="RedisClient.html">RedisClient</a>, <a name="net.fyrie.redis.RedisClientAsync" class="extype" href="RedisClientAsync.html">RedisClientAsync</a>, <a name="net.fyrie.redis.RedisClientMulti" class="extype" href="RedisClientMulti.html">RedisClientMulti</a>, <a name="net.fyrie.redis.RedisClientQuiet" class="extype" href="RedisClientQuiet.html">RedisClientQuiet</a>, <a name="net.fyrie.redis.RedisClientSync" class="extype" href="RedisClientSync.html">RedisClientSync</a></div>
@@ -57,34 +57,23 @@
             </div>
         </div>
 
-        
-
-        <div class="types members" id="types">
-              <h3>Type Members</h3>
-              <ol><li visbl="prt" name="net.fyrie.redis.Commands#RawResult" data-isabs="true">
-      <a id="RawResult:RawResult"></a>
+        <div class="members" id="constructors">
+              <h3>Instance Constructors</h3>
+              <ol><li visbl="pub" name="net.fyrie.redis.Commands#this" data-isabs="false">
+      <a id="this:Commands[Result]"></a>
       <h4 class="signature">
-      <span class="kind">type</span>
+      <span class="kind">new</span>
       <span class="symbol"> 
-        <span class="name">RawResult</span>
+        <span class="name">Commands</span>
         
-        
+        <span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="rf">rf: <a name="net.fyrie.redis.ResultFunctor" class="extype" href="ResultFunctor.html">ResultFunctor</a>[Result]</span>)</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#Result" data-isabs="true">
-      <a id="Result:Result[_]"></a>
-      <h4 class="signature">
-      <span class="kind">type</span>
-      <span class="symbol"> 
-        <span class="name">Result</span>
-        <span class="tparams">[<span name="_">_</span>]</span>
-        
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
+      
     </li></ol>
             </div>
+
+        
         
         <div class="values members" id="values">
               <h3>Abstract Value Members</h3>
@@ -99,212 +88,14 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsBool" data-isabs="true">
-      <a id="resultAsBool(RawResult):Result[Boolean]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsBool</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Boolean" class="extype">Boolean</span>]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsBulk" data-isabs="true">
-      <a id="resultAsBulk(RawResult):Result[Option[ByteString]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsBulk</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsDouble" data-isabs="true">
-      <a id="resultAsDouble(RawResult):Result[Double]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsDouble</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Double" class="extype">Double</span>]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsDoubleOption" data-isabs="true">
-      <a id="resultAsDoubleOption(RawResult):Result[Option[Double]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsDoubleOption</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="scala.Double" class="extype">Double</span>]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsInt" data-isabs="true">
-      <a id="resultAsInt(RawResult):Result[Int]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsInt</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Int" class="extype">Int</span>]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsIntOption" data-isabs="true">
-      <a id="resultAsIntOption(RawResult):Result[Option[Int]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsIntOption</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="scala.Int" class="extype">Int</span>]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsLong" data-isabs="true">
-      <a id="resultAsLong(RawResult):Result[Long]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsLong</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Long" class="extype">Long</span>]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulk" data-isabs="true">
-      <a id="resultAsMultiBulk(RawResult):Result[Option[List[Option[ByteString]]]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulk</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkFlat" data-isabs="true">
-      <a id="resultAsMultiBulkFlat(RawResult):Result[Option[List[ByteString]]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkFlat</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkFlatList" data-isabs="true">
-      <a id="resultAsMultiBulkFlatList(RawResult):Result[List[ByteString]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkFlatList</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkList" data-isabs="true">
-      <a id="resultAsMultiBulkList(RawResult):Result[List[Option[ByteString]]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkList</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkMap" data-isabs="true">
-      <a id="resultAsMultiBulkMap(RawResult):Result[Map[ByteString, ByteString]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkMap</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[Map[<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkScored" data-isabs="true">
-      <a id="resultAsMultiBulkScored(RawResult):Result[List[(ByteString, Double)]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkScored</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[List[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="scala.Double" class="extype">Double</span>)]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkSet" data-isabs="true">
-      <a id="resultAsMultiBulkSet(RawResult):Result[Set[ByteString]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkSet</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[Set[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkSinglePair" data-isabs="true">
-      <a id="resultAsMultiBulkSinglePair(RawResult):Result[Option[(ByteString, ByteString)]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkSinglePair</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>)]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkSinglePairK" data-isabs="true">
-      <a id="resultAsMultiBulkSinglePairK[K](RawResult)(Parse[K]):Result[Option[(K, ByteString)]]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsMultiBulkSinglePairK</span>
-        <span class="tparams">[<span name="K">K</span>]</span>
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Parse" class="extype" href="serialization/Parse.html">Parse</a>[K]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[(K, <span name="akka.util.ByteString" class="extype">ByteString</span>)]]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsOkStatus" data-isabs="true">
-      <a id="resultAsOkStatus(RawResult):Result[Unit]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsOkStatus</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[<span name="scala.Unit" class="extype">Unit</span>]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsStatus" data-isabs="true">
-      <a id="resultAsStatus(RawResult):Result[String]"></a>
-      <h4 class="signature">
-      <span class="kind">implicit def</span>
-      <span class="symbol"> 
-        <span class="name">resultAsStatus</span>
-        
-        <span class="params">(<span name="raw">raw: RawResult</span>)</span><span class="result">: Result[String]</span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit abstract </dd></dl></div>
     </li><li visbl="prt" name="net.fyrie.redis.Commands#send" data-isabs="true">
-      <a id="send(List[ByteString]):RawResult"></a>
+      <a id="send(List[ByteString]):Result[Any]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol"> 
         <span class="name">send</span>
         
-        <span class="params">(<span name="in">in: List[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: RawResult</span>
+        <span class="params">(<span name="in">in: List[<span name="akka.util.ByteString" class="extype">ByteString</span>]</span>)</span><span class="result">: Result[<span name="scala.Any" class="extype">Any</span>]</span>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd></dl></div>
@@ -536,6 +327,17 @@ or similar collection.</p><p>Returns: <code>Int</code>
 </p></div><dl class="paramcmts block"><dt class="param">keys</dt><dd class="cmt"><p>A collection of keys to delete.
 </p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="http://code.google.com/p/redis/wiki/DelCommand">Redis Command Reference</a>
 </p></span></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#echo" data-isabs="false">
+      <a id="echo[A](A)(Store[A]):Result[Option[ByteString]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">echo</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="value">value: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Store" class="extype" href="serialization/Store.html">Store</a>[A]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
       <a id="eq(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -1133,6 +935,17 @@ Returns <code>true</code> if successful.</p><p>Returns: <code>Boolean</code>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#ping" data-isabs="false">
+      <a id="ping():Result[String]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ping</span>
+        
+        <span class="params">()</span><span class="result">: Result[String]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a></dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#quit" data-isabs="false">
       <a id="quit():Result[Unit]"></a>
       <h4 class="signature">
@@ -1188,6 +1001,204 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
 </p></div><dl class="paramcmts block"><dt class="param">oldkey</dt><dd class="cmt"><p>The existing key to rename.</p></dd><dt class="param">newkey</dt><dd class="cmt"><p>The new key.
 </p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="http://code.google.com/p/redis/wiki/RenamenxCommand">Redis Command Reference</a>
 </p></span></dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsBool" data-isabs="false">
+      <a id="resultAsBool(Result[Any]):Result[Boolean]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsBool</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Boolean" class="extype">Boolean</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsBulk" data-isabs="false">
+      <a id="resultAsBulk(Result[Any]):Result[Option[ByteString]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsBulk</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsDouble" data-isabs="false">
+      <a id="resultAsDouble(Result[Any]):Result[Double]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsDouble</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Double" class="extype">Double</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsDoubleOption" data-isabs="false">
+      <a id="resultAsDoubleOption(Result[Any]):Result[Option[Double]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsDoubleOption</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="scala.Double" class="extype">Double</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsInt" data-isabs="false">
+      <a id="resultAsInt(Result[Any]):Result[Int]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsInt</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Int" class="extype">Int</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsIntOption" data-isabs="false">
+      <a id="resultAsIntOption(Result[Any]):Result[Option[Int]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsIntOption</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="scala.Int" class="extype">Int</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsLong" data-isabs="false">
+      <a id="resultAsLong(Result[Any]):Result[Long]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsLong</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Long" class="extype">Long</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulk" data-isabs="false">
+      <a id="resultAsMultiBulk(Result[Any]):Result[Option[List[Option[ByteString]]]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulk</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkFlat" data-isabs="false">
+      <a id="resultAsMultiBulkFlat(Result[Any]):Result[Option[List[ByteString]]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkFlat</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkFlatList" data-isabs="false">
+      <a id="resultAsMultiBulkFlatList(Result[Any]):Result[List[ByteString]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkFlatList</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[List[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkList" data-isabs="false">
+      <a id="resultAsMultiBulkList(Result[Any]):Result[List[Option[ByteString]]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkList</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[List[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkMap" data-isabs="false">
+      <a id="resultAsMultiBulkMap(Result[Any]):Result[Map[ByteString, ByteString]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkMap</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[Map[<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkScored" data-isabs="false">
+      <a id="resultAsMultiBulkScored(Result[Any]):Result[List[(ByteString, Double)]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkScored</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[List[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="scala.Double" class="extype">Double</span>)]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkSet" data-isabs="false">
+      <a id="resultAsMultiBulkSet(Result[Any]):Result[Set[ByteString]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkSet</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[Set[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkSinglePair" data-isabs="false">
+      <a id="resultAsMultiBulkSinglePair(Result[Any]):Result[Option[(ByteString, ByteString)]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkSinglePair</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[(<span name="akka.util.ByteString" class="extype">ByteString</span>, <span name="akka.util.ByteString" class="extype">ByteString</span>)]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsMultiBulkSinglePairK" data-isabs="false">
+      <a id="resultAsMultiBulkSinglePairK[K](Result[Any])(Parse[K]):Result[Option[(K, ByteString)]]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsMultiBulkSinglePairK</span>
+        <span class="tparams">[<span name="K">K</span>]</span>
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Parse" class="extype" href="serialization/Parse.html">Parse</a>[K]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[(K, <span name="akka.util.ByteString" class="extype">ByteString</span>)]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsOkStatus" data-isabs="false">
+      <a id="resultAsOkStatus(Result[Any]):Result[Unit]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsOkStatus</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[<span name="scala.Unit" class="extype">Unit</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.Commands#resultAsStatus" data-isabs="false">
+      <a id="resultAsStatus(Result[Any]):Result[String]"></a>
+      <h4 class="signature">
+      <span class="kind">implicit def</span>
+      <span class="symbol"> 
+        <span class="name">resultAsStatus</span>
+        
+        <span class="params">(<span name="raw">raw: Result[<span name="scala.Any" class="extype">Any</span>]</span>)</span><span class="result">: Result[String]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected implicit final </dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Lists#rpop" data-isabs="false">
       <a id="rpop[K](K)(Store[K]):Result[Option[ByteString]]"></a>
       <h4 class="signature">
@@ -1994,19 +2005,19 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
             </div>
 
         <div name="net.fyrie.redis.commands.Hashes" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.Hashes" class="extype" href="commands/Hashes.html">Hashes</a>[Result]</h3>
             </div><div name="net.fyrie.redis.commands.SortedSets" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.SortedSets" class="extype" href="commands/SortedSets.html">SortedSets</a>[Result]</h3>
             </div><div name="net.fyrie.redis.commands.Sets" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.Sets" class="extype" href="commands/Sets.html">Sets</a>[Result]</h3>
             </div><div name="net.fyrie.redis.commands.Lists" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.Lists" class="extype" href="commands/Lists.html">Lists</a>[Result]</h3>
             </div><div name="net.fyrie.redis.commands.Strings" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.Strings" class="extype" href="commands/Strings.html">Strings</a>[Result]</h3>
             </div><div name="net.fyrie.redis.commands.Servers" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.Servers" class="extype" href="commands/Servers.html">Servers</a>[Result]</h3>
             </div><div name="net.fyrie.redis.commands.Keys" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a></h3>
+              <h3>Inherited from <a name="net.fyrie.redis.commands.Keys" class="extype" href="commands/Keys.html">Keys</a>[Result]</h3>
             </div><div name="scala.AnyRef" class="parent">
               <h3>Inherited from AnyRef</h3>
             </div><div name="scala.Any" class="parent">

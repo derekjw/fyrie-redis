@@ -23,12 +23,12 @@
       <span class="kind">trait</span>
       <span class="symbol"> 
         <span class="name">Keys</span>
-        
+        <span class="tparams">[<span name="Result">Result<span class="tparams">[<span name="_">_</span>]</span></span>]</span>
         <span class="result"> extends AnyRef</span>
       </span>
       </h4>
       
-          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Self Type</dt><dd><a name="net.fyrie.redis.Commands" class="extype" href="../Commands.html">Commands</a></dd></dl><div class="toggleContainer block">
+          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Self Type</dt><dd><a name="net.fyrie.redis.Commands" class="extype" href="../Commands.html">Commands</a>[Result]</dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div><div class="toggleContainer block">
@@ -200,6 +200,17 @@ or similar collection.</p><p>Returns: <code>Int</code>
 </p></div><dl class="paramcmts block"><dt class="param">keys</dt><dd class="cmt"><p>A collection of keys to delete.
 </p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="http://code.google.com/p/redis/wiki/DelCommand">Redis Command Reference</a>
 </p></span></dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#echo" data-isabs="false">
+      <a id="echo[A](A)(Store[A]):Result[Option[ByteString]]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">echo</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="value">value: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Store" class="extype" href="../serialization/Store.html">Store</a>[A]</span>)</span><span class="result">: Result[<span name="scala.Option" class="extype">Option</span>[<span name="akka.util.ByteString" class="extype">ByteString</span>]]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="scala.AnyRef#eq" data-isabs="false">
       <a id="eq(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -412,6 +423,17 @@ Returns <code>true</code> if successful.</p><p>Returns: <code>Boolean</code>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#ping" data-isabs="false">
+      <a id="ping():Result[String]"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">ping</span>
+        
+        <span class="params">()</span><span class="result">: Result[String]</span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#quit" data-isabs="false">
       <a id="quit():Result[Unit]"></a>
       <h4 class="signature">
