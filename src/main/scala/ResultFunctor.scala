@@ -2,11 +2,11 @@ package net.fyrie.redis
 
 import akka.dispatch.Future
 
-sealed abstract class ResultFunctor[R[_]] {
+private[redis] sealed abstract class ResultFunctor[R[_]] {
   def fmap[A, B](a: R[A])(f: A => B): R[B]
 }
 
-object ResultFunctor {
+private[redis] object ResultFunctor {
   implicit val async: ResultFunctor[Future] = new ResultFunctor[Future] {
     def fmap[A, B](a: Future[A])(f: A => B): Future[B] = a map f
   }

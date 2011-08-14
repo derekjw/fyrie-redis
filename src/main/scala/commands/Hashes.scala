@@ -4,7 +4,7 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Hashes[Result[_]] {
+private[redis] trait Hashes[Result[_]] {
   this: Commands[Result] =>
   import Protocol._
 

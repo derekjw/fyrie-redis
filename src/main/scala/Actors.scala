@@ -18,7 +18,7 @@ import scala.util.continuations._
 
 import scala.collection.mutable.Queue
 
-final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
+private[redis] final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
 
   var socket: IO.SocketHandle = _
   var worker: ActorRef = _
@@ -75,7 +75,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, con
 
 }
 
-final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor with IO {
+private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor with IO {
   import Protocol._
 
   var socket: IO.SocketHandle = _

@@ -10,14 +10,14 @@ object Queued {
     new QueuedSingle(value, request, response)
   def apply[A](value: A): Queued[A] = new QueuedValue(value)
 
-  final class QueuedValue[+A](val value: A) extends Queued[A] {
+  private[redis] final class QueuedValue[+A](val value: A) extends Queued[A] {
     def requests = Vector.empty
     def responses = Vector.empty
     def flatMap[B](f: A => Queued[B]): Queued[B] = f(value)
     def map[B](f: A => B): Queued[B] = new QueuedValue(f(value))
   }
 
-  final class QueuedSingle[+A](val value: A, val request: (ByteString, Promise[RedisType]), val response: Promise[RedisType]) extends Queued[A] {
+  private[redis] final class QueuedSingle[+A](val value: A, val request: (ByteString, Promise[RedisType]), val response: Promise[RedisType]) extends Queued[A] {
     def requests = Vector(request)
     def responses = Vector(response)
     def flatMap[B](f: A => Queued[B]): Queued[B] = {
@@ -27,7 +27,7 @@ object Queued {
     def map[B](f: A => B): Queued[B] = new QueuedSingle(f(value), request, response)
   }
 
-  final class QueuedList[+A](val value: A, val requests: Vector[(ByteString, Promise[RedisType])], val responses: Vector[Promise[RedisType]]) extends Queued[A] {
+  private[redis] final class QueuedList[+A](val value: A, val requests: Vector[(ByteString, Promise[RedisType])], val responses: Vector[Promise[RedisType]]) extends Queued[A] {
     def flatMap[B](f: A => Queued[B]): Queued[B] = {
       f(value) match {
         case that: QueuedList[_] =>
