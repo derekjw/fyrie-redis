@@ -2,57 +2,56 @@ package net.fyrie
 package redis
 
 import actors._
-import messages.{Request, MultiRequest, Disconnect}
+import messages.{ Request, MultiRequest, Disconnect }
 import Protocol.EOL
 import types._
 import serialization.Parse
 
-import akka.actor.{Actor,ActorRef,IOManager,PoisonPill}
-import Actor.{actorOf}
+import akka.actor.{ Actor, ActorRef, IOManager, PoisonPill }
+import Actor.{ actorOf }
 import akka.util.ByteString
-import akka.dispatch.{Future, DefaultCompletableFuture}
+import akka.dispatch.{ CompletableFuture => Promise }
+import akka.dispatch.{ Future, Promise }
+import java.util.concurrent.TimeUnit
 
-case class RedisClientConfig(timeout: Long = 5000,
-                             autoReconnect: Boolean = true,
-                             retryOnReconnect: Boolean = true)
+case class Timeout(length: Long = 5000, unit: TimeUnit = TimeUnit.MILLISECONDS)
+
+case class RedisClientConfig(timeout: Timeout = Timeout(),
+  autoReconnect: Boolean = true,
+  retryOnReconnect: Boolean = true)
 
 object RedisClient {
-  def connect(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
+  def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
     new RedisClient(host, port, config, ioManager)
 }
 
-final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync with FlexibleRedisClient {
-  client =>
+final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync {
 
-  final protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
+  protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
 
   def disconnect = actor ! Disconnect
 
-  val async = this
+  val sync: RedisClientSync = new RedisClientSync {
+    val actor = RedisClient.this.actor
 
-  val sync: RedisClientSync = new RedisClientSync with FlexibleRedisClient {
-    val actor = client.actor
-
-    val async: RedisClientAsync = client
-    val sync: RedisClientSync = this
-    val quiet: RedisClientQuiet = client.quiet
+    val async: RedisClientAsync = RedisClient.this
+    val quiet: RedisClientQuiet = RedisClient.this.quiet
   }
 
-  val quiet: RedisClientQuiet = new RedisClientQuiet with FlexibleRedisClient {
-    val actor = client.actor
+  val quiet: RedisClientQuiet = new RedisClientQuiet {
+    val actor = RedisClient.this.actor
 
-    val async: RedisClientAsync = client
-    val sync: RedisClientSync = client.sync
-    val quiet: RedisClientQuiet = this
+    val async: RedisClientAsync = RedisClient.this
+    val sync: RedisClientSync = RedisClient.this.sync
   }
 
   def multi[T](block: (RedisClientMulti) => Queued[T]): T = {
-    val rq = new RedisClientMulti { val actor = client.actor }
+    val rq = new RedisClientMulti { val actor = RedisClient.this.actor }
     rq.exec(block(rq))
   }
 }
 
-sealed trait FlexibleRedisClient {
+sealed trait ConfigurableRedisClient {
 
   def sync: RedisClientSync
   def async: RedisClientAsync
@@ -60,142 +59,28 @@ sealed trait FlexibleRedisClient {
 
 }
 
-sealed trait RedisClientAsync extends Commands {
-  protected type RawResult = Future[Any]
-  type Result[A] = Future[A]
-
+sealed abstract class RedisClientAsync extends Commands[Future] with ConfigurableRedisClient {
   final protected def send(in: List[ByteString]): Future[Any] = actor !!! Request(format(in))
 
-  final protected implicit def resultAsMultiBulk(future: Future[Any]): Future[Option[List[Option[ByteString]]]] = future map toMultiBulk
-  final protected implicit def resultAsMultiBulkList(future: Future[Any]): Future[List[Option[ByteString]]] = future map toMultiBulkList
-  final protected implicit def resultAsMultiBulkFlat(future: Future[Any]): Future[Option[List[ByteString]]] = future map toMultiBulkFlat
-  final protected implicit def resultAsMultiBulkFlatList(future: Future[Any]): Future[List[ByteString]] = future map toMultiBulkFlatList
-  final protected implicit def resultAsMultiBulkSet(future: Future[Any]): Future[Set[ByteString]] = future map toMultiBulkSet
-  final protected implicit def resultAsMultiBulkMap(future: Future[Any]): Future[Map[ByteString, ByteString]] = future map toMultiBulkMap
-  final protected implicit def resultAsMultiBulkScored(future: Future[Any]): Future[List[(ByteString, Double)]] = future map toMultiBulkScored
-  final protected implicit def resultAsMultiBulkSinglePair(future: Future[Any]): Future[Option[(ByteString, ByteString)]] = future map toMultiBulkSinglePair
-  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](future: Future[Any]): Future[Option[(K, ByteString)]] = future map (toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2)))
-  final protected implicit def resultAsBulk(future: Future[Any]): Future[Option[ByteString]] = future map toBulk
-  final protected implicit def resultAsDouble(future: Future[Any]): Future[Double] = future map toDouble
-  final protected implicit def resultAsDoubleOption(future: Future[Any]): Future[Option[Double]] = future map toDoubleOption
-  final protected implicit def resultAsLong(future: Future[Any]): Future[Long] = future map toLong
-  final protected implicit def resultAsInt(future: Future[Any]): Future[Int] = future map (toLong(_).toInt)
-  final protected implicit def resultAsIntOption(future: Future[Any]): Future[Option[Int]] = future map toIntOption
-  final protected implicit def resultAsBool(future: Future[Any]): Future[Boolean] = future map toBool
-  final protected implicit def resultAsStatus(future: Future[Any]): Future[String] = future map toStatus
-  final protected implicit def resultAsOkStatus(future: Future[Any]): Future[Unit] = future map toOkStatus
-
+  val async: RedisClientAsync = this
 }
 
-sealed trait RedisClientSync extends Commands {
-  protected type RawResult = Any
-  type Result[A] = A
-
+sealed abstract class RedisClientSync extends Commands[({ type λ[α] = α })#λ] with ConfigurableRedisClient {
   final protected def send(in: List[ByteString]): Any = (actor !!! Request(format(in))).get
 
-  final protected implicit def resultAsMultiBulk(raw: Any): Option[List[Option[ByteString]]] = toMultiBulk(raw)
-  final protected implicit def resultAsMultiBulkList(raw: Any): List[Option[ByteString]] = toMultiBulkList(raw)
-  final protected implicit def resultAsMultiBulkFlat(raw: Any): Option[List[ByteString]] = toMultiBulkFlat(raw)
-  final protected implicit def resultAsMultiBulkFlatList(raw: Any): List[ByteString] = toMultiBulkFlatList(raw)
-  final protected implicit def resultAsMultiBulkSet(raw: Any): Set[ByteString] = toMultiBulkSet(raw)
-  final protected implicit def resultAsMultiBulkMap(raw: Any): Map[ByteString, ByteString] = toMultiBulkMap(raw)
-  final protected implicit def resultAsMultiBulkScored(raw: Any): List[(ByteString, Double)] = toMultiBulkScored(raw)
-  final protected implicit def resultAsMultiBulkSinglePair(raw: Any): Option[(ByteString, ByteString)] = toMultiBulkSinglePair(raw)
-  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Any): Option[(K, ByteString)] = toMultiBulkSinglePair(raw).map(kv => (Parse(kv._1), kv._2))
-  final protected implicit def resultAsBulk(raw: Any): Option[ByteString] = toBulk(raw)
-  final protected implicit def resultAsDouble(raw: Any): Double = toDouble(raw)
-  final protected implicit def resultAsDoubleOption(raw: Any): Option[Double] = toDoubleOption(raw)
-  final protected implicit def resultAsLong(raw: Any): Long = toLong(raw)
-  final protected implicit def resultAsInt(raw: Any): Int = toLong(raw).toInt
-  final protected implicit def resultAsIntOption(raw: Any): Option[Int] = toIntOption(raw)
-  final protected implicit def resultAsBool(raw: Any): Boolean = toBool(raw)
-  final protected implicit def resultAsStatus(raw: Any): String = toStatus(raw)
-  final protected implicit def resultAsOkStatus(raw: Any): Unit = toOkStatus(raw)
-
+  val sync: RedisClientSync = this
 }
 
-sealed trait RedisClientQuiet extends Commands {
-  protected type RawResult = Unit
-  type Result[_] = Unit
-
+sealed abstract class RedisClientQuiet extends Commands[({ type λ[_] = Unit })#λ] with ConfigurableRedisClient {
   final protected def send(in: List[ByteString]) = actor ! Request(format(in))
 
-  final protected implicit def resultAsMultiBulk(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkList(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkFlat(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkFlatList(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkSet(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkMap(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkScored(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkSinglePair(raw: Unit): Unit = ()
-  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Unit): Unit = ()
-  final protected implicit def resultAsBulk(raw: Unit): Unit = ()
-  final protected implicit def resultAsDouble(raw: Unit): Unit = ()
-  final protected implicit def resultAsDoubleOption(raw: Unit): Unit = ()
-  final protected implicit def resultAsLong(raw: Unit): Unit = ()
-  final protected implicit def resultAsInt(raw: Unit): Unit = ()
-  final protected implicit def resultAsIntOption(raw: Unit): Unit = ()
-  final protected implicit def resultAsBool(raw: Unit): Unit = ()
-  final protected implicit def resultAsStatus(raw: Unit): Unit = ()
-  final protected implicit def resultAsOkStatus(raw: Unit): Unit = ()
+  val quiet: RedisClientQuiet = this
 }
 
-object Queued {
-  def apply[A](value: A, request: (ByteString, DefaultCompletableFuture[RedisType]), response: DefaultCompletableFuture[RedisType]): Queued[A] =
-    new QueuedSingle(value, request, response)
-  def apply[A](value: A): Queued[A] = new QueuedValue(value)
-
-  final class QueuedValue[+A] (val value: A) extends Queued[A] {
-    def requests = Vector.empty
-    def responses = Vector.empty
-    def flatMap[B](f: A => Queued[B]): Queued[B] = f(value)
-    def map[B](f: A => B): Queued[B] = new QueuedValue(f(value))
-  }
-
-  final class QueuedSingle[+A] (val value: A, val request: (ByteString, DefaultCompletableFuture[RedisType]), val response: DefaultCompletableFuture[RedisType]) extends Queued[A] {
-    def requests = Vector(request)
-    def responses = Vector(response)
-    def flatMap[B](f: A => Queued[B]): Queued[B] = {
-      val that = f(value)
-      new QueuedList(that.value, request +: that.requests, response +: that.responses)
-    }
-    def map[B](f: A => B): Queued[B] = new QueuedSingle(f(value), request, response)
-  }
-
-  final class QueuedList[+A] (val value: A, val requests: Vector[(ByteString, DefaultCompletableFuture[RedisType])], val responses: Vector[DefaultCompletableFuture[RedisType]]) extends Queued[A] {
-    def flatMap[B](f: A => Queued[B]): Queued[B] = {
-      f(value) match {
-        case that: QueuedList[_] =>
-          new QueuedList(that.value, requests ++ that.requests, responses ++ that.responses)
-        case that: QueuedSingle[_] =>
-          new QueuedList(that.value, requests :+ that.request, responses :+ that.response)
-        case that: QueuedValue[_] =>
-          new QueuedList(that.value, requests, responses)
-      }
-    }
-    def map[B](f: A => B): Queued[B] = new QueuedList(f(value), requests, responses)
-  }
-}
-
-sealed trait Queued[+A] {
-  def value: A
-  def requests: Vector[(ByteString, DefaultCompletableFuture[RedisType])]
-  def responses: Vector[DefaultCompletableFuture[RedisType]]
-  def flatMap[B](f: A => Queued[B]): Queued[B]
-  def map[B](f: A => B): Queued[B]
-}
-
-sealed trait RedisClientMulti extends Commands {
-  protected type RawResult = Queued[Future[RedisType]]
-  type Result[A] = Queued[Future[A]]
-
-  final protected def send(in: List[ByteString]): Queued[Future[RedisType]] = {
-    val status = Future.empty[RedisType]()
-    val statusFuture = status map toStatus
-    val bytes = format(in)
-    val result = Future.empty[RedisType]()
-    statusFuture onComplete { _.value.get match { case Left(e) => result.complete(Left(e)); case _ => } }
-    Queued(result, (bytes, status), result)
+sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
+  final protected def send(in: List[ByteString]): Queued[Future[Any]] = {
+    val result = Promise[RedisType]()
+    Queued(result, (format(in), Promise[RedisType]()), result)
   }
 
   def exec[T](q: Queued[T]): T = {
@@ -203,6 +88,10 @@ sealed trait RedisClientMulti extends Commands {
       (_: Any) match {
         case RedisMulti(m) =>
           var responses = q.responses
+          (q.responses.iterator zip (q.requests.iterator map (_._2.value))) foreach {
+            case (resp, Some(Right(status))) => try { toStatus(status) } catch { case e => resp complete Left(e) }
+            case (resp, _) => resp complete Left(RedisProtocolException("Unexpected response"))
+          }
           for {
             list <- m
             rtype <- list
@@ -221,66 +110,43 @@ sealed trait RedisClientMulti extends Commands {
     }
     q.value
   }
-
-  final protected implicit def resultAsMultiBulk(queued: Queued[Future[RedisType]]): Queued[Future[Option[List[Option[ByteString]]]]] = queued map (_ map toMultiBulk)
-  final protected implicit def resultAsMultiBulkList(queued: Queued[Future[RedisType]]): Queued[Future[List[Option[ByteString]]]] = queued map (_ map toMultiBulkList)
-  final protected implicit def resultAsMultiBulkFlat(queued: Queued[Future[RedisType]]): Queued[Future[Option[List[ByteString]]]] = queued map (_ map toMultiBulkFlat)
-  final protected implicit def resultAsMultiBulkFlatList(queued: Queued[Future[RedisType]]): Queued[Future[List[ByteString]]] = queued map (_ map toMultiBulkFlatList)
-  final protected implicit def resultAsMultiBulkSet(queued: Queued[Future[RedisType]]): Queued[Future[Set[ByteString]]] = queued map (_ map toMultiBulkSet)
-  final protected implicit def resultAsMultiBulkMap(queued: Queued[Future[RedisType]]): Queued[Future[Map[ByteString, ByteString]]] = queued map (_ map toMultiBulkMap)
-  final protected implicit def resultAsMultiBulkScored(queued: Queued[Future[RedisType]]): Queued[Future[List[(ByteString, Double)]]] = queued map (_ map toMultiBulkScored)
-  final protected implicit def resultAsMultiBulkSinglePair(queued: Queued[Future[RedisType]]): Queued[Future[Option[(ByteString, ByteString)]]] = queued map (_ map toMultiBulkSinglePair)
-  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](queued: Queued[Future[RedisType]]): Queued[Future[Option[(K, ByteString)]]] = queued map (_ map (toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2))))
-  final protected implicit def resultAsBulk(queued: Queued[Future[RedisType]]): Queued[Future[Option[ByteString]]] = queued map (_ map toBulk)
-  final protected implicit def resultAsDouble(queued: Queued[Future[RedisType]]): Queued[Future[Double]] = queued map (_ map toDouble)
-  final protected implicit def resultAsDoubleOption(queued: Queued[Future[RedisType]]): Queued[Future[Option[Double]]] = queued map (_ map toDoubleOption)
-  final protected implicit def resultAsLong(queued: Queued[Future[RedisType]]): Queued[Future[Long]] = queued map (_ map toLong)
-  final protected implicit def resultAsInt(queued: Queued[Future[RedisType]]): Queued[Future[Int]] = queued map (_ map (toLong(_).toInt))
-  final protected implicit def resultAsIntOption(queued: Queued[Future[RedisType]]): Queued[Future[Option[Int]]] = queued map (_ map toIntOption)
-  final protected implicit def resultAsBool(queued: Queued[Future[RedisType]]): Queued[Future[Boolean]] = queued map (_ map toBool)
-  final protected implicit def resultAsStatus(queued: Queued[Future[RedisType]]): Queued[Future[String]] = queued map (_ map toStatus)
-  final protected implicit def resultAsOkStatus(queued: Queued[Future[RedisType]]): Queued[Future[Unit]] = queued map (_ map toOkStatus)
-
 }
 
-
 import commands._
-sealed trait Commands extends Keys with Servers with Strings with Lists with Sets with SortedSets with Hashes {
-  protected type RawResult
-  protected type Result[_]
+sealed abstract class Commands[Result[_]](implicit rf: ResultFunctor[Result]) extends Keys[Result] with Servers[Result] with Strings[Result] with Lists[Result] with Sets[Result] with SortedSets[Result] with Hashes[Result] {
 
   protected def actor: ActorRef
 
-  protected def send(in: List[ByteString]): RawResult
+  protected def send(in: List[ByteString]): Result[Any]
 
   final protected def format(in: List[ByteString]): ByteString = {
     var count = 0
     var cmd = ByteString.empty
     in foreach { bytes =>
       count += 1
-      cmd ++= ByteString("$"+bytes.length) ++ EOL ++ bytes ++ EOL
+      cmd ++= ByteString("$" + bytes.length) ++ EOL ++ bytes ++ EOL
     }
-    ByteString("*"+count) ++ EOL ++ cmd
+    ByteString("*" + count) ++ EOL ++ cmd
   }
 
-  protected implicit def resultAsMultiBulk(raw: RawResult): Result[Option[List[Option[ByteString]]]]
-  protected implicit def resultAsMultiBulkList(raw: RawResult): Result[List[Option[ByteString]]]
-  protected implicit def resultAsMultiBulkFlat(raw: RawResult): Result[Option[List[ByteString]]]
-  protected implicit def resultAsMultiBulkFlatList(raw: RawResult): Result[List[ByteString]]
-  protected implicit def resultAsMultiBulkSet(raw: RawResult): Result[Set[ByteString]]
-  protected implicit def resultAsMultiBulkMap(raw: RawResult): Result[Map[ByteString, ByteString]]
-  protected implicit def resultAsMultiBulkScored(raw: RawResult): Result[List[(ByteString, Double)]]
-  protected implicit def resultAsMultiBulkSinglePair(raw: RawResult): Result[Option[(ByteString, ByteString)]]
-  protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: RawResult): Result[Option[(K, ByteString)]]
-  protected implicit def resultAsBulk(raw: RawResult): Result[Option[ByteString]]
-  protected implicit def resultAsDouble(raw: RawResult): Result[Double]
-  protected implicit def resultAsDoubleOption(raw: RawResult): Result[Option[Double]]
-  protected implicit def resultAsLong(raw: RawResult): Result[Long]
-  protected implicit def resultAsInt(raw: RawResult): Result[Int]
-  protected implicit def resultAsIntOption(raw: RawResult): Result[Option[Int]]
-  protected implicit def resultAsBool(raw: RawResult): Result[Boolean]
-  protected implicit def resultAsStatus(raw: RawResult): Result[String]
-  protected implicit def resultAsOkStatus(raw: RawResult): Result[Unit]
+  final protected implicit def resultAsMultiBulk(raw: Result[Any]): Result[Option[List[Option[ByteString]]]] = rf.fmap(raw)(toMultiBulk)
+  final protected implicit def resultAsMultiBulkList(raw: Result[Any]): Result[List[Option[ByteString]]] = rf.fmap(raw)(toMultiBulkList)
+  final protected implicit def resultAsMultiBulkFlat(raw: Result[Any]): Result[Option[List[ByteString]]] = rf.fmap(raw)(toMultiBulkFlat)
+  final protected implicit def resultAsMultiBulkFlatList(raw: Result[Any]): Result[List[ByteString]] = rf.fmap(raw)(toMultiBulkFlatList)
+  final protected implicit def resultAsMultiBulkSet(raw: Result[Any]): Result[Set[ByteString]] = rf.fmap(raw)(toMultiBulkSet)
+  final protected implicit def resultAsMultiBulkMap(raw: Result[Any]): Result[Map[ByteString, ByteString]] = rf.fmap(raw)(toMultiBulkMap)
+  final protected implicit def resultAsMultiBulkScored(raw: Result[Any]): Result[List[(ByteString, Double)]] = rf.fmap(raw)(toMultiBulkScored)
+  final protected implicit def resultAsMultiBulkSinglePair(raw: Result[Any]): Result[Option[(ByteString, ByteString)]] = rf.fmap(raw)(toMultiBulkSinglePair)
+  final protected implicit def resultAsMultiBulkSinglePairK[K: Parse](raw: Result[Any]): Result[Option[(K, ByteString)]] = rf.fmap(raw)(toMultiBulkSinglePair(_).map(kv => (Parse(kv._1), kv._2)))
+  final protected implicit def resultAsBulk(raw: Result[Any]): Result[Option[ByteString]] = rf.fmap(raw)(toBulk)
+  final protected implicit def resultAsDouble(raw: Result[Any]): Result[Double] = rf.fmap(raw)(toDouble)
+  final protected implicit def resultAsDoubleOption(raw: Result[Any]): Result[Option[Double]] = rf.fmap(raw)(toDoubleOption)
+  final protected implicit def resultAsLong(raw: Result[Any]): Result[Long] = rf.fmap(raw)(toLong)
+  final protected implicit def resultAsInt(raw: Result[Any]): Result[Int] = rf.fmap(raw)(toLong(_).toInt)
+  final protected implicit def resultAsIntOption(raw: Result[Any]): Result[Option[Int]] = rf.fmap(raw)(toIntOption)
+  final protected implicit def resultAsBool(raw: Result[Any]): Result[Boolean] = rf.fmap(raw)(toBool)
+  final protected implicit def resultAsStatus(raw: Result[Any]): Result[String] = rf.fmap(raw)(toStatus)
+  final protected implicit def resultAsOkStatus(raw: Result[Any]): Result[Unit] = rf.fmap(raw)(toOkStatus)
 
   final protected val toMultiBulk: Any => Option[List[Option[ByteString]]] = _ match {
     case RedisMulti(m) => m map (_ map toBulk)
@@ -334,7 +200,7 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
   }
 
   final protected val toMultiBulkSinglePair: Any => Option[(ByteString, ByteString)] = _ match {
-    case RedisMulti(Some(List(RedisBulk(Some(a)),RedisBulk(Some(b))))) => Some((a,b))
+    case RedisMulti(Some(List(RedisBulk(Some(a)), RedisBulk(Some(b))))) => Some((a, b))
     case RedisMulti(_) => None
     case RedisError(e) => throw RedisErrorException(e)
     case _ => throw RedisProtocolException("Unexpected response")
@@ -388,10 +254,9 @@ sealed trait Commands extends Keys with Servers with Strings with Lists with Set
   final protected val toOkStatus: Any => Unit = _ match {
     case RedisString("OK") => Unit
     case RedisError(e) => throw RedisErrorException(e)
-    case _ => throw RedisProtocolException("Unexpected response")
+    case e => throw RedisProtocolException("Unexpected response")
   }
 }
-
 
 case class RedisErrorException(message: String) extends RuntimeException(message)
 case class RedisProtocolException(message: String) extends RuntimeException(message)

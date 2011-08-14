@@ -5,10 +5,14 @@ package actors
 import messages._
 import types._
 
-import akka.actor.{ Actor, ActorRef, IO, IOManager }
+import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler }
 import Actor.{ actorOf }
 import akka.util.ByteString
 import akka.util.cps._
+import akka.event.EventHandler
+
+import java.util.concurrent.TimeUnit
+import java.net.ConnectException
 
 import scala.util.continuations._
 
@@ -22,6 +26,7 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, con
   val waiting = Queue.empty[RequestMessage]
 
   override def preStart = {
+    EventHandler info (this, "Connecting")
     worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
     self startLink worker
     socket = IO.connect(ioManager, host, port, worker)
@@ -29,33 +34,40 @@ final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, con
   }
 
   def receive = {
+
     case req: Request =>
       socket write req.bytes
       worker forward Run
       if (config.retryOnReconnect) waiting enqueue req
+
     case req: MultiRequest =>
       sendMulti(req)
       worker forward MultiRun(req.cmds.map(_._2))
       if (config.retryOnReconnect) waiting enqueue req
+
     case Received =>
       waiting.dequeue
+
     case Socket(handle) =>
-      //println("Retrying "+waiting.length+" commands")
       socket = handle
       if (config.retryOnReconnect) {
         waiting foreach {
-          case req: Request      => socket write req.bytes
+          case req: Request => socket write req.bytes
           case req: MultiRequest => sendMulti(req)
         }
+        if (waiting.nonEmpty) EventHandler info (this, "Retrying " + waiting.length + " commands")
       }
+
     case Disconnect =>
+      EventHandler info (this, "Shutting down")
       worker ! Disconnect
       self.stop()
+
   }
 
   def sendMulti(req: MultiRequest): Unit = {
     socket write req.multi
-    req.cmds foreach {cmd =>
+    req.cmds foreach { cmd =>
       socket write cmd._1
     }
     socket write req.exec
@@ -69,36 +81,48 @@ final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, conf
   var socket: IO.SocketHandle = _
 
   def receiveIO: ReceiveIO = {
+
     case Socket(handle) =>
       socket = handle
-    case IO.Closed(handle) if socket == handle =>
-      //println("Connection closed, reconnecting...")
-      if (config.autoReconnect) {
-        socket = IO.connect(ioManager, host, port, self)
-        self.supervisor foreach (_ ! Socket(socket))
-        retry
-      } else {
-        self.supervisor foreach (_ ! Disconnect)
-      }
+
+    case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect =>
+      EventHandler info (this, "Connection refused, retrying in 1 second")
+      Scheduler.scheduleOnce(self, IO.Closed(handle, None), 1, TimeUnit.SECONDS)
+      retry
+
+    case IO.Closed(handle, cause) if socket == handle && config.autoReconnect =>
+      EventHandler info (this, "Reconnecting" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
+      socket = IO.connect(ioManager, host, port, self)
+      self.supervisor foreach (_ ! Socket(socket))
+      retry
+
+    case IO.Closed(handle, cause) if socket == handle =>
+      EventHandler info (this, "Connection closed" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
+      self.supervisor foreach (_ ! Disconnect)
+
     case Run =>
       val result = readResult
       self reply_? result
       if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
+
     case msg: MultiRun =>
       val multi = readResult
       var promises = msg.promises
       whileC(promises.nonEmpty) {
         val promise = promises.head
         promises = promises.tail
-        promise completeWithResult readResult
-        () // TODO: fix this in akka.util.cps.whileC
+        val result = readResult
+        promise completeWithResult result
       }
       val exec = readResult
       self reply_? exec
       if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
+
     case Disconnect =>
+      // TODO: Complete all waiting requests with a RedisConnectionException
       socket.close
       self.stop()
+
   }
 
   def readResult: RedisType @cps[IO.IOSuspendable[Any]] = {
@@ -109,7 +133,7 @@ final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, conf
       case ':' => readInteger
       case '$' => readBulk
       case '*' => readMulti
-      case x => sys.error("Invalid result type: " + x.toByte)
+      case x => throw RedisProtocolException("Invalid result type: " + x.toByte)
     }
   }
 

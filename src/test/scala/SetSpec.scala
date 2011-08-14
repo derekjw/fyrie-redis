@@ -3,9 +3,9 @@ package net.fyrie.redis
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
-class SetOperationsSpec extends Spec 
-                           with ShouldMatchers
-                           with RedisTestServer {
+class SetOperationsSpec extends Spec
+  with ShouldMatchers
+  with RedisTestServer {
 
   describe("sadd") {
     it("should add a non-existent value to the set") {
@@ -18,7 +18,7 @@ class SetOperationsSpec extends Spec
     }
     it("should fail if the key points to a non-set") {
       r.sync.lpush("list-1", "foo") should equal(1)
-      val thrown = evaluating { r.sync.sadd("list-1", "foo") } should produce [Exception]
+      val thrown = evaluating { r.sync.sadd("list-1", "foo") } should produce[Exception]
       thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }
@@ -36,7 +36,7 @@ class SetOperationsSpec extends Spec
     }
     it("should fail if the key points to a non-set") {
       r.sync.lpush("list-1", "foo") should equal(1)
-      val thrown = evaluating { r.sync.srem("list-1", "foo") } should produce [Exception]
+      val thrown = evaluating { r.sync.srem("list-1", "foo") } should produce[Exception]
       thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }
@@ -78,7 +78,7 @@ class SetOperationsSpec extends Spec
       r.sync.lpush("list-1", "bar") should equal(2)
       r.sync.lpush("list-1", "baz") should equal(3)
       r.sync.sadd("set-1", "foo") should equal(true)
-      val thrown = evaluating { r.sync.smove("list-1", "set-1", "bat") } should produce [Exception]
+      val thrown = evaluating { r.sync.smove("list-1", "set-1", "bat") } should produce[Exception]
       thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
     }
   }

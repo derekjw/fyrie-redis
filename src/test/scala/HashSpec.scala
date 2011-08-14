@@ -4,8 +4,8 @@ import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
 class HashSpec extends Spec
-               with ShouldMatchers
-               with RedisTestServer {
+  with ShouldMatchers
+  with RedisTestServer {
 
   describe("hset") {
     it("should set and get fields") {

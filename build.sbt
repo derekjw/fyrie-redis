@@ -20,3 +20,5 @@ addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.0-1")
 scalacOptions += "-P:continuations:enable"
 
 parallelExecution in Test := false
+
+seq(ScalariformPlugin.settings: _*)

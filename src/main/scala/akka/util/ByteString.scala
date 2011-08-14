@@ -81,7 +81,7 @@ object ByteString {
       new String(if (startIndex == 0 && endIndex == bytes.length) bytes else toArray, "UTF-8")
 
     def ++(that: ByteString): ByteString = that match {
-      case b: ByteString1  ⇒ ByteStrings(this, b)
+      case b: ByteString1 ⇒ ByteStrings(this, b)
       case bs: ByteStrings ⇒ ByteStrings(this, bs)
     }
 
@@ -184,7 +184,7 @@ object ByteString {
     }
 
     def ++(that: ByteString): ByteString = that match {
-      case b: ByteString1  ⇒ ByteStrings(this, b)
+      case b: ByteString1 ⇒ ByteStrings(this, b)
       case bs: ByteStrings ⇒ ByteStrings(this, bs)
     }
 

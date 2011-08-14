@@ -6,8 +6,8 @@ import org.scalatest.matchers.ShouldMatchers
 import akka.dispatch.Future
 
 class OperationsSpec extends Spec
-    with ShouldMatchers
-    with RedisTestServer {
+  with ShouldMatchers
+  with RedisTestServer {
 
   describe("keys") {
     it("should fetch keys") {
@@ -118,13 +118,13 @@ class OperationsSpec extends Spec
 
   describe("Multi exec commands") {
     it("should work with single commands") {
-      val result = r.multi{ rq =>
+      val result = r.multi { rq =>
         rq.set("testkey1", "testvalue1")
       }
       result.get should be(())
     }
     it("should work with several commands") {
-      val result = r.multi{ rq =>
+      val result = r.multi { rq =>
         for {
           _ <- rq.set("testkey1", "testvalue1")
           _ <- rq.set("testkey2", "testvalue2")
@@ -142,7 +142,7 @@ class OperationsSpec extends Spec
       Future.sequence(result).get.flatten should be(values.map(2*))
     }
     it("should throw an error") {
-      val result = r.multi{ rq =>
+      val result = r.multi { rq =>
         for {
           _ <- rq.set("a", "abc")
           x <- rq.lpop("a").parse[String]
@@ -153,7 +153,7 @@ class OperationsSpec extends Spec
       result._2.get should be(Some("abc"))
     }
     it("should handle invalid requests") {
-      val result = r.multi{ rq =>
+      val result = r.multi { rq =>
         for {
           _ <- rq.set("testkey1", "testvalue1")
           _ <- rq.set("testkey2", "testvalue2")
@@ -181,29 +181,29 @@ class OperationsSpec extends Spec
     }
     it("should return multiple items") {
       val list = List(("item1", "data1", 1, 4),
-                      ("item2", "data2", 2, 8),
-                      ("item3", "data3", 3, 1),
-                      ("item4", "data4", 4, 6),
-                      ("item5", "data5", 5, 3))
+        ("item2", "data2", 2, 8),
+        ("item3", "data3", 3, 1),
+        ("item4", "data4", 4, 6),
+        ("item5", "data5", 5, 3))
       for ((key, data, num, rank) <- list) {
         r.quiet.sadd("items", key)
-        r.quiet.set("data::"+key, data)
-        r.quiet.set("num::"+key, num)
-        r.quiet.set("rank::"+key, rank)
+        r.quiet.set("data::" + key, data)
+        r.quiet.set("num::" + key, num)
+        r.quiet.set("rank::" + key, rank)
       }
       r.quiet.del(List("num::item1"))
       r.sync.sort("items",
-                  get = Seq("#", "data::*", "num::*"),
-                  by = Some("rank::*"),
-                  limit = Limit(1,3)).parse[String] should be(List(Some("item5"), Some("data5"), Some("5"),
-                                                                   Some("item1"), Some("data1"), None,
-                                                                   Some("item4"), Some("data4"), Some("4")))
+        get = Seq("#", "data::*", "num::*"),
+        by = Some("rank::*"),
+        limit = Limit(1, 3)).parse[String] should be(List(Some("item5"), Some("data5"), Some("5"),
+          Some("item1"), Some("data1"), None,
+          Some("item4"), Some("data4"), Some("4")))
       r.sync.sort("items",
-                  get = Seq("#", "data::*", "num::*"),
-                  by = Some("rank::*"),
-                  limit = Limit(1,3)).parse[String,String,Int] should be(List((Some("item5"), Some("data5"), Some(5)),
-                                                                              (Some("item1"), Some("data1"), None),
-                                                                              (Some("item4"), Some("data4"), Some(4))))
+        get = Seq("#", "data::*", "num::*"),
+        by = Some("rank::*"),
+        limit = Limit(1, 3)).parse[String, String, Int] should be(List((Some("item5"), Some("data5"), Some(5)),
+          (Some("item1"), Some("data1"), None),
+          (Some("item4"), Some("data4"), Some(4))))
     }
   }
 }

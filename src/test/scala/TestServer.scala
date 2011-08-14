@@ -4,7 +4,7 @@ import org.scalatest.Spec
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.BeforeAndAfterAll
 
-trait RedisTestServer extends BeforeAndAfterEach  with BeforeAndAfterAll {
+trait RedisTestServer extends BeforeAndAfterEach with BeforeAndAfterAll {
   self: Spec =>
 
   val r = new RedisClient
@@ -16,8 +16,7 @@ trait RedisTestServer extends BeforeAndAfterEach  with BeforeAndAfterAll {
   override def afterEach = {
     r.sync.flushall
   }
-/*
   override def afterAll = {
     r.disconnect
-  }*/
+  }
 }

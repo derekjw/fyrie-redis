@@ -4,8 +4,8 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait Servers {
-  this: Commands =>
+trait Servers[Result[_]] {
+  this: Commands[Result] =>
   import Protocol._
 
   def save(): Result[Unit] = send(SAVE :: Nil)
@@ -21,7 +21,7 @@ trait Servers {
   def info(): Result[String] = send(INFO :: Nil)
 
   //def monitor extends Command(OkStatus)
-/*
+  /*
   def slaveof(hostPort: Option[(String, Int)])(implicit format: Format) extends Command(OkStatus) {
     override def args = hostPort map (x => Iterator(x._1, x._2)) getOrElse Iterator("NO ONE")
   }
