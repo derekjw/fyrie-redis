@@ -10,7 +10,8 @@ version := "2.0-SNAPSHOT"
 
 resolvers += "Akka Snapshots" at "http://repo.typesafe.com/typesafe/maven-timestamps"
 
-libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-20110807-000243" % "compile",
+libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-SNAPSHOT" % "compile",
+                            "se.scalablesolutions.akka" % "akka-testkit" % "2.0-SNAPSHOT" % "test",
                             "org.scalatest" % "scalatest_2.9.0" % "1.6.1" % "test")
 
 autoCompilerPlugins := true
