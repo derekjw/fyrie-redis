@@ -4,7 +4,7 @@ package messages
 
 import akka.util.ByteString
 import akka.actor.IO
-import akka.dispatch.Promise
+import akka.dispatch.{ CompletableFuture => Promise }
 
 import types.RedisType
 

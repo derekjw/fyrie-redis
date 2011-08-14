@@ -2,7 +2,7 @@ package net.fyrie.redis
 
 import types._
 
-import akka.dispatch.{ Promise, Future }
+import akka.dispatch.{ Future, CompletableFuture => Promise }
 import akka.util.ByteString
 
 object Queued {

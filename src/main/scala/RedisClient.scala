@@ -7,12 +7,16 @@ import Protocol.EOL
 import types._
 import serialization.Parse
 
-import akka.actor.{ Actor, ActorRef, IOManager, PoisonPill, Timeout }
+import akka.actor.{ Actor, ActorRef, IOManager, PoisonPill }
 import Actor.{ actorOf }
 import akka.util.ByteString
+import akka.dispatch.{ CompletableFuture => Promise }
 import akka.dispatch.{ Future, Promise }
+import java.util.concurrent.TimeUnit
 
-case class RedisClientConfig(timeout: Timeout = implicitly,
+case class Timeout(length: Long = 5000, unit: TimeUnit = TimeUnit.MILLISECONDS)
+
+case class RedisClientConfig(timeout: Timeout = Timeout(),
   autoReconnect: Boolean = true,
   retryOnReconnect: Boolean = true)
 

@@ -6,12 +6,11 @@ name := "fyrie-redis"
 
 organization := "net.fyrie"
 
-version := "2.0-SNAPSHOT"
+version := "1.2-SNAPSHOT"
 
-resolvers += "Akka Snapshots" at "http://repo.typesafe.com/typesafe/maven-timestamps"
+resolvers += "Akka Repo" at "http://akka.io/repository"
 
-libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "2.0-SNAPSHOT" % "compile",
-                            "se.scalablesolutions.akka" % "akka-testkit" % "2.0-SNAPSHOT" % "test",
+libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.2-RC2" % "compile",
                             "org.scalatest" % "scalatest_2.9.0" % "1.6.1" % "test")
 
 autoCompilerPlugins := true

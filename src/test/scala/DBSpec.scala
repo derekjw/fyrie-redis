@@ -4,7 +4,6 @@ import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 
 import akka.dispatch.Future
-import akka.testkit.{ filterEvents, EventFilter }
 
 class OperationsSpec extends Spec
   with ShouldMatchers
@@ -143,17 +142,15 @@ class OperationsSpec extends Spec
       Future.sequence(result).get.flatten should be(values.map(2*))
     }
     it("should throw an error") {
-      filterEvents(EventFilter[RedisErrorException]("ERR Operation against a key holding the wrong kind of value")) {
-        val result = r.multi { rq =>
-          for {
-            _ <- rq.set("a", "abc")
-            x <- rq.lpop("a").parse[String]
-            y <- rq.get("a").parse[String]
-          } yield (x, y)
-        }
-        evaluating { result._1.get } should produce[RedisErrorException]
-        result._2.get should be(Some("abc"))
+      val result = r.multi { rq =>
+        for {
+          _ <- rq.set("a", "abc")
+          x <- rq.lpop("a").parse[String]
+          y <- rq.get("a").parse[String]
+        } yield (x, y)
       }
+      evaluating { result._1.get } should produce[RedisErrorException]
+      result._2.get should be(Some("abc"))
     }
     it("should handle invalid requests") {
       val result = r.multi { rq =>
