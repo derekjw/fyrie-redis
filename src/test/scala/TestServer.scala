@@ -16,8 +16,7 @@ trait RedisTestServer extends BeforeAndAfterEach with BeforeAndAfterAll {
   override def afterEach = {
     r.sync.flushall
   }
-  /*
   override def afterAll = {
     r.disconnect
-  }*/
+  }
 }
