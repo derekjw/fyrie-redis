@@ -17,7 +17,7 @@ case class RedisClientConfig(timeout: Timeout = implicitly,
   retryOnReconnect: Boolean = true)
 
 object RedisClient {
-  def connect(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
+  def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
     new RedisClient(host, port, config, ioManager)
 }
 
@@ -75,18 +75,18 @@ sealed abstract class RedisClientQuiet extends Commands[({ type λ[_] = Unit })#
 
 sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
   final protected def send(in: List[ByteString]): Queued[Future[Any]] = {
-    val status = Promise[RedisType]()
-    val statusFuture = status map toStatus
-    val bytes = format(in)
     val result = Promise[RedisType]()
-    statusFuture onException { case e => result complete Left(e) }
-    Queued(result, (bytes, status), result)
+    Queued(result, (format(in), Promise[RedisType]()), result)
   }
 
   def exec[T](q: Queued[T]): T = {
     actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
       case RedisMulti(m) =>
         var responses = q.responses
+        (q.responses.iterator zip (q.requests.iterator map (_._2.value))) foreach {
+          case (resp, Some(Right(status))) => try { toStatus(status) } catch { case e => resp complete Left(e) }
+          case (resp, _) => resp complete Left(RedisProtocolException("Unexpected response"))
+        }
         for {
           list <- m
           rtype <- list
