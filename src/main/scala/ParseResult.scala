@@ -4,7 +4,7 @@ import akka.util.ByteString
 import akka.dispatch.Future
 import serialization.Parse
 
-trait ParseResult {
+private[redis] trait ParseResult {
   implicit def parseBulk(result: Option[ByteString]) = new ParseBulk[({ type λ[α] = α })#λ](result)
   implicit def parseBulk(result: Future[Option[ByteString]]) = new ParseBulk[Future](result)
   implicit def parseBulk(result: Queued[Future[Option[ByteString]]]) = new ParseBulk[({ type λ[α] = Queued[Future[α]] })#λ](result)

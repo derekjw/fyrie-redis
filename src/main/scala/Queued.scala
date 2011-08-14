@@ -6,7 +6,7 @@ import akka.dispatch.{ Promise, Future }
 import akka.util.ByteString
 
 object Queued {
-  def apply[A](value: A, request: (ByteString, Promise[RedisType]), response: Promise[RedisType]): Queued[A] =
+  private[redis] def apply[A](value: A, request: (ByteString, Promise[RedisType]), response: Promise[RedisType]): Queued[A] =
     new QueuedSingle(value, request, response)
   def apply[A](value: A): Queued[A] = new QueuedValue(value)
 
@@ -44,8 +44,8 @@ object Queued {
 
 sealed trait Queued[+A] {
   def value: A
-  def requests: Vector[(ByteString, Promise[RedisType])]
-  def responses: Vector[Promise[RedisType]]
+  private[redis] def requests: Vector[(ByteString, Promise[RedisType])]
+  private[redis] def responses: Vector[Promise[RedisType]]
   def flatMap[B](f: A => Queued[B]): Queued[B]
   def map[B](f: A => B): Queued[B]
 }
