@@ -169,6 +169,32 @@ class OperationsSpec extends Spec
     }
   }
 
+  describe("watch") {
+    it("should handle complex request") {
+      r.sync.rpush("mykey1", 5)
+      r.set("mykey2", "hello")
+      r.hset("mykey3", "hello", 7)
+      val result = r watch { rw =>
+        for {
+          _ <- rw.watch("mykey1")
+          _ <- rw.watch("mykey2")
+          _ <- rw.watch("mykey3")
+          Some(a) <- rw.lindex("mykey1", 0).parse[Int]
+          Some(b) <- rw.get("mykey2").parse[String]
+          Some(c) <- rw.hget("mykey3", b).parse[Int]
+        } yield rw.multi { rq =>
+          for {
+            _ <- rq.rpush("mykey1", a + 1)
+            _ <- rq.hset("mykey3", b, c + 1)
+          } yield (a, b, c)
+        }
+      }
+      result.get should be(5, "hello", 7)
+      r.sync.lrange("mykey1").parse[Int] should be(Some(List(5, 6)))
+      r.sync.hget("mykey3", "hello").parse[Int] should be(Some(8))
+    }
+  }
+
   describe("sort") {
     it("should do a simple sort") {
       List(6, 3, 5, 47, 1, 1, 4, 9) foreach (r.lpush("sortlist", _))
