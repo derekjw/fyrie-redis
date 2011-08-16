@@ -185,11 +185,7 @@ class OperationsSpec extends Spec
           for {
             _ <- rw watch "key"
             Some(n) <- rw.get("key").parse[Int]
-          } yield rw multi { rq =>
-            for {
-              _ <- rq.set("key", n + 1)
-            } yield n
-          }
+          } yield rw multi (_.set("key", n + 1).map(_ => n))
         }
       }
       Future.sequence(futures).await
