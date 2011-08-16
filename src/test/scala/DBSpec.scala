@@ -181,7 +181,7 @@ class OperationsSpec extends Spec
         r watch { rw =>
           for {
             _ <- rw watch "key"
-            Some(n) <- rw.get("key").parse[Int]
+            Some(n: Int) <- rw.get("key").parse[Int]
           } yield rw multi (_.set("key", n + 1).map(_ => n))
         }
       }
@@ -197,9 +197,9 @@ class OperationsSpec extends Spec
           _ <- rw.watch("mykey1")
           _ <- rw.watch("mykey2")
           _ <- rw.watch("mykey3")
-          Some(a) <- rw.lindex("mykey1", 0).parse[Int]
-          Some(b) <- rw.get("mykey2").parse[String]
-          Some(c) <- rw.hget("mykey3", b).parse[Int]
+          Some(a: Int) <- rw.lindex("mykey1", 0).parse[Int]
+          Some(b: String) <- rw.get("mykey2").parse[String]
+          Some(c: Int) <- rw.hget("mykey3", b).parse[Int]
         } yield rw.multi { rq =>
           for {
             _ <- rq.rpush("mykey1", a + 1)
