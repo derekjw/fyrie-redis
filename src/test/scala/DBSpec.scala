@@ -166,6 +166,53 @@ class OperationsSpec extends Spec
     }
   }
 
+  describe("watch") {
+    it("should fail without watch") {
+      r.sync.set("key", 0)
+      val clients = List.fill(10)(RedisClient())
+      val futures = for (client <- clients; _ <- 1 to 10) yield client.get("key").parse[Int] flatMap { n => client.set("key", n.get + 1) }
+      Future.sequence(futures).await
+      clients foreach (_.disconnect)
+      r.sync.get("key").parse[Int] should not be (Some(100))
+    }
+    it("should succeed with watch") {
+      r.sync.set("key", 0)
+      val futures = for (_ <- 1 to 100) yield {
+        r watch { rw =>
+          for {
+            _ <- rw watch "key"
+            Some(n) <- rw.get("key").parse[Int]
+          } yield rw multi (_.set("key", n + 1).map(_ => n))
+        }
+      }
+      Future.sequence(futures).await
+      r.sync.get("key").parse[Int] should be(Some(100))
+    }
+    it("should handle complex request") {
+      r.sync.rpush("mykey1", 5)
+      r.set("mykey2", "hello")
+      r.hset("mykey3", "hello", 7)
+      val result = r watch { rw =>
+        for {
+          _ <- rw.watch("mykey1")
+          _ <- rw.watch("mykey2")
+          _ <- rw.watch("mykey3")
+          Some(a) <- rw.lindex("mykey1", 0).parse[Int]
+          Some(b) <- rw.get("mykey2").parse[String]
+          Some(c) <- rw.hget("mykey3", b).parse[Int]
+        } yield rw.multi { rq =>
+          for {
+            _ <- rq.rpush("mykey1", a + 1)
+            _ <- rq.hset("mykey3", b, c + 1)
+          } yield (a, b, c)
+        }
+      }
+      result.get should be(5, "hello", 7)
+      r.sync.lrange("mykey1").parse[Int] should be(Some(List(5, 6)))
+      r.sync.hget("mykey3", "hello").parse[Int] should be(Some(8))
+    }
+  }
+
   describe("sort") {
     it("should do a simple sort") {
       List(6, 3, 5, 47, 1, 1, 4, 9) foreach (r.lpush("sortlist", _))
