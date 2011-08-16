@@ -170,6 +170,31 @@ class OperationsSpec extends Spec
   }
 
   describe("watch") {
+    it("should fail without watch") {
+      r.sync.set("key", 0)
+      val clients = List.fill(10)(RedisClient())
+      val futures = for (client <- clients; _ <- 1 to 10) yield client.get("key").parse[Int] flatMap { n => client.set("key", n.get + 1) }
+      Future.sequence(futures).await
+      clients foreach (_.disconnect)
+      r.sync.get("key").parse[Int] should not be (Some(100))
+    }
+    it("should succeed with watch") {
+      r.sync.set("key", 0)
+      val futures = for (_ <- 1 to 100) yield {
+        r watch { rw =>
+          for {
+            _ <- rw watch "key"
+            Some(n) <- rw.get("key").parse[Int]
+          } yield rw multi { rq =>
+            for {
+              _ <- rq.set("key", n + 1)
+            } yield n
+          }
+        }
+      }
+      Future.sequence(futures).await
+      r.sync.get("key").parse[Int] should be(Some(100))
+    }
     it("should handle complex request") {
       r.sync.rpush("mykey1", 5)
       r.set("mykey2", "hello")
