@@ -5,7 +5,7 @@ package actors
 import messages._
 import types._
 
-import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler }
+import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
 import Actor.{ actorOf }
 import akka.util.ByteString
 import akka.util.cps._
@@ -93,17 +93,17 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     case IO.Closed(handle, cause) if socket == handle && config.autoReconnect =>
       EventHandler info (this, "Reconnecting" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
       socket = IO.connect(ioManager, host, port, self)
-      self.supervisor foreach (_ ! Socket(socket))
+      sendToSupervisor(Socket(socket))
       retry
 
     case IO.Closed(handle, cause) if socket == handle =>
       EventHandler info (this, "Connection closed" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
-      self.supervisor foreach (_ ! Disconnect)
+      sendToSupervisor(Disconnect)
 
     case Run =>
       val result = readResult
       self tryReply result
-      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
+      if (config.retryOnReconnect) sendToSupervisor(Received)
 
     case msg: MultiRun =>
       val multi = readResult
@@ -116,13 +116,21 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       }
       val exec = readResult
       self tryReply exec
-      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
+      if (config.retryOnReconnect) sendToSupervisor(Received)
 
     case Disconnect =>
       // TODO: Complete all waiting requests with a RedisConnectionException
       socket.close
       self.stop()
 
+  }
+
+  def sendToSupervisor(msg: Any) {
+    try {
+      self.supervisor foreach (_ ! msg)
+    } catch {
+      case e: ActorInitializationException => // ignore, probably shutting down
+    }
   }
 
   def readResult: RedisType @cps[IO.IOSuspendable[Any]] = {
