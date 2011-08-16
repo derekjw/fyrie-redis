@@ -9,7 +9,7 @@ version := "1.2-SNAPSHOT"
 
 resolvers += "Akka Repo" at "http://akka.io/repository"
 
-libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.2-RC2" % "compile",
+libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.2-RC3" % "compile",
                             "org.scalatest" % "scalatest_2.9.0" % "1.6.1" % "test")
 
 autoCompilerPlugins := true
