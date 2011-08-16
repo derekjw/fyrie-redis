@@ -1,5 +1,4 @@
 
-
 scalaVersion := "2.9.0-1"
 
 name := "fyrie-redis"
@@ -23,3 +22,9 @@ scalacOptions += "-P:continuations:enable"
 parallelExecution in Test := false
 
 seq(ScalariformPlugin.settings: _*)
+
+publishTo <<= (version) { version: String =>
+  val repo = (s: String) =>
+    Resolver.ssh(s, "repo.fyrie.net", "/home/repo/" + s + "/") as("derek", file("/home/derek/.ssh/id_rsa")) withPermissions("0644")
+  Some(if (version.trim.endsWith("SNAPSHOT")) repo("snapshots") else repo("releases"))
+}
