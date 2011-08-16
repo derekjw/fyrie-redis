@@ -2,7 +2,7 @@ package net.fyrie.redis
 
 import akka.util.ByteString
 
-object Protocol {
+private[redis] object Protocol {
   val AFTER = ByteString("AFTER")
   val AGGREGATE = ByteString("AGGREGATE")
   val ALLKEYS = ByteString("*")

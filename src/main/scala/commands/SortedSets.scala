@@ -4,7 +4,7 @@ package commands
 import serialization._
 import akka.util.ByteString
 
-trait SortedSets[Result[_]] {
+private[redis] trait SortedSets[Result[_]] {
   this: Commands[Result] =>
   import Protocol._
 
