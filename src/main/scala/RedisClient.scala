@@ -117,11 +117,11 @@ sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.
   final private[redis] def run[T](block: (RedisClientWatch) => Future[Queued[T]]): Future[T] = {
     val promise = Promise[T]()
     exec(promise, block)
-    promise
+    promise onComplete { _ => actor ! Disconnect }
   }
 
   final private[redis] def exec[T](promise: Promise[T], block: (RedisClientWatch) => Future[Queued[T]]): Unit = {
-    block(this) foreach { q =>
+    block(this) onException { case e => promise complete Left(e) } foreach { q =>
       actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
         case RedisMulti(None) =>
           if (!promise.isExpired) exec(promise, block)
