@@ -46,6 +46,7 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
     rq.exec(block(rq))
   }
 
+  // TODO: Use a connection pool
   def watch[T](block: (RedisClientWatch) => Future[Queued[T]]): Future[T] = {
     val rw = new RedisClientWatch { val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start }
     rw.run(block)
