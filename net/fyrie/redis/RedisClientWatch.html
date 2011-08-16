@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
         <head>
-          <title>net.fyrie.redis.RedisClient</title>
+          <title>net.fyrie.redis.RedisClientWatch</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
@@ -14,23 +14,23 @@
         </head>
         <body class="type">
       <div id="definition">
-        <a title="Go to companion" href="RedisClient$.html"><img src="../../../lib/class_to_object_big.png" /></a>
+        <img src="../../../lib/class_big.png" />
         <p id="owner"><a name="net" class="extype" href="../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../package.html">fyrie</a>.<a name="net.fyrie.redis" class="extype" href="package.html">redis</a></p>
-        <h1><a title="Go to companion" href="RedisClient$.html">RedisClient</a></h1>
+        <h1>RedisClientWatch</h1>
       </div>
 
       <h4 class="signature" id="signature">
       <span class="kind">class</span>
       <span class="symbol"> 
-        <span class="name">RedisClient</span>
+        <span class="name">RedisClientWatch</span>
         
-        <span class="result"> extends <a name="net.fyrie.redis.RedisClientAsync" class="extype" href="RedisClientAsync.html">RedisClientAsync</a></span>
+        <span class="result"> extends <span name="net.fyrie.redis.Commands" class="extype">Commands</span>[<span name="akka.dispatch.Future" class="extype">Future</span>]</span>
       </span>
       </h4>
       
-          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd></dl><div class="toggleContainer block">
+          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed abstract </dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a name="net.fyrie.redis.RedisClientAsync" class="extype" href="RedisClientAsync.html">RedisClientAsync</a>, <a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a>, <span name="net.fyrie.redis.Commands" class="extype">Commands</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Hashes" class="extype">Hashes</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.SortedSets" class="extype">SortedSets</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Sets" class="extype">Sets</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Lists" class="extype">Lists</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Strings" class="extype">Strings</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Servers" class="extype">Servers</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Keys" class="extype">Keys</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+          <div class="superTypes hiddenContent"><span name="net.fyrie.redis.Commands" class="extype">Commands</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Hashes" class="extype">Hashes</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.SortedSets" class="extype">SortedSets</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Sets" class="extype">Sets</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Lists" class="extype">Lists</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Strings" class="extype">Strings</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Servers" class="extype">Servers</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], <span name="net.fyrie.redis.commands.Keys" class="extype">Keys</span>[<span name="akka.dispatch.Future" class="extype">Future</span>], AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
         
 
@@ -46,7 +46,7 @@
                 <span class="filtertype">Inherited</span>
                 <ol><li class="hideall out"><span>Hide All</span></li>
                 <li class="showall in"><span>Show all</span></li></ol>
-                <ol id="linearization"><li name="net.fyrie.redis.RedisClient" class="in"><span>RedisClient</span></li><li name="net.fyrie.redis.RedisClientAsync" class="in"><span>RedisClientAsync</span></li><li name="net.fyrie.redis.ConfigurableRedisClient" class="in"><span>ConfigurableRedisClient</span></li><li name="net.fyrie.redis.Commands" class="in"><span>Commands</span></li><li name="net.fyrie.redis.commands.Hashes" class="in"><span>Hashes</span></li><li name="net.fyrie.redis.commands.SortedSets" class="in"><span>SortedSets</span></li><li name="net.fyrie.redis.commands.Sets" class="in"><span>Sets</span></li><li name="net.fyrie.redis.commands.Lists" class="in"><span>Lists</span></li><li name="net.fyrie.redis.commands.Strings" class="in"><span>Strings</span></li><li name="net.fyrie.redis.commands.Servers" class="in"><span>Servers</span></li><li name="net.fyrie.redis.commands.Keys" class="in"><span>Keys</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+                <ol id="linearization"><li name="net.fyrie.redis.RedisClientWatch" class="in"><span>RedisClientWatch</span></li><li name="net.fyrie.redis.Commands" class="in"><span>Commands</span></li><li name="net.fyrie.redis.commands.Hashes" class="in"><span>Hashes</span></li><li name="net.fyrie.redis.commands.SortedSets" class="in"><span>SortedSets</span></li><li name="net.fyrie.redis.commands.Sets" class="in"><span>Sets</span></li><li name="net.fyrie.redis.commands.Lists" class="in"><span>Lists</span></li><li name="net.fyrie.redis.commands.Strings" class="in"><span>Strings</span></li><li name="net.fyrie.redis.commands.Servers" class="in"><span>Servers</span></li><li name="net.fyrie.redis.commands.Keys" class="in"><span>Keys</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
               </div>
           <div id="visbl">
               <span class="filtertype">Visibility</span>
@@ -56,14 +56,14 @@
 
         <div class="members" id="constructors">
               <h3>Instance Constructors</h3>
-              <ol><li visbl="pub" name="net.fyrie.redis.RedisClient#this" data-isabs="false">
-      <a id="this:RedisClient"></a>
+              <ol><li visbl="pub" name="net.fyrie.redis.RedisClientWatch#this" data-isabs="false">
+      <a id="this:RedisClientWatch"></a>
       <h4 class="signature">
       <span class="kind">new</span>
       <span class="symbol"> 
-        <span class="name">RedisClient</span>
+        <span class="name">RedisClientWatch</span>
         
-        <span class="params">(<span name="host">host: String</span>, <span name="port">port: <span name="scala.Int" class="extype">Int</span></span>, <span name="config">config: <a name="net.fyrie.redis.RedisClientConfig" class="extype" href="RedisClientConfig.html">RedisClientConfig</a></span>, <span name="ioManager">ioManager: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>)</span>
+        <span class="params">()</span>
       </span>
       </h4>
       
@@ -72,10 +72,24 @@
 
         
         
+        <div class="values members" id="values">
+              <h3>Abstract Value Members</h3>
+              <ol><li visbl="prt" name="net.fyrie.redis.Commands#actor" data-isabs="true">
+      <a id="actor:ActorRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">actor</span>
         
+        <span class="result">: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected abstract </dd><dt>Definition Classes</dt><dd>Commands</dd></dl></div>
+    </li></ol>
+            </div>
 
         <div class="values members" id="values">
-              <h3>Value Members</h3>
+              <h3>Concrete Value Members</h3>
               <ol><li visbl="pub" name="scala.AnyRef#!=" data-isabs="false">
       <a id="!=(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -131,17 +145,6 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li visbl="prt" name="net.fyrie.redis.RedisClient#actor" data-isabs="false">
-      <a id="actor:ActorRef"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">actor</span>
-        
-        <span class="result">: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a name="net.fyrie.redis.RedisClient" class="extype" href="">RedisClient</a> → Commands</dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Strings#append" data-isabs="false">
       <a id="append[K, V](K,V)(Store[K],Store[V]):Future[Int]"></a>
       <h4 class="signature">
@@ -164,17 +167,6 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClientAsync#async" data-isabs="false">
-      <a id="async:RedisClientAsync"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">async</span>
-        
-        <span class="result">: <a name="net.fyrie.redis.RedisClientAsync" class="extype" href="RedisClientAsync.html">RedisClientAsync</a></span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.RedisClientAsync" class="extype" href="RedisClientAsync.html">RedisClientAsync</a> → <a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a></dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#auth" data-isabs="false">
       <a id="auth[A](A)(Store[A]):Future[Unit]"></a>
       <h4 class="signature">
@@ -258,17 +250,6 @@
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#config" data-isabs="false">
-      <a id="config:RedisClientConfig"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">config</span>
-        
-        <span class="result">: <a name="net.fyrie.redis.RedisClientConfig" class="extype" href="RedisClientConfig.html">RedisClientConfig</a></span>
-      </span>
-      </h4>
-      
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#dbsize" data-isabs="false">
       <a id="dbsize():Future[Int]"></a>
       <h4 class="signature">
@@ -332,17 +313,6 @@ or similar collection.</p><p>Returns: <code>Int</code>
 </p></div><dl class="paramcmts block"><dt class="param">keys</dt><dd class="cmt"><p>A collection of keys to delete.
 </p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>Keys</dd><dt>See also</dt><dd><span class="cmt"><p><a href="http://code.google.com/p/redis/wiki/DelCommand">Redis Command Reference</a>
 </p></span></dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#disconnect" data-isabs="false">
-      <a id="disconnect:Unit"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol"> 
-        <span class="name">disconnect</span>
-        
-        <span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
-      </span>
-      </h4>
-      
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#echo" data-isabs="false">
       <a id="echo[A](A)(Store[A]):Future[Option[ByteString]]"></a>
       <h4 class="signature">
@@ -625,17 +595,6 @@ automatically deleted. Returns 'true' if the expire command is successful.</p><p
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Hashes</dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#host" data-isabs="false">
-      <a id="host:String"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">host</span>
-        
-        <span class="result">: String</span>
-      </span>
-      </h4>
-      
     </li><li visbl="pub" name="net.fyrie.redis.commands.Hashes#hset" data-isabs="false">
       <a id="hset[K, F, V](K,F,V)(Store[K],Store[F],Store[V]):Future[Boolean]"></a>
       <h4 class="signature">
@@ -702,17 +661,6 @@ automatically deleted. Returns 'true' if the expire command is successful.</p><p
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Servers</dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#ioManager" data-isabs="false">
-      <a id="ioManager:ActorRef"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">ioManager</span>
-        
-        <span class="result">: <span name="akka.actor.ActorRef" class="extype">ActorRef</span></span>
-      </span>
-      </h4>
-      
     </li><li visbl="pub" name="scala.Any#isInstanceOf" data-isabs="false">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <h4 class="signature">
@@ -929,14 +877,14 @@ Returns <code>true</code> if successful.</p><p>Returns: <code>Boolean</code>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Strings</dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#multi" data-isabs="false">
-      <a id="multi[T]((RedisClientMulti) ⇒ Queued[T]):T"></a>
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClientWatch#multi" data-isabs="false">
+      <a id="multi[T]((RedisClientMulti) ⇒ Queued[T]):Queued[T]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol"> 
         <span class="name">multi</span>
         <span class="tparams">[<span name="T">T</span>]</span>
-        <span class="params">(<span name="block">block: (<a name="net.fyrie.redis.RedisClientMulti" class="extype" href="RedisClientMulti.html">RedisClientMulti</a>) ⇒ <a name="net.fyrie.redis.Queued" class="extype" href="Queued.html">Queued</a>[T]</span>)</span><span class="result">: T</span>
+        <span class="params">(<span name="block">block: (<a name="net.fyrie.redis.RedisClientMulti" class="extype" href="RedisClientMulti.html">RedisClientMulti</a>) ⇒ <a name="net.fyrie.redis.Queued" class="extype" href="Queued.html">Queued</a>[T]</span>)</span><span class="result">: <a name="net.fyrie.redis.Queued" class="extype" href="Queued.html">Queued</a>[T]</span>
       </span>
       </h4>
       
@@ -984,28 +932,6 @@ Returns <code>true</code> if successful.</p><p>Returns: <code>Boolean</code>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Keys</dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#port" data-isabs="false">
-      <a id="port:Int"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">port</span>
-        
-        <span class="result">: <span name="scala.Int" class="extype">Int</span></span>
-      </span>
-      </h4>
-      
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#quiet" data-isabs="false">
-      <a id="quiet:RedisClientQuiet"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">quiet</span>
-        
-        <span class="result">: <a name="net.fyrie.redis.RedisClientQuiet" class="extype" href="RedisClientQuiet.html">RedisClientQuiet</a></span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.RedisClient" class="extype" href="">RedisClient</a> → <a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a></dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#quit" data-isabs="false">
       <a id="quit():Future[Unit]"></a>
       <h4 class="signature">
@@ -1367,17 +1293,6 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Sets</dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#sync" data-isabs="false">
-      <a id="sync:RedisClientSync"></a>
-      <h4 class="signature">
-      <span class="kind">val</span>
-      <span class="symbol"> 
-        <span class="name">sync</span>
-        
-        <span class="result">: <a name="net.fyrie.redis.RedisClientSync" class="extype" href="RedisClientSync.html">RedisClientSync</a></span>
-      </span>
-      </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="net.fyrie.redis.RedisClient" class="extype" href="">RedisClient</a> → <a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a></dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -1456,14 +1371,14 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li visbl="pub" name="net.fyrie.redis.RedisClient#watch" data-isabs="false">
-      <a id="watch[T]((RedisClientWatch) ⇒ Future[Queued[T]]):Future[T]"></a>
+    </li><li visbl="pub" name="net.fyrie.redis.RedisClientWatch#watch" data-isabs="false">
+      <a id="watch[A](A)(Store[A]):Future[Unit]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol"> 
         <span class="name">watch</span>
-        <span class="tparams">[<span name="T">T</span>]</span>
-        <span class="params">(<span name="block">block: (<a name="net.fyrie.redis.RedisClientWatch" class="extype" href="RedisClientWatch.html">RedisClientWatch</a>) ⇒ <span name="akka.dispatch.Future" class="extype">Future</span>[<a name="net.fyrie.redis.Queued" class="extype" href="Queued.html">Queued</a>[T]]</span>)</span><span class="result">: <span name="akka.dispatch.Future" class="extype">Future</span>[T]</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="key">key: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Store" class="extype" href="serialization/Store.html">Store</a>[A]</span>)</span><span class="result">: <span name="akka.dispatch.Future" class="extype">Future</span>[<span name="scala.Unit" class="extype">Unit</span>]</span>
       </span>
       </h4>
       
@@ -1712,11 +1627,7 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
     </li></ol>
             </div>
 
-        <div name="net.fyrie.redis.RedisClientAsync" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.RedisClientAsync" class="extype" href="RedisClientAsync.html">RedisClientAsync</a></h3>
-            </div><div name="net.fyrie.redis.ConfigurableRedisClient" class="parent">
-              <h3>Inherited from <a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a></h3>
-            </div><div name="net.fyrie.redis.Commands" class="parent">
+        <div name="net.fyrie.redis.Commands" class="parent">
               <h3>Inherited from <span name="net.fyrie.redis.Commands" class="extype">Commands</span>[<span name="akka.dispatch.Future" class="extype">Future</span>]</h3>
             </div><div name="net.fyrie.redis.commands.Hashes" class="parent">
               <h3>Inherited from <span name="net.fyrie.redis.commands.Hashes" class="extype">Hashes</span>[<span name="akka.dispatch.Future" class="extype">Future</span>]</h3>
