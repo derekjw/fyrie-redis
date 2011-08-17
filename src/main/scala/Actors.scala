@@ -4,6 +4,7 @@ package actors
 
 import messages._
 import types._
+import pubsub._
 
 import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
 import Actor.{ actorOf }
@@ -75,6 +76,46 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
 }
 
+private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
+
+  var socket: IO.SocketHandle = _
+  var worker: ActorRef = _
+
+  var client: RedisClientSub = _
+
+  override def preStart = {
+    client = new RedisClientSub(self, host, port, config)
+    EventHandler info (this, "Connecting")
+    worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
+    self startLink worker
+    socket = IO.connect(ioManager, host, port, worker)
+    worker ! Socket(socket)
+    worker ! Subscriber(listener)
+  }
+
+  def receive = {
+
+    case Subscribe(channels) =>
+      socket write (client.subscribe(channels))
+
+    case Unsubscribe(channels) =>
+      socket write (client.unsubscribe(channels))
+
+    case PSubscribe(patterns) =>
+      socket write (client.psubscribe(patterns))
+
+    case PUnsubscribe(patterns) =>
+      socket write (client.punsubscribe(patterns))
+
+    case Disconnect =>
+      EventHandler info (this, "Shutting down")
+      socket.close
+      self.stop()
+
+  }
+
+}
+
 private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor with IO {
   import Protocol._
 
@@ -117,6 +158,22 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       val exec = readResult
       self tryReply exec
       if (config.retryOnReconnect) sendToSupervisor(Received)
+
+    case Subscriber(listener) =>
+      loopC {
+        val result = readResult
+        result match {
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
+            listener ! pubsub.Subscribed(channel, count)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
+            listener ! pubsub.Unsubscribed(channel, count)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
+            listener ! pubsub.Message(channel, message)
+          case other =>
+            throw RedisProtocolException("Unexpected response")
+            ()
+        }
+      }
 
     case Disconnect =>
       // TODO: Complete all waiting requests with a RedisConnectionException

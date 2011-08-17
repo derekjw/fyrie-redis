@@ -1,6 +1,7 @@
 package net.fyrie.redis
 
 import akka.dispatch.Future
+import akka.util.ByteString
 
 private[redis] sealed abstract class ResultFunctor[R[_]] {
   def fmap[A, B](a: R[A])(f: A => B): R[B]
@@ -19,5 +20,7 @@ private[redis] object ResultFunctor {
   implicit val multi: ResultFunctor[({ type λ[α] = Queued[Future[α]] })#λ] = new ResultFunctor[({ type λ[α] = Queued[Future[α]] })#λ] {
     def fmap[A, B](a: Queued[Future[A]])(f: A => B): Queued[Future[B]] = a map (_ map f)
   }
-
+  implicit val raw: ResultFunctor[({ type X[_] = ByteString })#X] = new ResultFunctor[({ type X[_] = ByteString })#X] {
+    def fmap[A, B](a: ByteString)(f: A => B): ByteString = a
+  }
 }
