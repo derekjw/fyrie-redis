@@ -21,16 +21,16 @@ class PubSubSpec extends Spec
     }
 
     def receive = {
-      case msg: Subscribe => client ! msg
-      case msg: Unsubscribe => client ! msg
-      case msg: PSubscribe => client ! msg
-      case msg: PUnsubscribe => client ! msg
-      case Subscribed(channel, count) => ps enqueue ("[" + Parse[String](channel) + "] Subscribed")
-      case Unsubscribed(channel, count) => ps enqueue ("[" + Parse[String](channel) + "] Unsubscribed")
-      case Message(channel, bytes) => ps enqueue ("[" + Parse[String](channel) + "] Message: " + Parse[String](bytes))
-      case PSubscribed(pattern, count) => ps enqueue ("[" + Parse[String](pattern) + "] Subscribed")
-      case PUnsubscribed(pattern, count) => ps enqueue ("[" + Parse[String](pattern) + "] Unsubscribed")
-      case PMessage(pattern, channel, bytes) => ps enqueue ("[" + Parse[String](pattern) + "][" + Parse[String](channel) + "] Message: " + Parse[String](bytes))
+      case msg: Subscribe                    ⇒ client ! msg
+      case msg: Unsubscribe                  ⇒ client ! msg
+      case msg: PSubscribe                   ⇒ client ! msg
+      case msg: PUnsubscribe                 ⇒ client ! msg
+      case Subscribed(channel, count)        ⇒ ps enqueue ("[" + Parse[String](channel) + "] Subscribed")
+      case Unsubscribed(channel, count)      ⇒ ps enqueue ("[" + Parse[String](channel) + "] Unsubscribed")
+      case Message(channel, bytes)           ⇒ ps enqueue ("[" + Parse[String](channel) + "] Message: " + Parse[String](bytes))
+      case PSubscribed(pattern, count)       ⇒ ps enqueue ("[" + Parse[String](pattern) + "] Subscribed")
+      case PUnsubscribed(pattern, count)     ⇒ ps enqueue ("[" + Parse[String](pattern) + "] Unsubscribed")
+      case PMessage(pattern, channel, bytes) ⇒ ps enqueue ("[" + Parse[String](pattern) + "][" + Parse[String](channel) + "] Message: " + Parse[String](bytes))
     }
   }
 

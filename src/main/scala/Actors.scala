@@ -36,30 +36,30 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
   def receive = {
 
-    case req: Request =>
+    case req: Request ⇒
       socket write req.bytes
       worker forward Run
       if (config.retryOnReconnect) waiting enqueue req
 
-    case req: MultiRequest =>
+    case req: MultiRequest ⇒
       sendMulti(req)
       worker forward MultiRun(req.cmds.map(_._2))
       if (config.retryOnReconnect) waiting enqueue req
 
-    case Received =>
+    case Received ⇒
       waiting.dequeue
 
-    case Socket(handle) =>
+    case Socket(handle) ⇒
       socket = handle
       if (config.retryOnReconnect) {
         waiting foreach {
-          case req: Request => socket write req.bytes
-          case req: MultiRequest => sendMulti(req)
+          case req: Request      ⇒ socket write req.bytes
+          case req: MultiRequest ⇒ sendMulti(req)
         }
         if (waiting.nonEmpty) EventHandler info (this, "Retrying " + waiting.length + " commands")
       }
 
-    case Disconnect =>
+    case Disconnect ⇒
       EventHandler info (this, "Shutting down")
       worker ! Disconnect
       self.stop()
@@ -68,7 +68,7 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
   def sendMulti(req: MultiRequest): Unit = {
     socket write req.multi
-    req.cmds foreach { cmd =>
+    req.cmds foreach { cmd ⇒
       socket write cmd._1
     }
     socket write req.exec
@@ -95,19 +95,19 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
 
   def receive = {
 
-    case Subscribe(channels) =>
+    case Subscribe(channels) ⇒
       socket write (client.subscribe(channels))
 
-    case Unsubscribe(channels) =>
+    case Unsubscribe(channels) ⇒
       socket write (client.unsubscribe(channels))
 
-    case PSubscribe(patterns) =>
+    case PSubscribe(patterns) ⇒
       socket write (client.psubscribe(patterns))
 
-    case PUnsubscribe(patterns) =>
+    case PUnsubscribe(patterns) ⇒
       socket write (client.punsubscribe(patterns))
 
-    case Disconnect =>
+    case Disconnect ⇒
       EventHandler info (this, "Shutting down")
       socket.close
       self.stop()
@@ -123,30 +123,30 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
   def receiveIO: ReceiveIO = {
 
-    case Socket(handle) =>
+    case Socket(handle) ⇒
       socket = handle
 
-    case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect =>
+    case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect ⇒
       EventHandler info (this, "Connection refused, retrying in 1 second")
       Scheduler.scheduleOnce(self, IO.Closed(handle, None), 1, TimeUnit.SECONDS)
       retry
 
-    case IO.Closed(handle, cause) if socket == handle && config.autoReconnect =>
-      EventHandler info (this, "Reconnecting" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
+    case IO.Closed(handle, cause) if socket == handle && config.autoReconnect ⇒
+      EventHandler info (this, "Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       socket = IO.connect(ioManager, host, port, self)
       sendToSupervisor(Socket(socket))
       retry
 
-    case IO.Closed(handle, cause) if socket == handle =>
-      EventHandler info (this, "Connection closed" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
+    case IO.Closed(handle, cause) if socket == handle ⇒
+      EventHandler info (this, "Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       sendToSupervisor(Disconnect)
 
-    case Run =>
+    case Run ⇒
       val result = readResult
       self tryReply result
       if (config.retryOnReconnect) sendToSupervisor(Received)
 
-    case msg: MultiRun =>
+    case msg: MultiRun ⇒
       val multi = readResult
       var promises = msg.promises
       whileC(promises.nonEmpty) {
@@ -159,29 +159,29 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       self tryReply exec
       if (config.retryOnReconnect) sendToSupervisor(Received)
 
-    case Subscriber(listener) =>
+    case Subscriber(listener) ⇒
       loopC {
         val result = readResult
         result match {
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
             listener ! pubsub.Message(channel, message)
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
             listener ! pubsub.PMessage(pattern, channel, message)
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
             listener ! pubsub.Subscribed(channel, count)
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
             listener ! pubsub.Unsubscribed(channel, count)
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) =>
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
             listener ! pubsub.PSubscribed(pattern, count)
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) =>
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
             listener ! pubsub.PUnsubscribed(pattern, count)
-          case other =>
+          case other ⇒
             throw RedisProtocolException("Unexpected response")
             ()
         }
       }
 
-    case Disconnect =>
+    case Disconnect ⇒
       // TODO: Complete all waiting requests with a RedisConnectionException
       socket.close
       self.stop()
@@ -192,19 +192,19 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     try {
       self.supervisor foreach (_ ! msg)
     } catch {
-      case e: ActorInitializationException => // ignore, probably shutting down
+      case e: ActorInitializationException ⇒ // ignore, probably shutting down
     }
   }
 
   def readResult: RedisType @cps[IO.IOSuspendable[Any]] = {
     val resultType = socket read 1
     resultType.head.toChar match {
-      case '+' => readString
-      case '-' => readError
-      case ':' => readInteger
-      case '$' => readBulk
-      case '*' => readMulti
-      case x => throw RedisProtocolException("Invalid result type: " + x.toByte)
+      case '+' ⇒ readString
+      case '-' ⇒ readError
+      case ':' ⇒ readInteger
+      case '$' ⇒ readBulk
+      case '*' ⇒ readMulti
+      case x   ⇒ throw RedisProtocolException("Invalid result type: " + x.toByte)
     }
   }
 
@@ -226,9 +226,9 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
   def readBulk = {
     val length = socket read EOL
     matchC(length.utf8String.toInt) {
-      case -1 => RedisBulk.notfound
-      case 0 => RedisBulk.empty
-      case n =>
+      case -1 ⇒ RedisBulk.notfound
+      case 0  ⇒ RedisBulk.empty
+      case n ⇒
         val bytes = socket read n
         socket read EOL
         RedisBulk(Some(bytes))
@@ -238,9 +238,9 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
   def readMulti = {
     val count = socket read EOL
     matchC(count.utf8String.toInt) {
-      case -1 => RedisMulti.notfound
-      case 0 => RedisMulti.empty
-      case n =>
+      case -1 ⇒ RedisMulti.notfound
+      case 0  ⇒ RedisMulti.empty
+      case n ⇒
         var result = new Array[RedisType](n)
         var i = 0
         repeatC(n) {

@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait Hashes[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   def hdel[K: Store, F: Store](key: K, field: F): Result[Boolean] =
@@ -33,7 +33,7 @@ private[redis] trait Hashes[Result[_]] {
     send(HMGET :: Store(key) :: (fields.map(Store(_))(collection.breakOut): List[ByteString]))
 
   def hmset[K: Store, F: Store, V: Store](key: K, fvs: Iterable[Product2[F, V]]): Result[Unit] =
-    send(HMSET :: Store(key) :: (fvs.flatMap(fv => Iterable(Store(fv._1), Store(fv._2)))(collection.breakOut): List[ByteString]))
+    send(HMSET :: Store(key) :: (fvs.flatMap(fv ⇒ Iterable(Store(fv._1), Store(fv._2)))(collection.breakOut): List[ByteString]))
 
   def hset[K: Store, F: Store, V: Store](key: K, field: F, value: V): Result[Boolean] =
     send(HSET :: Store(key) :: Store(field) :: Store(value) :: Nil)
