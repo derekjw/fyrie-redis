@@ -5,7 +5,7 @@ import actors._
 import messages.{ Request, MultiRequest, Disconnect }
 import Protocol.EOL
 import types._
-import serialization.Parse
+import serialization.{ Parse, Store }
 
 import akka.actor.{ Actor, ActorRef, IOManager, PoisonPill }
 import Actor.{ actorOf }
@@ -23,6 +23,9 @@ case class RedisClientConfig(timeout: Timeout = Timeout(),
 object RedisClient {
   def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
     new RedisClient(host, port, config, ioManager)
+
+  def subscriber(listener: ActorRef)(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start): ActorRef =
+    actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config)).start
 }
 
 final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync {
@@ -55,6 +58,10 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
     val rw = new RedisClientWatch { val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start }
     rw.run(block)
   }
+
+  def subscriber(listener: ActorRef): ActorRef =
+    actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config)).start
+
 }
 
 sealed trait ConfigurableRedisClient {
@@ -165,8 +172,23 @@ sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.
 
 }
 
+private[redis] final class RedisClientSub(protected val actor: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Commands[({ type X[_] = ByteString })#X] {
+  import Protocol._
+
+  final def send(in: List[ByteString]): ByteString = format(in)
+
+  def subscribe[A: Store](channels: Iterable[A]): ByteString = send(SUBSCRIBE :: (channels.map(Store(_))(collection.breakOut): List[ByteString]))
+
+  def unsubscribe[A: Store](channels: Iterable[A]): ByteString = send(UNSUBSCRIBE :: (channels.map(Store(_))(collection.breakOut): List[ByteString]))
+
+  def psubscribe[A: Store](patterns: Iterable[A]): ByteString = send(PSUBSCRIBE :: (patterns.map(Store(_))(collection.breakOut): List[ByteString]))
+
+  def punsubscribe[A: Store](patterns: Iterable[A]): ByteString = send(PUNSUBSCRIBE :: (patterns.map(Store(_))(collection.breakOut): List[ByteString]))
+
+}
+
 import commands._
-private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunctor[Result]) extends Keys[Result] with Servers[Result] with Strings[Result] with Lists[Result] with Sets[Result] with SortedSets[Result] with Hashes[Result] {
+private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunctor[Result]) extends Keys[Result] with Servers[Result] with Strings[Result] with Lists[Result] with Sets[Result] with SortedSets[Result] with Hashes[Result] with PubSub[Result] {
 
   protected def actor: ActorRef
 

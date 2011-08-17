@@ -4,8 +4,9 @@ package actors
 
 import messages._
 import types._
+import pubsub._
 
-import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler }
+import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
 import Actor.{ actorOf }
 import akka.util.ByteString
 import akka.util.cps._
@@ -75,6 +76,46 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
 }
 
+private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
+
+  var socket: IO.SocketHandle = _
+  var worker: ActorRef = _
+
+  var client: RedisClientSub = _
+
+  override def preStart = {
+    client = new RedisClientSub(self, host, port, config)
+    EventHandler info (this, "Connecting")
+    worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
+    self startLink worker
+    socket = IO.connect(ioManager, host, port, worker)
+    worker ! Socket(socket)
+    worker ! Subscriber(listener)
+  }
+
+  def receive = {
+
+    case Subscribe(channels) =>
+      socket write (client.subscribe(channels))
+
+    case Unsubscribe(channels) =>
+      socket write (client.unsubscribe(channels))
+
+    case PSubscribe(patterns) =>
+      socket write (client.psubscribe(patterns))
+
+    case PUnsubscribe(patterns) =>
+      socket write (client.punsubscribe(patterns))
+
+    case Disconnect =>
+      EventHandler info (this, "Shutting down")
+      socket.close
+      self.stop()
+
+  }
+
+}
+
 private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor with IO {
   import Protocol._
 
@@ -93,17 +134,17 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     case IO.Closed(handle, cause) if socket == handle && config.autoReconnect =>
       EventHandler info (this, "Reconnecting" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
       socket = IO.connect(ioManager, host, port, self)
-      self.supervisor foreach (_ ! Socket(socket))
+      sendToSupervisor(Socket(socket))
       retry
 
     case IO.Closed(handle, cause) if socket == handle =>
       EventHandler info (this, "Connection closed" + (cause map (e => ", cause: " + e.toString) getOrElse ""))
-      self.supervisor foreach (_ ! Disconnect)
+      sendToSupervisor(Disconnect)
 
     case Run =>
       val result = readResult
       self tryReply result
-      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
+      if (config.retryOnReconnect) sendToSupervisor(Received)
 
     case msg: MultiRun =>
       val multi = readResult
@@ -116,13 +157,37 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       }
       val exec = readResult
       self tryReply exec
-      if (config.retryOnReconnect) self.supervisor foreach (_ ! Received)
+      if (config.retryOnReconnect) sendToSupervisor(Received)
+
+    case Subscriber(listener) =>
+      loopC {
+        val result = readResult
+        result match {
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
+            listener ! pubsub.Subscribed(channel, count)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
+            listener ! pubsub.Unsubscribed(channel, count)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
+            listener ! pubsub.Message(channel, message)
+          case other =>
+            throw RedisProtocolException("Unexpected response")
+            ()
+        }
+      }
 
     case Disconnect =>
       // TODO: Complete all waiting requests with a RedisConnectionException
       socket.close
       self.stop()
 
+  }
+
+  def sendToSupervisor(msg: Any) {
+    try {
+      self.supervisor foreach (_ ! msg)
+    } catch {
+      case e: ActorInitializationException => // ignore, probably shutting down
+    }
   }
 
   def readResult: RedisType @cps[IO.IOSuspendable[Any]] = {

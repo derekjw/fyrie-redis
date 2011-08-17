@@ -179,10 +179,10 @@ class OperationsSpec extends Spec
       r.sync.set("key", 0)
       val futures = for (_ <- 1 to 100) yield {
         r watch { rw =>
+          rw watch "key"
           for {
-            _ <- rw watch "key"
             Some(n: Int) <- rw.get("key").parse[Int]
-          } yield rw multi (_.set("key", n + 1).map(_ => n))
+          } yield rw multi (_.set("key", n + 1))
         }
       }
       Future.sequence(futures).await

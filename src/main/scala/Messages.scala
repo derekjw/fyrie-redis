@@ -3,10 +3,11 @@ package redis
 package messages
 
 import akka.util.ByteString
-import akka.actor.IO
+import akka.actor.{ IO, ActorRef }
 import akka.dispatch.{ CompletableFuture => Promise }
 
 import types.RedisType
+import serialization.Store
 
 private[redis] sealed trait Message
 private[redis] sealed trait RequestMessage extends Message
@@ -17,3 +18,4 @@ private[redis] case object Run extends Message
 private[redis] case class MultiRun(promises: Seq[Promise[RedisType]]) extends Message
 private[redis] case class Socket(handle: IO.SocketHandle) extends Message
 private[redis] case object Received extends Message
+private[redis] case class Subscriber(listener: ActorRef) extends Message
