@@ -163,12 +163,18 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       loopC {
         val result = readResult
         result match {
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
+            listener ! pubsub.Message(channel, message)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
+            listener ! pubsub.PMessage(pattern, channel, message)
           case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
             listener ! pubsub.Subscribed(channel, count)
           case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) =>
             listener ! pubsub.Unsubscribed(channel, count)
-          case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) =>
-            listener ! pubsub.Message(channel, message)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) =>
+            listener ! pubsub.PSubscribed(pattern, count)
+          case RedisMulti(Some(List(RedisBulk(Some(Protocol.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) =>
+            listener ! pubsub.PUnsubscribed(pattern, count)
           case other =>
             throw RedisProtocolException("Unexpected response")
             ()
