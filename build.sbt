@@ -1,7 +1,9 @@
 import scalariform.formatter.preferences._
 import ScalariformPlugin.formatPreferences
 
-scalaVersion := "2.9.0-1"
+scalaVersion := "2.9.1"
+
+crossScalaVersions := Seq("2.9.0-1", "2.9.1")
 
 name := "fyrie-redis"
 
@@ -16,7 +18,7 @@ libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.2-RC
 
 autoCompilerPlugins := true
 
-addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.0-1")
+libraryDependencies <+= scalaVersion { v => compilerPlugin("org.scala-lang.plugins" % "continuations" % v) }
 
 scalacOptions += "-P:continuations:enable"
 
