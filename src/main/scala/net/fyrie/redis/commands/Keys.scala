@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait Keys[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   /**
@@ -218,13 +218,13 @@ private[redis] trait Keys[Result[_]] {
   def sort[K: Store, B: Store, G: Store](key: K, by: Option[B] = Option.empty[ByteString], limit: RedisLimit = NoLimit, get: Seq[G] = List.empty[ByteString], order: Option[SortOrder] = None, alpha: Boolean = false): Result[List[Option[ByteString]]] = {
     var cmd: List[ByteString] = Nil
     if (alpha) cmd ::= ALPHA
-    order foreach (o => cmd ::= Store(o))
-    get.reverse foreach (g => cmd = GET :: Store(g) :: cmd)
+    order foreach (o ⇒ cmd ::= Store(o))
+    get.reverse foreach (g ⇒ cmd = GET :: Store(g) :: cmd)
     limit match {
-      case Limit(o, c) => cmd = LIMIT :: Store(o) :: Store(c) :: cmd
-      case NoLimit =>
+      case Limit(o, c) ⇒ cmd = LIMIT :: Store(o) :: Store(c) :: cmd
+      case NoLimit     ⇒
     }
-    by foreach (b => cmd = BY :: Store(b) :: cmd)
+    by foreach (b ⇒ cmd = BY :: Store(b) :: cmd)
     send(SORT :: Store(key) :: cmd)
   }
 

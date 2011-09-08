@@ -1,5 +1,9 @@
+import scalariform.formatter.preferences._
+import ScalariformPlugin.formatPreferences
 
-scalaVersion := "2.9.0-1"
+scalaVersion := "2.9.1"
+
+crossScalaVersions := Seq("2.9.0-1", "2.9.1")
 
 name := "fyrie-redis"
 
@@ -14,13 +18,20 @@ libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.1.3"
 
 autoCompilerPlugins := true
 
-addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.0-1")
+libraryDependencies <+= scalaVersion { v => compilerPlugin("org.scala-lang.plugins" % "continuations" % v) }
 
 scalacOptions += "-P:continuations:enable"
 
 parallelExecution in Test := false
 
-seq(ScalariformPlugin.settings: _*)
+seq((ScalariformPlugin.settings ++ Seq(formatPreferences in Compile := (FormattingPreferences()
+                                                                        .setPreference(RewriteArrowSymbols, true)
+                                                                        .setPreference(AlignParameters, true)
+                                                                        .setPreference(AlignSingleLineCaseStatements, true)),
+                                       formatPreferences in Test :=    (FormattingPreferences()
+                                                                        .setPreference(RewriteArrowSymbols, true)
+                                                                        .setPreference(AlignParameters, true)
+                                                                        .setPreference(AlignSingleLineCaseStatements, true)))): _*)
 
 publishTo <<= (version) { version: String =>
   val repo = (s: String) =>

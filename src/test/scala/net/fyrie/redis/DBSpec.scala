@@ -102,13 +102,13 @@ class OperationsSpec extends Spec
       r.sync.get("key1").parse[String] should be(Some("value1"))
     }
     ignore("should reconnect with many commands") { // ignore until fixed
-      (1 to 1000) foreach (_ => r.incr("incKey"))
+      (1 to 1000) foreach (_ ⇒ r.incr("incKey"))
       r.quit
       val result1 = r.get("incKey").parse[Int]
-      (1 to 1000) foreach (_ => r.incr("incKey"))
+      (1 to 1000) foreach (_ ⇒ r.incr("incKey"))
       val result2 = r.get("incKey").parse[Int]
       r.quit
-      (1 to 1000) foreach (_ => r.incr("incKey"))
+      (1 to 1000) foreach (_ ⇒ r.incr("incKey"))
       val result3 = r.get("incKey").parse[Int]
       result1.get should be(Some(1000))
       result2.get should be(Some(2000))
@@ -118,47 +118,47 @@ class OperationsSpec extends Spec
 
   describe("Multi exec commands") {
     it("should work with single commands") {
-      val result = r.multi { rq =>
+      val result = r.multi { rq ⇒
         rq.set("testkey1", "testvalue1")
       }
       result.get should be(())
     }
     it("should work with several commands") {
-      val result = r.multi { rq =>
+      val result = r.multi { rq ⇒
         for {
-          _ <- rq.set("testkey1", "testvalue1")
-          _ <- rq.set("testkey2", "testvalue2")
-          x <- rq.mget(List("testkey1", "testkey2")).parse[String]
+          _ ← rq.set("testkey1", "testvalue1")
+          _ ← rq.set("testkey2", "testvalue2")
+          x ← rq.mget(List("testkey1", "testkey2")).parse[String]
         } yield x
       }
       result.get should be(List(Some("testvalue1"), Some("testvalue2")))
     }
     it("should work with a list of commands") {
       val values = List.range(1, 100)
-      val result = r.multi { rq =>
-        val setq = (Queued[Any](()) /: values)((q, v) => q flatMap (_ => rq.set(v, v * 2)))
-        (setq.map(_ => List[Future[Option[Int]]]()) /: values)((q, v) => q flatMap (l => rq.get(v).parse[Int].map(_ :: l))).map(_.reverse)
+      val result = r.multi { rq ⇒
+        val setq = (Queued[Any](()) /: values)((q, v) ⇒ q flatMap (_ ⇒ rq.set(v, v * 2)))
+        (setq.map(_ ⇒ List[Future[Option[Int]]]()) /: values)((q, v) ⇒ q flatMap (l ⇒ rq.get(v).parse[Int].map(_ :: l))).map(_.reverse)
       }
       Future.sequence(result).get.flatten should be(values.map(2*))
     }
     it("should throw an error") {
-      val result = r.multi { rq =>
+      val result = r.multi { rq ⇒
         for {
-          _ <- rq.set("a", "abc")
-          x <- rq.lpop("a").parse[String]
-          y <- rq.get("a").parse[String]
+          _ ← rq.set("a", "abc")
+          x ← rq.lpop("a").parse[String]
+          y ← rq.get("a").parse[String]
         } yield (x, y)
       }
       evaluating { result._1.get } should produce[RedisErrorException]
       result._2.get should be(Some("abc"))
     }
     it("should handle invalid requests") {
-      val result = r.multi { rq =>
+      val result = r.multi { rq ⇒
         for {
-          _ <- rq.set("testkey1", "testvalue1")
-          _ <- rq.set("testkey2", "testvalue2")
-          x <- rq.mget(List[String]()).parse[String]
-          y <- rq.mget(List("testkey1", "testkey2")).parse[String]
+          _ ← rq.set("testkey1", "testvalue1")
+          _ ← rq.set("testkey2", "testvalue2")
+          x ← rq.mget(List[String]()).parse[String]
+          y ← rq.mget(List("testkey1", "testkey2")).parse[String]
         } yield (x, y)
       }
       evaluating { result._1.get } should produce[RedisErrorException]
@@ -170,19 +170,19 @@ class OperationsSpec extends Spec
     it("should fail without watch") {
       r.sync.set("key", 0)
       val clients = List.fill(10)(RedisClient())
-      val futures = for (client <- clients; _ <- 1 to 10) yield client.get("key").parse[Int] flatMap { n => client.set("key", n.get + 1) }
+      val futures = for (client ← clients; _ ← 1 to 10) yield client.get("key").parse[Int] flatMap { n ⇒ client.set("key", n.get + 1) }
       Future.sequence(futures).await
       clients foreach (_.disconnect)
       r.sync.get("key").parse[Int] should not be (Some(100))
     }
     it("should succeed with watch") {
       r.sync.set("key", 0)
-      val futures = for (_ <- 1 to 100) yield {
-        r watch { rw =>
+      val futures = for (_ ← 1 to 100) yield {
+        r watch { rw ⇒
+          rw watch "key"
           for {
-            _ <- rw watch "key"
-            Some(n: Int) <- rw.get("key").parse[Int]
-          } yield rw multi (_.set("key", n + 1).map(_ => n))
+            Some(n: Int) ← rw.get("key").parse[Int]
+          } yield rw multi (_.set("key", n + 1))
         }
       }
       Future.sequence(futures).await
@@ -192,18 +192,18 @@ class OperationsSpec extends Spec
       r.sync.rpush("mykey1", 5)
       r.set("mykey2", "hello")
       r.hset("mykey3", "hello", 7)
-      val result = r watch { rw =>
+      val result = r watch { rw ⇒
         for {
-          _ <- rw.watch("mykey1")
-          _ <- rw.watch("mykey2")
-          _ <- rw.watch("mykey3")
-          Some(a: Int) <- rw.lindex("mykey1", 0).parse[Int]
-          Some(b: String) <- rw.get("mykey2").parse[String]
-          Some(c: Int) <- rw.hget("mykey3", b).parse[Int]
-        } yield rw.multi { rq =>
+          _ ← rw.watch("mykey1")
+          _ ← rw.watch("mykey2")
+          _ ← rw.watch("mykey3")
+          Some(a: Int) ← rw.lindex("mykey1", 0).parse[Int]
+          Some(b: String) ← rw.get("mykey2").parse[String]
+          Some(c: Int) ← rw.hget("mykey3", b).parse[Int]
+        } yield rw.multi { rq ⇒
           for {
-            _ <- rq.rpush("mykey1", a + 1)
-            _ <- rq.hset("mykey3", b, c + 1)
+            _ ← rq.rpush("mykey1", a + 1)
+            _ ← rq.hset("mykey3", b, c + 1)
           } yield (a, b, c)
         }
       }
@@ -232,7 +232,7 @@ class OperationsSpec extends Spec
         ("item3", "data3", 3, 1),
         ("item4", "data4", 4, 6),
         ("item5", "data5", 5, 3))
-      for ((key, data, num, rank) <- list) {
+      for ((key, data, num, rank) ← list) {
         r.quiet.sadd("items", key)
         r.quiet.set("data::" + key, data)
         r.quiet.set("num::" + key, num)

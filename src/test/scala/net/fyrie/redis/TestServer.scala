@@ -5,7 +5,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.BeforeAndAfterAll
 
 trait RedisTestServer extends BeforeAndAfterEach with BeforeAndAfterAll {
-  self: Spec =>
+  self: Spec ⇒
 
   val r = new RedisClient
 

@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait Sets[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   def sadd[K: Store, V: Store](key: K, value: V): Result[Boolean] =

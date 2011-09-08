@@ -20,10 +20,15 @@ Redis is an advanced key-value store. It is similar to memcached but the dataset
 
 ## Requirements
 
-- sbt 0.10 ([github.com/harrah/xsbt/wiki](https://github.com/harrah/xsbt/wiki))
-- Akka 2.0-SNAPSHOT from my development branch ([github.com/jboner/akka/tree/wip-derekjw](http://github.com/jboner/akka/tree/wip-derekjw))
+Fyrie Redis version numbers match the version of Akka that it is compatible with. The recommended version is currently 1.2, which can be found on the ['akka-1.2' branch](https://github.com/derekjw/fyrie-redis/tree/akka-1.2).
 
-Support for Akka 1.1 is within the 'akka-1.1' branch ([github.com/derekjw/fyrie-redis/tree/akka-1.1](https://github.com/derekjw/fyrie-redis/tree/akka-1.1))
+If building from source sbt 0.10 ([github.com/harrah/xsbt/wiki](https://github.com/harrah/xsbt/wiki)) is required.
+
+Releases and snapshots are located at [repo.fyrie.net](http://repo.fyrie.net), which can be used in sbt like this:
+
+    resolvers += "fyrie snapshots" at "http://repo.fyrie.net/snapshots"
+    
+    libraryDependencies += "net.fyrie" %% "fyrie-redis" % "1.2-SNAPSHOT"
 
 ## All tests are functional tests and require a running instance of Redis
 
@@ -82,12 +87,14 @@ Another MultiExec example:
 
 This example will return a '(Future[String], Future[String], Future[String])'
 
-Until proper documentation is completed, the tests can be used as examples: ([github.com/derekjw/fyrie-redis/tree/master/src/test/scala](https://github.com/derekjw/fyrie-redis/tree/master/src/test/scala))
+## Documentation
+
+The api is published at ([http://derekjw.github.com/fyrie-redis](http://derekjw.github.com/fyrie-redis)), but it's documentation is far from complete.
+
+Until proper documentation is completed, the tests can be used as examples: ([github.com/derekjw/fyrie-redis/tree/master/src/test/scala/net/fyrie/redis](https://github.com/derekjw/fyrie-redis/tree/master/src/test/scala/net/fyrie/redis))
 
 ## TODO
 
-- Support WATCH
-- Support PUBSUB
 - Support clustering
 - Documentation
 
