@@ -188,7 +188,7 @@ trait IO {
     shift { _: (Any ⇒ IOSuspendable[Any]) ⇒
       _next match {
         case n: CurrentMessage ⇒ Retry(n.message)
-        case _ ⇒ Idle
+        case _                 ⇒ Idle
       }
     }
 
@@ -275,8 +275,8 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
       worker(Register(socket, channel, OP_CONNECT | OP_READ))
 
     case IO.Accept(socket, server) ⇒ worker(Accepted(socket, server))
-    case IO.Write(handle, data) ⇒ worker(Write(handle, data.asByteBuffer))
-    case IO.Close(handle) ⇒ worker(Close(handle))
+    case IO.Write(handle, data)    ⇒ worker(Write(handle, data.asByteBuffer))
+    case IO.Close(handle)          ⇒ worker(Close(handle))
   }
 
   override def postStop: Unit = {
@@ -381,15 +381,15 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
           }
       }
     } catch {
-      case e: CancelledKeyException ⇒ cleanup(handle, Some(e))
-      case e: IOException ⇒ cleanup(handle, Some(e))
+      case e: CancelledKeyException        ⇒ cleanup(handle, Some(e))
+      case e: IOException                  ⇒ cleanup(handle, Some(e))
       case e: ActorInitializationException ⇒ cleanup(handle, Some(e))
     }
   }
 
   private def cleanup(handle: IO.Handle, cause: Option[Exception]): Unit = {
     handle match {
-      case server: IO.ServerHandle ⇒ accepted -= server
+      case server: IO.ServerHandle  ⇒ accepted -= server
       case writable: IO.WriteHandle ⇒ writes -= writable
     }
     channels.get(handle) match {

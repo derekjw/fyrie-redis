@@ -8,6 +8,9 @@ sealed trait PubSubMessage
 case class Subscribed(channel: ByteString, count: Long) extends PubSubMessage
 case class Unsubscribed(channel: ByteString, count: Long) extends PubSubMessage
 case class Message(channel: ByteString, content: ByteString) extends PubSubMessage
+case class PSubscribed(pattern: ByteString, count: Long) extends PubSubMessage
+case class PUnsubscribed(pattern: ByteString, count: Long) extends PubSubMessage
+case class PMessage(pattern: ByteString, channel: ByteString, content: ByteString) extends PubSubMessage
 
 object Subscribe {
   def apply[A: Store](channel: A): Subscribe = new Subscribe(List(Store(channel)))

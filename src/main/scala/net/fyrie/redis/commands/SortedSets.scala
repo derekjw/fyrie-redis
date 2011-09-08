@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait SortedSets[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   def zadd[K: Store, M: Store](key: K, member: M, score: Double = 1.0): Result[Boolean] =
@@ -23,7 +23,7 @@ private[redis] trait SortedSets[Result[_]] {
   def zinterstore[D: Store, K: Store](dstKey: D, keys: Iterable[K], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
     var cmd = AGGREGATE :: Store(aggregate) :: Nil
     var keyCount = 0
-    keys foreach { k =>
+    keys foreach { k ⇒
       cmd ::= Store(k)
       keyCount += 1
     }
@@ -33,12 +33,12 @@ private[redis] trait SortedSets[Result[_]] {
   def zinterstoreWeighted[D: Store, K: Store](dstKey: D, kws: Iterable[Product2[K, Double]], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
     var cmd: List[ByteString] = Nil
     var keyCount = 0
-    kws foreach { kw =>
+    kws foreach { kw ⇒
       cmd ::= Store(kw._1)
       keyCount += 1
     }
     cmd ::= WEIGHTS
-    kws foreach { kw => cmd ::= Store(kw._2) }
+    kws foreach { kw ⇒ cmd ::= Store(kw._2) }
     send(ZINTERSTORE :: Store(dstKey) :: Store(keyCount) :: (Store(aggregate) :: AGGREGATE :: cmd).reverse)
   }
 
@@ -50,14 +50,14 @@ private[redis] trait SortedSets[Result[_]] {
 
   def zrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[ByteString]] =
     send(ZRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: (limit match {
-      case NoLimit => Nil
-      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case NoLimit     ⇒ Nil
+      case Limit(o, c) ⇒ LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrangebyscoreWithScores[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[(ByteString, Double)]] =
     send(ZRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: WITHSCORES :: (limit match {
-      case NoLimit => Nil
-      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case NoLimit     ⇒ Nil
+      case Limit(o, c) ⇒ LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrank[K: Store, M: Store](key: K, member: M): Result[Option[Int]] =
@@ -80,14 +80,14 @@ private[redis] trait SortedSets[Result[_]] {
 
   def zrevrangebyscore[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[ByteString]] =
     send(ZREVRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: (limit match {
-      case NoLimit => Nil
-      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case NoLimit     ⇒ Nil
+      case Limit(o, c) ⇒ LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrevrangebyscoreWithScores[K: Store](key: K, min: RedisScore = RedisScore.min, max: RedisScore = RedisScore.max, limit: RedisLimit = NoLimit): Result[List[(ByteString, Double)]] =
     send(ZREVRANGEBYSCORE :: Store(key) :: Store(min) :: Store(max) :: WITHSCORES :: (limit match {
-      case NoLimit => Nil
-      case Limit(o, c) => LIMIT :: Store(o) :: Store(c) :: Nil
+      case NoLimit     ⇒ Nil
+      case Limit(o, c) ⇒ LIMIT :: Store(o) :: Store(c) :: Nil
     }))
 
   def zrevrank[K: Store, M: Store](key: K, member: M): Result[Option[Int]] =
@@ -99,7 +99,7 @@ private[redis] trait SortedSets[Result[_]] {
   def zunionstore[D: Store, K: Store](dstKey: D, keys: Iterable[K], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
     var cmd = AGGREGATE :: Store(aggregate) :: Nil
     var keyCount = 0
-    keys foreach { k =>
+    keys foreach { k ⇒
       cmd ::= Store(k)
       keyCount += 1
     }
@@ -109,12 +109,12 @@ private[redis] trait SortedSets[Result[_]] {
   def zunionstoreWeighted[D: Store, K: Store](dstKey: D, kws: Iterable[Product2[K, Double]], aggregate: Aggregate = Aggregate.Sum): Result[Int] = {
     var cmd: List[ByteString] = Nil
     var keyCount = 0
-    kws foreach { kw =>
+    kws foreach { kw ⇒
       cmd ::= Store(kw._1)
       keyCount += 1
     }
     cmd ::= WEIGHTS
-    kws foreach { kw => cmd ::= Store(kw._2) }
+    kws foreach { kw ⇒ cmd ::= Store(kw._2) }
     send(ZUNIONSTORE :: Store(dstKey) :: Store(keyCount) :: (Store(aggregate) :: AGGREGATE :: cmd).reverse)
   }
 }

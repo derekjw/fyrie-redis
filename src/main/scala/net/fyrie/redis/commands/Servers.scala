@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait Servers[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   def save(): Result[Unit] = send(SAVE :: Nil)

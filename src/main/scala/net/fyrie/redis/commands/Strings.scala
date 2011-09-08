@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait Strings[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   def append[K: Store, V: Store](key: K, value: V): Result[Int] =
@@ -39,10 +39,10 @@ private[redis] trait Strings[Result[_]] {
     send(MGET :: (keys.map(Store(_))(collection.breakOut): List[ByteString]))
 
   def mset[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Unit] =
-    send(MSET :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]))
+    send(MSET :: (kvs.flatMap(kv ⇒ Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]))
 
   def msetnx[K: Store, V: Store](kvs: Iterable[Product2[K, V]]): Result[Boolean] =
-    send(MSETNX :: (kvs.flatMap(kv => Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]))
+    send(MSETNX :: (kvs.flatMap(kv ⇒ Iterable(Store(kv._1), Store(kv._2)))(collection.breakOut): List[ByteString]))
 
   def set[K: Store, V: Store](key: K, value: V): Result[Unit] =
     send(SET :: Store(key) :: Store(value) :: Nil)

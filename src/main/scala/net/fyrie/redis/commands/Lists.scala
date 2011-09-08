@@ -5,7 +5,7 @@ import serialization._
 import akka.util.ByteString
 
 private[redis] trait Lists[Result[_]] {
-  this: Commands[Result] =>
+  this: Commands[Result] ⇒
   import Protocol._
 
   def blpop[K: Store: Parse](keys: Seq[K], timeout: Int = 0): Result[Option[(K, ByteString)]] =

@@ -1,3 +1,5 @@
+import scalariform.formatter.preferences._
+import ScalariformPlugin.formatPreferences
 
 scalaVersion := "2.9.0-1"
 
@@ -20,7 +22,14 @@ scalacOptions += "-P:continuations:enable"
 
 parallelExecution in Test := false
 
-seq(ScalariformPlugin.settings: _*)
+seq((ScalariformPlugin.settings ++ Seq(formatPreferences in Compile := (FormattingPreferences()
+                                                                        .setPreference(RewriteArrowSymbols, true)
+                                                                        .setPreference(AlignParameters, true)
+                                                                        .setPreference(AlignSingleLineCaseStatements, true)),
+                                       formatPreferences in Test :=    (FormattingPreferences()
+                                                                        .setPreference(RewriteArrowSymbols, true)
+                                                                        .setPreference(AlignParameters, true)
+                                                                        .setPreference(AlignSingleLineCaseStatements, true)))): _*)
 
 publishTo <<= (version) { version: String =>
   val repo = (s: String) =>
