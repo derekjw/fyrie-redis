@@ -2,38 +2,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
         <head>
-          <title>net.fyrie.redis.Aggregate</title>
+          <title>net.fyrie.redis.pubsub.Unsubscribe</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
-      <link type="text/css" media="screen" rel="stylesheet" href="../../../lib/template.css" />
-      <script type="text/javascript" src="../../../lib/jquery.js"></script>
-      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
-      <script type="text/javascript" src="../../../lib/template.js"></script>
-      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      <link type="text/css" media="screen" rel="stylesheet" href="../../../../lib/template.css" />
+      <script type="text/javascript" src="../../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
     
         </head>
-        <body class="type">
+        <body class="value">
       <div id="definition">
-        <a title="Go to companion" href="Aggregate$.html"><img src="../../../lib/trait_to_object_big.png" /></a>
-        <p id="owner"><a name="net" class="extype" href="../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../package.html">fyrie</a>.<a name="net.fyrie.redis" class="extype" href="package.html">redis</a></p>
-        <h1><a title="Go to companion" href="Aggregate$.html">Aggregate</a></h1>
+        <a title="Go to companion" href="Unsubscribe.html"><img src="../../../../lib/object_to_class_big.png" /></a>
+        <p id="owner"><a name="net" class="extype" href="../../../package.html">net</a>.<a name="net.fyrie" class="extype" href="../../package.html">fyrie</a>.<a name="net.fyrie.redis" class="extype" href="../package.html">redis</a>.<a name="net.fyrie.redis.pubsub" class="extype" href="package.html">pubsub</a></p>
+        <h1><a title="Go to companion" href="Unsubscribe.html">Unsubscribe</a></h1>
       </div>
 
       <h4 class="signature" id="signature">
-      <span class="kind">trait</span>
+      <span class="kind">object</span>
       <span class="symbol"> 
-        <span class="name">Aggregate</span>
+        <span class="name">Unsubscribe</span>
         
-        <span class="result"> extends AnyRef</span>
+        <span class="result"> extends <span name="scala.Serializable" class="extype">Serializable</span></span>
       </span>
       </h4>
       
-          <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed </dd></dl><div class="toggleContainer block">
+          <div class="fullcommenttop" id="comment"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
-        </div><div class="toggleContainer block">
-          <span class="toggle">Known Subclasses</span>
-          <div class="subClasses hiddenContent"><a name="net.fyrie.redis.Aggregate.Max" class="extype" href="Aggregate$$Max$.html">Max</a>, <a name="net.fyrie.redis.Aggregate.Min" class="extype" href="Aggregate$$Min$.html">Min</a>, <a name="net.fyrie.redis.Aggregate.Sum" class="extype" href="Aggregate$$Sum$.html">Sum</a></div>
+          <div class="superTypes hiddenContent"><span name="scala.Serializable" class="extype">Serializable</span>, <span name="java.io.Serializable" class="extype">Serializable</span>, AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
         
 
@@ -49,7 +46,7 @@
                 <span class="filtertype">Inherited</span>
                 <ol><li class="hideall out"><span>Hide All</span></li>
                 <li class="showall in"><span>Show all</span></li></ol>
-                <ol id="linearization"><li name="net.fyrie.redis.Aggregate" class="in"><span>Aggregate</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+                <ol id="linearization"><li name="net.fyrie.redis.pubsub.Unsubscribe" class="in"><span>Unsubscribe</span></li><li name="scala.Serializable" class="in"><span>Serializable</span></li><li name="java.io.Serializable" class="in"><span>Serializable</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
               </div>
           <div id="visbl">
               <span class="filtertype">Visibility</span>
@@ -120,6 +117,28 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.pubsub.Unsubscribe#apply" data-isabs="false">
+      <a id="apply[A](Iterable[A])(Store[A]):Unsubscribe"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="channels">channels: Iterable[A]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Store" class="extype" href="../serialization/Store.html">Store</a>[A]</span>)</span><span class="result">: <a name="net.fyrie.redis.pubsub.Unsubscribe" class="extype" href="Unsubscribe.html">Unsubscribe</a></span>
+      </span>
+      </h4>
+      
+    </li><li visbl="pub" name="net.fyrie.redis.pubsub.Unsubscribe#apply" data-isabs="false">
+      <a id="apply[A](A)(Store[A]):Unsubscribe"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">apply</span>
+        <span class="tparams">[<span name="A">A</span>]</span>
+        <span class="params">(<span name="channel">channel: A</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Store" class="extype" href="../serialization/Store.html">Store</a>[A]</span>)</span><span class="result">: <a name="net.fyrie.redis.pubsub.Unsubscribe" class="extype" href="Unsubscribe.html">Unsubscribe</a></span>
+      </span>
+      </h4>
+      
     </li><li visbl="pub" name="scala.Any#asInstanceOf" data-isabs="false">
       <a id="asInstanceOf[T0]:T0"></a>
       <h4 class="signature">
@@ -141,7 +160,7 @@
         <span class="params">()</span><span class="result">: AnyRef</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
@@ -177,7 +196,7 @@
         <span class="params">()</span><span class="result">: <span name="scala.Unit" class="extype">Unit</span></span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="java.lang" class="extype" href="../../../../java/lang/package.html">lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
@@ -247,6 +266,17 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li visbl="prt" name="net.fyrie.redis.pubsub.Unsubscribe#readResolve" data-isabs="false">
+      <a id="readResolve():AnyRef"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">readResolve</span>
+        
+        <span class="params">()</span><span class="result">: AnyRef</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -316,7 +346,11 @@
 
         
 
-        <div name="scala.AnyRef" class="parent">
+        <div name="scala.Serializable" class="parent">
+              <h3>Inherited from <span name="scala.Serializable" class="extype">Serializable</span></h3>
+            </div><div name="java.io.Serializable" class="parent">
+              <h3>Inherited from <span name="java.io.Serializable" class="extype">Serializable</span></h3>
+            </div><div name="scala.AnyRef" class="parent">
               <h3>Inherited from AnyRef</h3>
             </div><div name="scala.Any" class="parent">
               <h3>Inherited from <span name="scala.Any" class="extype">Any</span></h3>

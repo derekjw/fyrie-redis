@@ -30,7 +30,7 @@
       
           <div class="fullcommenttop" id="comment"><dl class="attributes block"> <dt>Attributes</dt><dd>sealed abstract </dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a>, <span name="net.fyrie.redis.Commands" class="extype">Commands</span>[[α]α], <span name="net.fyrie.redis.commands.Hashes" class="extype">Hashes</span>[[α]α], <span name="net.fyrie.redis.commands.SortedSets" class="extype">SortedSets</span>[[α]α], <span name="net.fyrie.redis.commands.Sets" class="extype">Sets</span>[[α]α], <span name="net.fyrie.redis.commands.Lists" class="extype">Lists</span>[[α]α], <span name="net.fyrie.redis.commands.Strings" class="extype">Strings</span>[[α]α], <span name="net.fyrie.redis.commands.Servers" class="extype">Servers</span>[[α]α], <span name="net.fyrie.redis.commands.Keys" class="extype">Keys</span>[[α]α], AnyRef, <span name="scala.Any" class="extype">Any</span></div>
+          <div class="superTypes hiddenContent"><a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a>, <span name="net.fyrie.redis.Commands" class="extype">Commands</span>[[α]α], <span name="net.fyrie.redis.commands.PubSub" class="extype">PubSub</span>[[α]α], <span name="net.fyrie.redis.commands.Hashes" class="extype">Hashes</span>[[α]α], <span name="net.fyrie.redis.commands.SortedSets" class="extype">SortedSets</span>[[α]α], <span name="net.fyrie.redis.commands.Sets" class="extype">Sets</span>[[α]α], <span name="net.fyrie.redis.commands.Lists" class="extype">Lists</span>[[α]α], <span name="net.fyrie.redis.commands.Strings" class="extype">Strings</span>[[α]α], <span name="net.fyrie.redis.commands.Servers" class="extype">Servers</span>[[α]α], <span name="net.fyrie.redis.commands.Keys" class="extype">Keys</span>[[α]α], AnyRef, <span name="scala.Any" class="extype">Any</span></div>
         </div></div>
         
 
@@ -46,7 +46,7 @@
                 <span class="filtertype">Inherited</span>
                 <ol><li class="hideall out"><span>Hide All</span></li>
                 <li class="showall in"><span>Show all</span></li></ol>
-                <ol id="linearization"><li name="net.fyrie.redis.RedisClientSync" class="in"><span>RedisClientSync</span></li><li name="net.fyrie.redis.ConfigurableRedisClient" class="in"><span>ConfigurableRedisClient</span></li><li name="net.fyrie.redis.Commands" class="in"><span>Commands</span></li><li name="net.fyrie.redis.commands.Hashes" class="in"><span>Hashes</span></li><li name="net.fyrie.redis.commands.SortedSets" class="in"><span>SortedSets</span></li><li name="net.fyrie.redis.commands.Sets" class="in"><span>Sets</span></li><li name="net.fyrie.redis.commands.Lists" class="in"><span>Lists</span></li><li name="net.fyrie.redis.commands.Strings" class="in"><span>Strings</span></li><li name="net.fyrie.redis.commands.Servers" class="in"><span>Servers</span></li><li name="net.fyrie.redis.commands.Keys" class="in"><span>Keys</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+                <ol id="linearization"><li name="net.fyrie.redis.RedisClientSync" class="in"><span>RedisClientSync</span></li><li name="net.fyrie.redis.ConfigurableRedisClient" class="in"><span>ConfigurableRedisClient</span></li><li name="net.fyrie.redis.Commands" class="in"><span>Commands</span></li><li name="net.fyrie.redis.commands.PubSub" class="in"><span>PubSub</span></li><li name="net.fyrie.redis.commands.Hashes" class="in"><span>Hashes</span></li><li name="net.fyrie.redis.commands.SortedSets" class="in"><span>SortedSets</span></li><li name="net.fyrie.redis.commands.Sets" class="in"><span>Sets</span></li><li name="net.fyrie.redis.commands.Lists" class="in"><span>Lists</span></li><li name="net.fyrie.redis.commands.Strings" class="in"><span>Strings</span></li><li name="net.fyrie.redis.commands.Servers" class="in"><span>Servers</span></li><li name="net.fyrie.redis.commands.Keys" class="in"><span>Keys</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
               </div>
           <div id="visbl">
               <span class="filtertype">Visibility</span>
@@ -473,7 +473,7 @@ automatically deleted. Returns 'true' if the expire command is successful.</p><p
         <span class="params">()</span><span class="result">: java.lang.Class[_]</span>
       </span>
       </h4>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Strings#getbit" data-isabs="false">
       <a id="getbit[K](K,Int)(Store[K]):Int"></a>
       <h4 class="signature">
@@ -943,6 +943,17 @@ Returns <code>true</code> if successful.</p><p>Returns: <code>Boolean</code>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Keys</dd></dl></div>
+    </li><li visbl="pub" name="net.fyrie.redis.commands.PubSub#publish" data-isabs="false">
+      <a id="publish[A, B](A,B)(Store[A],Store[B]):Int"></a>
+      <h4 class="signature">
+      <span class="kind">def</span>
+      <span class="symbol"> 
+        <span class="name">publish</span>
+        <span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span>
+        <span class="params">(<span name="channel">channel: A</span>, <span name="message">message: B</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a name="net.fyrie.redis.serialization.Store" class="extype" href="serialization/Store.html">Store</a>[A]</span>, <span name="arg1">arg1: <a name="net.fyrie.redis.serialization.Store" class="extype" href="serialization/Store.html">Store</a>[B]</span>)</span><span class="result">: <span name="scala.Int" class="extype">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>PubSub</dd></dl></div>
     </li><li visbl="pub" name="net.fyrie.redis.commands.Keys#quit" data-isabs="false">
       <a id="quit():Unit"></a>
       <h4 class="signature">
@@ -1638,10 +1649,14 @@ successfully renamed.</p><p>Returns: <code>Boolean</code>
     </li></ol>
             </div>
 
+        
+
         <div name="net.fyrie.redis.ConfigurableRedisClient" class="parent">
               <h3>Inherited from <a name="net.fyrie.redis.ConfigurableRedisClient" class="extype" href="ConfigurableRedisClient.html">ConfigurableRedisClient</a></h3>
             </div><div name="net.fyrie.redis.Commands" class="parent">
               <h3>Inherited from <span name="net.fyrie.redis.Commands" class="extype">Commands</span>[[α]α]</h3>
+            </div><div name="net.fyrie.redis.commands.PubSub" class="parent">
+              <h3>Inherited from <span name="net.fyrie.redis.commands.PubSub" class="extype">PubSub</span>[[α]α]</h3>
             </div><div name="net.fyrie.redis.commands.Hashes" class="parent">
               <h3>Inherited from <span name="net.fyrie.redis.commands.Hashes" class="extype">Hashes</span>[[α]α]</h3>
             </div><div name="net.fyrie.redis.commands.SortedSets" class="parent">
