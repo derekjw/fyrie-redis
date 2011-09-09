@@ -29,7 +29,6 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
   override def preStart = {
     EventHandler info (this, "Connecting")
     worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
-    worker.start
     self link worker
     socket = IO.connect(ioManager, host, port, worker)
     worker ! Socket(socket)
@@ -88,7 +87,6 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
     client = new RedisClientSub(self, host, port, config)
     EventHandler info (this, "Connecting")
     worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
-    worker.start
     self link worker
     socket = IO.connect(ioManager, host, port, worker)
     worker ! Socket(socket)

@@ -37,7 +37,7 @@ class PubSubSpec extends Spec
   describe("pubsub") {
     it("should work") {
       val ps = PromiseStream[String]()
-      val s = actorOf(new TestSubscriber(ps)).start
+      val s = actorOf(new TestSubscriber(ps))
       s ! Subscribe(Seq("Test Channel", "Test Channel 2"))
       ps.dequeue.get should be("[Test Channel] Subscribed")
       ps.dequeue.get should be("[Test Channel 2] Subscribed")

@@ -17,16 +17,16 @@ case class RedisClientConfig(timeout: Timeout = implicitly,
                              retryOnReconnect: Boolean = true)
 
 object RedisClient {
-  def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
+  def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager())) =
     new RedisClient(host, port, config, ioManager)
 
-  def subscriber(listener: ActorRef)(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start): ActorRef =
-    actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config)).start
+  def subscriber(listener: ActorRef)(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager())): ActorRef =
+    actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config))
 }
 
-final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync {
+final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager())) extends RedisClientAsync {
 
-  protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
+  protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config))
 
   def disconnect = actor ! Disconnect
 
@@ -51,12 +51,12 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
 
   // TODO: Use a connection pool
   def watch[T](block: (RedisClientWatch) ⇒ Future[Queued[T]]): Future[T] = {
-    val rw = new RedisClientWatch { val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start }
+    val rw = new RedisClientWatch { val actor = actorOf(new RedisClientSession(ioManager, host, port, config)) }
     rw.run(block)
   }
 
   def subscriber(listener: ActorRef): ActorRef =
-    actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config)).start
+    actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config))
 
 }
 
