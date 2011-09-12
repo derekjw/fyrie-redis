@@ -25,6 +25,8 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
   var worker: ActorRef = _
 
   val waiting = Queue.empty[RequestMessage]
+  var requests = 0L
+  var requestCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
 
   override def preStart = {
     EventHandler info (this, "Connecting")
@@ -37,15 +39,21 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
   def receive = {
 
+    case RequestCallback(callback) ⇒
+      requestCallbacks +:= callback
+
+    case msg: ResultCallback ⇒
+      worker forward msg
+
     case req: Request ⇒
       socket write req.bytes
       worker forward Run
-      if (config.retryOnReconnect) waiting enqueue req
+      onRequest(req)
 
     case req: MultiRequest ⇒
       sendMulti(req)
       worker forward MultiRun(req.cmds.map(_._2))
-      if (config.retryOnReconnect) waiting enqueue req
+      onRequest(req)
 
     case Received ⇒
       waiting.dequeue
@@ -65,6 +73,15 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
       worker ! Disconnect
       self.stop()
 
+  }
+
+  def onRequest(req: RequestMessage): Unit = {
+    if (config.retryOnReconnect) waiting enqueue req
+    requests += 1L
+    if (requestCallbacks.nonEmpty) {
+      val atTime = System.currentTimeMillis
+      requestCallbacks foreach (_(requests, atTime))
+    }
   }
 
   def sendMulti(req: MultiRequest): Unit = {
@@ -123,7 +140,13 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
   var socket: IO.SocketHandle = _
 
+  var results = 0L
+  var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
+
   def receiveIO: ReceiveIO = {
+
+    case ResultCallback(callback) ⇒
+      resultCallbacks +:= callback
 
     case Socket(handle) ⇒
       socket = handle
@@ -146,7 +169,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     case Run ⇒
       val result = readResult
       self tryReply result
-      if (config.retryOnReconnect) sendToSupervisor(Received)
+      onResult()
 
     case msg: MultiRun ⇒
       val multi = readResult
@@ -159,7 +182,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       }
       val exec = readResult
       self tryReply exec
-      if (config.retryOnReconnect) sendToSupervisor(Received)
+      onResult()
 
     case Subscriber(listener) ⇒
       loopC {
@@ -188,6 +211,15 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       socket.close
       self.stop()
 
+  }
+
+  def onResult() {
+    if (config.retryOnReconnect) sendToSupervisor(Received)
+    results += 1L
+    if (resultCallbacks.nonEmpty) {
+      val atTime = System.currentTimeMillis
+      resultCallbacks foreach (_(results, atTime))
+    }
   }
 
   def sendToSupervisor(msg: Any) {
