@@ -2,7 +2,7 @@ package net.fyrie
 package redis
 
 import actors._
-import messages.{ Request, MultiRequest, Disconnect }
+import messages.{ Request, MultiRequest, Disconnect, RequestCallback, ResultCallback }
 import Protocol.EOL
 import types._
 import serialization.{ Parse, Store }
@@ -61,6 +61,30 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
 
   def subscriber(listener: ActorRef): ActorRef =
     actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config)).start
+
+  /**
+   * Callback to be run when a request is sent to the server. The callback
+   * must accept 2 Longs, the first is the id for the request (sequentially
+   * incremented starting at 1, and is not shared between clients), and the
+   * second is the time the request was made (in millis).
+   */
+  def onRequest(callback: (Long, Long) ⇒ Unit) {
+    actor ! RequestCallback(callback)
+  }
+
+  /**
+   * Callback to be run when a result is received from the sender. The callback
+   * must accept 2 Longs, the first is the id for the result (sequentially
+   * incremented, and is not shared between clients), and the second is the time
+   * the result was fully received (in millis).
+   *
+   * FIXME: The id should match with the request id, but if any requests were
+   * lost due to connection failures they may lose sync. A more reliable method
+   * will be implemented later.
+   */
+  def onResult(callback: (Long, Long) ⇒ Unit) {
+    actor ! ResultCallback(callback)
+  }
 
 }
 
