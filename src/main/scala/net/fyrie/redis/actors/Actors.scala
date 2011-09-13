@@ -102,7 +102,7 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
   var client: RedisClientSub = _
 
   override def preStart = {
-    client = new RedisClientSub(self, host, port, config)
+    client = new RedisClientSub(self, config)
     EventHandler info (this, "Connecting")
     worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
     worker.start

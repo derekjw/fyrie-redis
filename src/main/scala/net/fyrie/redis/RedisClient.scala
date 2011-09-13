@@ -2,7 +2,7 @@ package net.fyrie
 package redis
 
 import actors._
-import messages.{ Request, MultiRequest, Disconnect, RequestCallback, ResultCallback }
+import messages.{ Request, MultiRequest, Disconnect, RequestCallback, ResultCallback, ReleaseClient, RequestClient }
 import Protocol.EOL
 import types._
 import serialization.{ Parse, Store }
@@ -18,7 +18,8 @@ case class Timeout(length: Long = 5000, unit: TimeUnit = TimeUnit.MILLISECONDS)
 
 case class RedisClientConfig(timeout: Timeout = Timeout(),
                              autoReconnect: Boolean = true,
-                             retryOnReconnect: Boolean = true)
+                             retryOnReconnect: Boolean = true,
+                             poolSize: Range = 10 to 50)
 
 object RedisClient {
   def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
@@ -32,7 +33,13 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
 
   protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
 
-  def disconnect = actor ! Disconnect
+  protected val pool: ActorRef = actorOf(new ConnectionPool(config.poolSize, () ⇒
+    new RedisClientPoolWorker(actorOf(new RedisClientSession(ioManager, host, port, config)).start, config, pool))).start
+
+  def disconnect = {
+    actor ! Disconnect
+    pool ! Disconnect
+  }
 
   val sync: RedisClientSync = new RedisClientSync {
     val actor = RedisClient.this.actor
@@ -53,10 +60,10 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
     rq.exec(block(rq))
   }
 
-  // TODO: Use a connection pool
-  def watch[T](block: (RedisClientWatch) ⇒ Future[Queued[T]]): Future[T] = {
-    val rw = new RedisClientWatch { val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start }
-    rw.run(block)
+  def atomic[T](block: (RedisClientWatch) ⇒ Future[Queued[T]]): Future[T] = {
+    val promise = Promise[RedisClientPoolWorker]()
+    pool ! RequestClient(promise)
+    promise flatMap (_.run(block))
   }
 
   def subscriber(listener: ActorRef): ActorRef =
@@ -148,19 +155,21 @@ sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[
 }
 
 sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.async) {
+  self: RedisClientPoolWorker ⇒
+
   final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
   final private[redis] def run[T](block: (RedisClientWatch) ⇒ Future[Queued[T]]): Future[T] = {
     val promise = Promise[T]()
     exec(promise, block)
-    promise onComplete { _ ⇒ actor ! Disconnect }
+    promise onComplete { _ ⇒ this.release }
   }
 
   final private[redis] def exec[T](promise: Promise[T], block: (RedisClientWatch) ⇒ Future[Queued[T]]): Unit = {
     block(this) onException { case e ⇒ promise complete Left(e) } foreach { q ⇒
       actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
         case RedisMulti(None) ⇒
-          if (!promise.isExpired) exec(promise, block)
+          if (!promise.isExpired) exec(promise, block) else this.release
         case RedisMulti(m) ⇒
           var responses = q.responses
           (q.responses.iterator zip (q.requests.iterator map (_._2.value))) foreach {
@@ -196,7 +205,12 @@ sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.
 
 }
 
-private[redis] final class RedisClientSub(protected val actor: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Commands[({ type X[_] = ByteString })#X] {
+private[redis] final class RedisClientPoolWorker(protected val actor: ActorRef, config: RedisClientConfig, pool: ActorRef) extends RedisClientWatch {
+  def disconnect = actor ! Disconnect
+  def release = pool ! ReleaseClient(this)
+}
+
+private[redis] final class RedisClientSub(protected val actor: ActorRef, config: RedisClientConfig) extends Commands[({ type X[_] = ByteString })#X] {
   import Protocol._
 
   final def send(in: List[ByteString]): ByteString = format(in)

@@ -178,7 +178,7 @@ class OperationsSpec extends Spec
     it("should succeed with watch") {
       r.sync.set("key", 0)
       val futures = for (_ ← 1 to 100) yield {
-        r watch { rw ⇒
+        r atomic { rw ⇒
           rw watch "key"
           for {
             Some(n: Int) ← rw.get("key").parse[Int]
@@ -192,7 +192,7 @@ class OperationsSpec extends Spec
       r.sync.rpush("mykey1", 5)
       r.set("mykey2", "hello")
       r.hset("mykey3", "hello", 7)
-      val result = r watch { rw ⇒
+      val result = r atomic { rw ⇒
         for {
           _ ← rw.watch("mykey1")
           _ ← rw.watch("mykey2")
