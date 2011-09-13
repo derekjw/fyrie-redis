@@ -3,7 +3,6 @@ package net.fyrie.redis
 import org.specs2._
 import execute._
 import specification._
-import org.specs2.internal.scalaz._, Scalaz._
 
 import akka.dispatch.Future
 import akka.actor.{ Actor, ActorRef }
