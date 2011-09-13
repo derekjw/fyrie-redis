@@ -1,151 +1,148 @@
 package net.fyrie.redis
 
-import org.scalatest.Spec
-import org.scalatest.matchers.ShouldMatchers
+import org.specs2._
 
-class StringOperationsSpec extends Spec
-  with ShouldMatchers
-  with RedisTestServer {
+class StringSpec extends mutable.Specification with TestClient {
 
-  describe("set") {
-    it("should set key/value pairs") {
-      r.sync.set("anshin-1", "debasish")
-      r.sync.set("anshin-2", "maulindu")
+  "set" >> {
+    "should set key/value pairs" ! client { r =>
+      r.sync.set("anshin-1", "debasish") === ()
+      r.sync.set("anshin-2", "maulindu") === ()
     }
   }
 
-  describe("get") {
-    it("should retrieve key/value pairs for existing keys") {
+  "get" >> {
+    "should retrieve key/value pairs for existing keys" ! client { r =>
       r.quiet.set("anshin-1", "debasish")
-      r.sync.get("anshin-1").parse[String] should equal(Some("debasish"))
+      r.sync.get("anshin-1").parse[String] === (Some("debasish"))
     }
-    it("should fail for non-existent keys") {
-      r.sync.get("anshin-2").parse[String] should be(None)
+    "should fail for non-existent keys" ! client { r =>
+      r.sync.get("anshin-2").parse[String] === (None)
     }
   }
 
-  describe("getset") {
-    it("should set new values and return old values") {
+  "getset" >> {
+    "should set new values and return old values" ! client { r =>
       r.set("anshin-1", "debasish")
-      r.sync.get("anshin-1").parse[String] should equal(Some("debasish"))
-      r.sync.getset("anshin-1", "maulindu").parse[String] should equal(Some("debasish"))
-      r.sync.get("anshin-1").parse[String] should equal(Some("maulindu"))
+      r.sync.get("anshin-1").parse[String] === (Some("debasish"))
+      r.sync.getset("anshin-1", "maulindu").parse[String] === (Some("debasish"))
+      r.sync.get("anshin-1").parse[String] === (Some("maulindu"))
     }
   }
 
-  describe("setnx") {
-    it("should set only if the key does not exist") {
+  "setnx" >> {
+    "should set only if the key does not exist" ! client { r =>
       r.set("anshin-1", "debasish")
-      r.sync.setnx("anshin-1", "maulindu") should equal(false)
-      r.sync.setnx("anshin-2", "maulindu") should equal(true)
+      r.sync.setnx("anshin-1", "maulindu") === (false)
+      r.sync.setnx("anshin-2", "maulindu") === (true)
     }
   }
 
-  describe("incr") {
-    it("should increment by 1 for a key that contains a number") {
+  "incr" >> {
+    "should increment by 1 for a key that contains a number" ! client { r =>
       r.set("anshin-1", "10")
-      r.sync.incr("anshin-1") should equal(11)
+      r.sync.incr("anshin-1") === (11)
     }
-    it("should reset to 0 and then increment by 1 for a key that contains a diff type") {
+    "should reset to 0 and then increment by 1 for a key that contains a diff type" ! client { r =>
       r.set("anshin-2", "debasish")
-      try {
-        r.sync.incr("anshin-2")
-      } catch { case ex ⇒ ex.getMessage should startWith("ERR value is not an integer") }
+      r.sync.incr("anshin-2") must throwA[RedisErrorException].like {
+        case e => e.getMessage must startWith("ERR value is not an integer")
+      }
     }
-    it("should increment by 5 for a key that contains a number") {
+    "should increment by 5 for a key that contains a number" ! client { r =>
       r.set("anshin-3", "10")
-      r.sync.incrby("anshin-3", 5) should equal(15)
+      r.sync.incrby("anshin-3", 5) === (15)
     }
-    it("should reset to 0 and then increment by 5 for a key that contains a diff type") {
+    "should reset to 0 and then increment by 5 for a key that contains a diff type" ! client { r =>
       r.set("anshin-4", "debasish")
-      try {
-        r.sync.incrby("anshin-4", 5)
-      } catch { case ex ⇒ ex.getMessage should startWith("ERR value is not an integer") }
+      r.sync.incrby("anshin-4", 5) must throwA[RedisErrorException].like {
+        case e => e.getMessage must startWith("ERR value is not an integer")
+      }
     }
   }
 
-  describe("decr") {
-    it("should decrement by 1 for a key that contains a number") {
+  "decr" >> {
+    "should decrement by 1 for a key that contains a number" ! client { r =>
       r.set("anshin-1", "10")
-      r.sync.decr("anshin-1") should equal(9)
+      r.sync.decr("anshin-1") === (9)
     }
-    it("should reset to 0 and then decrement by 1 for a key that contains a diff type") {
+    "should reset to 0 and then decrement by 1 for a key that contains a diff type" ! client { r =>
       r.set("anshin-2", "debasish")
-      try {
-        r.sync.decr("anshin-2")
-      } catch { case ex ⇒ ex.getMessage should startWith("ERR value is not an integer") }
+      r.sync.decr("anshin-2") must throwA[RedisErrorException].like {
+        case e => e.getMessage must startWith("ERR value is not an integer")
+      }
     }
-    it("should decrement by 5 for a key that contains a number") {
+    "should decrement by 5 for a key that contains a number" ! client { r =>
       r.set("anshin-3", "10")
-      r.sync.decrby("anshin-3", 5) should equal(5)
+      r.sync.decrby("anshin-3", 5) === (5)
     }
-    it("should reset to 0 and then decrement by 5 for a key that contains a diff type") {
+    "should reset to 0 and then decrement by 5 for a key that contains a diff type" ! client { r =>
       r.set("anshin-4", "debasish")
-      try {
-        r.sync.decrby("anshin-4", 5)
-      } catch { case ex ⇒ ex.getMessage should startWith("ERR value is not an integer") }
+      r.sync.decrby("anshin-4", 5) must throwA[RedisErrorException].like {
+        case e => e.getMessage must startWith("ERR value is not an integer")
+      }
     }
   }
 
-  describe("mget") {
-    it("should get values for existing keys") {
+  "mget" >> {
+    "should get values for existing keys" ! client { r =>
       r.set("anshin-1", "debasish")
       r.set("anshin-2", "maulindu")
       r.set("anshin-3", "nilanjan")
-      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-3")).parse[String] should equal(List(Some("debasish"), Some("maulindu"), Some("nilanjan")))
+      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-3")).parse[String] === (List(Some("debasish"), Some("maulindu"), Some("nilanjan")))
     }
-    it("should give None for non-existing keys") {
+    "should give None for non-existing keys" ! client { r =>
       r.set("anshin-1", "debasish")
       r.set("anshin-2", "maulindu")
-      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-4")).parse[String] should equal(List(Some("debasish"), Some("maulindu"), None))
+      r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-4")).parse[String] === (List(Some("debasish"), Some("maulindu"), None))
     }
   }
 
-  describe("mset") {
-    it("should set all keys irrespective of whether they exist") {
+  "mset" >> {
+    "should set all keys irrespective of whether they exist" ! client { r =>
       r.sync.mset(Map(
         ("anshin-1", "debasish"),
         ("anshin-2", "maulindu"),
-        ("anshin-3", "nilanjan")))
+        ("anshin-3", "nilanjan"))) === ()
     }
 
-    it("should set all keys only if none of them exist") {
+    "should set all keys only if none of them exist" ! client { r =>
       r.sync.msetnx(Map(
         ("anshin-4", "debasish"),
         ("anshin-5", "maulindu"),
-        ("anshin-6", "nilanjan"))) should equal(true)
+        ("anshin-6", "nilanjan"))) === (true)
       r.sync.msetnx(Map(
         ("anshin-7", "debasish"),
         ("anshin-8", "maulindu"),
-        ("anshin-6", "nilanjan"))) should equal(false)
+        ("anshin-6", "nilanjan"))) === (false)
       r.sync.msetnx(Map(
         ("anshin-4", "debasish"),
         ("anshin-5", "maulindu"),
-        ("anshin-6", "nilanjan"))) should equal(false)
+        ("anshin-6", "nilanjan"))) === (false)
     }
   }
 
-  describe("get with spaces in keys") {
-    it("should retrieve key/value pairs for existing keys") {
+  "get with spaces in keys" >> {
+    "should retrieve key/value pairs for existing keys" ! client { r =>
       r.set("anshin software", "debasish ghosh")
-      r.sync.get("anshin software").parse[String] should equal(Some("debasish ghosh"))
+      r.sync.get("anshin software").parse[String] === (Some("debasish ghosh"))
 
       r.set("test key with spaces", "I am a value with spaces")
-      r.sync.get("test key with spaces").parse[String] should equal(Some("I am a value with spaces"))
+      r.sync.get("test key with spaces").parse[String] === (Some("I am a value with spaces"))
     }
   }
 
-  describe("set with newline values") {
-    it("should set key/value pairs") {
-      r.sync.set("anshin-x", "debasish\nghosh\nfather")
-      r.sync.set("anshin-y", "maulindu\nchatterjee")
+  "set with newline values" >> {
+    "should set key/value pairs" ! client { r =>
+      r.sync.set("anshin-x", "debasish\nghosh\nfather") === ()
+      r.sync.set("anshin-y", "maulindu\nchatterjee") === ()
     }
   }
 
-  describe("get with newline values") {
-    it("should retrieve key/value pairs for existing keys") {
+  "get with newline values" >> {
+    "should retrieve key/value pairs for existing keys" ! client { r =>
       r.set("anshin-x", "debasish\nghosh\nfather")
-      r.sync.get("anshin-x").parse[String] should equal(Some("debasish\nghosh\nfather"))
+      r.sync.get("anshin-x").parse[String] === (Some("debasish\nghosh\nfather"))
     }
   }
 }

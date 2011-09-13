@@ -1,22 +1,27 @@
 package net.fyrie.redis
 
-import org.scalatest.Spec
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.BeforeAndAfterAll
+import org.specs2._
+import specification._
+import execute._
 
-trait RedisTestServer extends BeforeAndAfterEach with BeforeAndAfterAll {
-  self: Spec ⇒
+trait TestClient { self: mutable.Specification ⇒
 
-  val r = new RedisClient
+  implicit val arguments = args(sequential = true)
 
-  override def beforeAll = {
+  def client = new AroundOutside[RedisClient] {
+
+    val r = RedisClient()
     r.sync.flushall
+
+    def around[T <% Result](t: ⇒ T) = {
+      val result = t
+      r.sync.flushall
+      r.disconnect
+      result
+    }
+
+    def outside: RedisClient = r
+
   }
 
-  override def afterEach = {
-    r.sync.flushall
-  }
-  override def afterAll = {
-    r.disconnect
-  }
 }
