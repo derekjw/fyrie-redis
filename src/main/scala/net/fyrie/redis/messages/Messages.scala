@@ -19,7 +19,7 @@ private[redis] case class MultiRun(promises: Seq[Promise[RedisType]]) extends Me
 private[redis] case class Socket(handle: IO.SocketHandle) extends Message
 private[redis] case object Received extends Message
 private[redis] case class Subscriber(listener: ActorRef) extends Message
-private[redis] case class RequestCallback(callback: (Long, Long) => Unit) extends Message
-private[redis] case class ResultCallback(callback: (Long, Long) => Unit) extends Message
+private[redis] case class RequestCallback(callback: (Long, Long) ⇒ Unit) extends Message
+private[redis] case class ResultCallback(callback: (Long, Long) ⇒ Unit) extends Message
 private[redis] case class ReleaseClient(client: RedisClientPoolWorker) extends Message
 private[redis] case class RequestClient(promise: Promise[RedisClientPoolWorker]) extends Message

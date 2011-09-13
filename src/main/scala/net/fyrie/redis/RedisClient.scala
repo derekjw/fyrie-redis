@@ -29,7 +29,7 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
 
   protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config))
 
-  protected val pool: ActorRef = actorOf(new ConnectionPool(config.poolSize, () =>
+  protected val pool: ActorRef = actorOf(new ConnectionPool(config.poolSize, () ⇒
     new RedisClientPoolWorker(actorOf(new RedisClientSession(ioManager, host, port, config)), config, pool)))
 
   def disconnect = {
@@ -71,7 +71,7 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
    * incremented starting at 1, and is not shared between clients), and the
    * second is the time the request was made (in millis).
    */
-  def onRequest(callback: (Long, Long) => Unit) {
+  def onRequest(callback: (Long, Long) ⇒ Unit) {
     actor ! RequestCallback(callback)
   }
 
@@ -85,7 +85,7 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
    * lost due to connection failures they may lose sync. A more reliable method
    * will be implemented later.
    */
-  def onResult(callback: (Long, Long) => Unit) {
+  def onResult(callback: (Long, Long) ⇒ Unit) {
     actor ! ResultCallback(callback)
   }
 
@@ -151,7 +151,7 @@ sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[
 }
 
 sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.async) {
-  self: RedisClientPoolWorker =>
+  self: RedisClientPoolWorker ⇒
 
   final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 

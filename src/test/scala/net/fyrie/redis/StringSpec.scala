@@ -5,24 +5,24 @@ import org.specs2._
 class StringSpec extends mutable.Specification with TestClient {
 
   "set" >> {
-    "should set key/value pairs" ! client { r =>
+    "should set key/value pairs" ! client { r ⇒
       r.sync.set("anshin-1", "debasish") === ()
       r.sync.set("anshin-2", "maulindu") === ()
     }
   }
 
   "get" >> {
-    "should retrieve key/value pairs for existing keys" ! client { r =>
+    "should retrieve key/value pairs for existing keys" ! client { r ⇒
       r.quiet.set("anshin-1", "debasish")
       r.sync.get("anshin-1").parse[String] === (Some("debasish"))
     }
-    "should fail for non-existent keys" ! client { r =>
+    "should fail for non-existent keys" ! client { r ⇒
       r.sync.get("anshin-2").parse[String] === (None)
     }
   }
 
   "getset" >> {
-    "should set new values and return old values" ! client { r =>
+    "should set new values and return old values" ! client { r ⇒
       r.set("anshin-1", "debasish")
       r.sync.get("anshin-1").parse[String] === (Some("debasish"))
       r.sync.getset("anshin-1", "maulindu").parse[String] === (Some("debasish"))
@@ -31,7 +31,7 @@ class StringSpec extends mutable.Specification with TestClient {
   }
 
   "setnx" >> {
-    "should set only if the key does not exist" ! client { r =>
+    "should set only if the key does not exist" ! client { r ⇒
       r.set("anshin-1", "debasish")
       r.sync.setnx("anshin-1", "maulindu") === (false)
       r.sync.setnx("anshin-2", "maulindu") === (true)
@@ -39,59 +39,59 @@ class StringSpec extends mutable.Specification with TestClient {
   }
 
   "incr" >> {
-    "should increment by 1 for a key that contains a number" ! client { r =>
+    "should increment by 1 for a key that contains a number" ! client { r ⇒
       r.set("anshin-1", "10")
       r.sync.incr("anshin-1") === (11)
     }
-    "should reset to 0 and then increment by 1 for a key that contains a diff type" ! client { r =>
+    "should reset to 0 and then increment by 1 for a key that contains a diff type" ! client { r ⇒
       r.set("anshin-2", "debasish")
       r.sync.incr("anshin-2") must throwA[RedisErrorException].like {
-        case e => e.getMessage must startWith("ERR value is not an integer")
+        case e ⇒ e.getMessage must startWith("ERR value is not an integer")
       }
     }
-    "should increment by 5 for a key that contains a number" ! client { r =>
+    "should increment by 5 for a key that contains a number" ! client { r ⇒
       r.set("anshin-3", "10")
       r.sync.incrby("anshin-3", 5) === (15)
     }
-    "should reset to 0 and then increment by 5 for a key that contains a diff type" ! client { r =>
+    "should reset to 0 and then increment by 5 for a key that contains a diff type" ! client { r ⇒
       r.set("anshin-4", "debasish")
       r.sync.incrby("anshin-4", 5) must throwA[RedisErrorException].like {
-        case e => e.getMessage must startWith("ERR value is not an integer")
+        case e ⇒ e.getMessage must startWith("ERR value is not an integer")
       }
     }
   }
 
   "decr" >> {
-    "should decrement by 1 for a key that contains a number" ! client { r =>
+    "should decrement by 1 for a key that contains a number" ! client { r ⇒
       r.set("anshin-1", "10")
       r.sync.decr("anshin-1") === (9)
     }
-    "should reset to 0 and then decrement by 1 for a key that contains a diff type" ! client { r =>
+    "should reset to 0 and then decrement by 1 for a key that contains a diff type" ! client { r ⇒
       r.set("anshin-2", "debasish")
       r.sync.decr("anshin-2") must throwA[RedisErrorException].like {
-        case e => e.getMessage must startWith("ERR value is not an integer")
+        case e ⇒ e.getMessage must startWith("ERR value is not an integer")
       }
     }
-    "should decrement by 5 for a key that contains a number" ! client { r =>
+    "should decrement by 5 for a key that contains a number" ! client { r ⇒
       r.set("anshin-3", "10")
       r.sync.decrby("anshin-3", 5) === (5)
     }
-    "should reset to 0 and then decrement by 5 for a key that contains a diff type" ! client { r =>
+    "should reset to 0 and then decrement by 5 for a key that contains a diff type" ! client { r ⇒
       r.set("anshin-4", "debasish")
       r.sync.decrby("anshin-4", 5) must throwA[RedisErrorException].like {
-        case e => e.getMessage must startWith("ERR value is not an integer")
+        case e ⇒ e.getMessage must startWith("ERR value is not an integer")
       }
     }
   }
 
   "mget" >> {
-    "should get values for existing keys" ! client { r =>
+    "should get values for existing keys" ! client { r ⇒
       r.set("anshin-1", "debasish")
       r.set("anshin-2", "maulindu")
       r.set("anshin-3", "nilanjan")
       r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-3")).parse[String] === (List(Some("debasish"), Some("maulindu"), Some("nilanjan")))
     }
-    "should give None for non-existing keys" ! client { r =>
+    "should give None for non-existing keys" ! client { r ⇒
       r.set("anshin-1", "debasish")
       r.set("anshin-2", "maulindu")
       r.sync.mget(Seq("anshin-1", "anshin-2", "anshin-4")).parse[String] === (List(Some("debasish"), Some("maulindu"), None))
@@ -99,14 +99,14 @@ class StringSpec extends mutable.Specification with TestClient {
   }
 
   "mset" >> {
-    "should set all keys irrespective of whether they exist" ! client { r =>
+    "should set all keys irrespective of whether they exist" ! client { r ⇒
       r.sync.mset(Map(
         ("anshin-1", "debasish"),
         ("anshin-2", "maulindu"),
         ("anshin-3", "nilanjan"))) === ()
     }
 
-    "should set all keys only if none of them exist" ! client { r =>
+    "should set all keys only if none of them exist" ! client { r ⇒
       r.sync.msetnx(Map(
         ("anshin-4", "debasish"),
         ("anshin-5", "maulindu"),
@@ -123,7 +123,7 @@ class StringSpec extends mutable.Specification with TestClient {
   }
 
   "get with spaces in keys" >> {
-    "should retrieve key/value pairs for existing keys" ! client { r =>
+    "should retrieve key/value pairs for existing keys" ! client { r ⇒
       r.set("anshin software", "debasish ghosh")
       r.sync.get("anshin software").parse[String] === (Some("debasish ghosh"))
 
@@ -133,14 +133,14 @@ class StringSpec extends mutable.Specification with TestClient {
   }
 
   "set with newline values" >> {
-    "should set key/value pairs" ! client { r =>
+    "should set key/value pairs" ! client { r ⇒
       r.sync.set("anshin-x", "debasish\nghosh\nfather") === ()
       r.sync.set("anshin-y", "maulindu\nchatterjee") === ()
     }
   }
 
   "get with newline values" >> {
-    "should retrieve key/value pairs for existing keys" ! client { r =>
+    "should retrieve key/value pairs for existing keys" ! client { r ⇒
       r.set("anshin-x", "debasish\nghosh\nfather")
       r.sync.get("anshin-x").parse[String] === (Some("debasish\nghosh\nfather"))
     }

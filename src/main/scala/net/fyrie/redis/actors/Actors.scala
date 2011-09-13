@@ -26,7 +26,7 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
   val waiting = Queue.empty[RequestMessage]
   var requests = 0L
-  var requestCallbacks = Seq.empty[(Long, Long) => Unit]
+  var requestCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
 
   override def preStart = {
     EventHandler info (this, "Connecting")
@@ -38,10 +38,10 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
   def receive = {
 
-    case RequestCallback(callback) =>
+    case RequestCallback(callback) ⇒
       requestCallbacks +:= callback
 
-    case msg: ResultCallback =>
+    case msg: ResultCallback ⇒
       worker forward msg
 
     case req: Request ⇒
@@ -139,11 +139,11 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
   var socket: IO.SocketHandle = _
 
   var results = 0L
-  var resultCallbacks = Seq.empty[(Long, Long) => Unit]
+  var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
 
   def receiveIO: ReceiveIO = {
 
-    case ResultCallback(callback) =>
+    case ResultCallback(callback) ⇒
       resultCallbacks +:= callback
 
     case Socket(handle) ⇒
