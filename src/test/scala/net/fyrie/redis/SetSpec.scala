@@ -1,269 +1,263 @@
 package net.fyrie.redis
 
-import org.scalatest.Spec
-import org.scalatest.matchers.ShouldMatchers
+import org.specs2._
 
-class SetOperationsSpec extends Spec
-  with ShouldMatchers
-  with RedisTestServer {
+class SetSpec extends mutable.Specification with TestClient {
 
-  describe("sadd") {
-    it("should add a non-existent value to the set") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
+  "sadd" >> {
+    "should add a non-existent value to the set" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
     }
-    it("should not add an existing value to the set") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "foo") should equal(false)
+    "should not add an existing value to the set" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "foo") === false
     }
-    it("should fail if the key points to a non-set") {
-      r.sync.lpush("list-1", "foo") should equal(1)
-      val thrown = evaluating { r.sync.sadd("list-1", "foo") } should produce[Exception]
-      thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
+    "should fail if the key points to a non-set" ! client { r ⇒
+      r.sync.lpush("list-1", "foo") === (1)
+      r.sync.sadd("list-1", "foo") must throwA[RedisErrorException]("ERR Operation against a key holding the wrong kind of value")
     }
   }
 
-  describe("srem") {
-    it("should remove a value from the set") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.srem("set-1", "bar") should equal(true)
-      r.sync.srem("set-1", "foo") should equal(true)
+  "srem" >> {
+    "should remove a value from the set" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.srem("set-1", "bar") === true
+      r.sync.srem("set-1", "foo") === true
     }
-    it("should not do anything if the value does not exist") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.srem("set-1", "bar") should equal(false)
+    "should not do anything if the value does not exist" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.srem("set-1", "bar") === false
     }
-    it("should fail if the key points to a non-set") {
-      r.sync.lpush("list-1", "foo") should equal(1)
-      val thrown = evaluating { r.sync.srem("list-1", "foo") } should produce[Exception]
-      thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
-    }
-  }
-
-  describe("spop") {
-    it("should pop a random element") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.spop("set-1").parse[String] should (equal(Some("foo")) or equal(Some("bar")) or equal(Some("baz")))
-    }
-    it("should return nil if the key does not exist") {
-      r.sync.spop("set-1") should equal(None)
+    "should fail if the key points to a non-set" ! client { r ⇒
+      r.sync.lpush("list-1", "foo") === 1
+      r.sync.srem("list-1", "foo") must throwA[RedisErrorException]("ERR Operation against a key holding the wrong kind of value")
     }
   }
 
-  describe("smove") {
-    it("should move from one set to another") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-
-      r.sync.sadd("set-2", "1") should equal(true)
-      r.sync.sadd("set-2", "2") should equal(true)
-
-      r.sync.smove("set-1", "set-2", "baz") should equal(true)
-      r.sync.sadd("set-2", "baz") should equal(false)
-      r.sync.sadd("set-1", "baz") should equal(true)
+  "spop" >> {
+    "should pop a random element" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.spop("set-1").parse[String] must beOneOf(Some("foo"), Some("bar"), Some("baz"))
     }
-    it("should return 0 if the element does not exist in source set") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.smove("set-1", "set-2", "bat") should equal(false)
-      r.sync.smove("set-3", "set-2", "bat") should equal(false)
-    }
-    it("should give error if the source or destination key is not a set") {
-      r.sync.lpush("list-1", "foo") should equal(1)
-      r.sync.lpush("list-1", "bar") should equal(2)
-      r.sync.lpush("list-1", "baz") should equal(3)
-      r.sync.sadd("set-1", "foo") should equal(true)
-      val thrown = evaluating { r.sync.smove("list-1", "set-1", "bat") } should produce[Exception]
-      thrown.getMessage should equal("ERR Operation against a key holding the wrong kind of value")
+    "should return nil if the key does not exist" ! client { r ⇒
+      r.sync.spop("set-1") === (None)
     }
   }
 
-  describe("scard") {
-    it("should return cardinality") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.scard("set-1") should equal(3)
-    }
-    it("should return 0 if key does not exist") {
-      r.sync.scard("set-1") should equal(0)
-    }
-  }
+  "smove" >> {
+    "should move from one set to another" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
 
-  describe("sismember") {
-    it("should return true for membership") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sismember("set-1", "foo") should equal(true)
-    }
-    it("should return false for no membership") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sismember("set-1", "fo") should equal(false)
-    }
-    it("should return false if key does not exist") {
-      r.sync.sismember("set-1", "fo") should equal(false)
-    }
-  }
+      r.sync.sadd("set-2", "1") === true
+      r.sync.sadd("set-2", "2") === true
 
-  describe("sinter") {
-    it("should return intersection") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-
-      r.sync.sadd("set-2", "foo") should equal(true)
-      r.sync.sadd("set-2", "bat") should equal(true)
-      r.sync.sadd("set-2", "baz") should equal(true)
-
-      r.sync.sadd("set-3", "for") should equal(true)
-      r.sync.sadd("set-3", "bat") should equal(true)
-      r.sync.sadd("set-3", "bay") should equal(true)
-
-      r.sync.sinter(Set("set-1", "set-2")).parse[String] should equal(Set("foo", "baz"))
-      r.sync.sinter(Set("set-1", "set-3")).parse[String] should equal(Set.empty)
+      r.sync.smove("set-1", "set-2", "baz") === true
+      r.sync.sadd("set-2", "baz") === false
+      r.sync.sadd("set-1", "baz") === true
     }
-    it("should return empty set for non-existing key") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sinter(Set("set-1", "set-4")).parse[String] should equal(Set.empty)
+    "should return 0 if the element does not exist in source set" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.smove("set-1", "set-2", "bat") === false
+      r.sync.smove("set-3", "set-2", "bat") === false
+    }
+    "should give error if the source or destination key is not a set" ! client { r ⇒
+      r.sync.lpush("list-1", "foo") === (1)
+      r.sync.lpush("list-1", "bar") === (2)
+      r.sync.lpush("list-1", "baz") === (3)
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.smove("list-1", "set-1", "bat") must throwA[RedisErrorException]("ERR Operation against a key holding the wrong kind of value")
     }
   }
 
-  describe("sinterstore") {
-    it("should store intersection") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-
-      r.sync.sadd("set-2", "foo") should equal(true)
-      r.sync.sadd("set-2", "bat") should equal(true)
-      r.sync.sadd("set-2", "baz") should equal(true)
-
-      r.sync.sadd("set-3", "for") should equal(true)
-      r.sync.sadd("set-3", "bat") should equal(true)
-      r.sync.sadd("set-3", "bay") should equal(true)
-
-      r.sync.sinterstore("set-r", Set("set-1", "set-2")) should equal(2)
-      r.sync.scard("set-r") should equal(2)
-      r.sync.sinterstore("set-s", Set("set-1", "set-3")) should equal(0)
-      r.sync.scard("set-s") should equal(0)
+  "scard" >> {
+    "should return cardinality" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.scard("set-1") === (3)
     }
-    it("should return empty set for non-existing key") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sinterstore("set-r", Seq("set-1", "set-4")) should equal(0)
-      r.sync.scard("set-r") should equal(0)
+    "should return 0 if key does not exist" ! client { r ⇒
+      r.sync.scard("set-1") === (0)
     }
   }
 
-  describe("sunion") {
-    it("should return union") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-
-      r.sync.sadd("set-2", "foo") should equal(true)
-      r.sync.sadd("set-2", "bat") should equal(true)
-      r.sync.sadd("set-2", "baz") should equal(true)
-
-      r.sync.sadd("set-3", "for") should equal(true)
-      r.sync.sadd("set-3", "bat") should equal(true)
-      r.sync.sadd("set-3", "bay") should equal(true)
-
-      r.sync.sunion(Set("set-1", "set-2")).parse[String] should equal(Set("foo", "bar", "baz", "bat"))
-      r.sync.sunion(Set("set-1", "set-3")).parse[String] should equal(Set("foo", "bar", "baz", "for", "bat", "bay"))
+  "sismember" >> {
+    "should return true for membership" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sismember("set-1", "foo") === true
     }
-    it("should return empty set for non-existing key") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sunion(Seq("set-1", "set-2")).parse[String] should equal(Set("foo", "bar", "baz"))
+    "should return false for no membership" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sismember("set-1", "fo") === false
+    }
+    "should return false if key does not exist" ! client { r ⇒
+      r.sync.sismember("set-1", "fo") === false
     }
   }
 
-  describe("sunionstore") {
-    it("should store union") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
+  "sinter" >> {
+    "should return intersection" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
 
-      r.sync.sadd("set-2", "foo") should equal(true)
-      r.sync.sadd("set-2", "bat") should equal(true)
-      r.sync.sadd("set-2", "baz") should equal(true)
+      r.sync.sadd("set-2", "foo") === true
+      r.sync.sadd("set-2", "bat") === true
+      r.sync.sadd("set-2", "baz") === true
 
-      r.sync.sadd("set-3", "for") should equal(true)
-      r.sync.sadd("set-3", "bat") should equal(true)
-      r.sync.sadd("set-3", "bay") should equal(true)
+      r.sync.sadd("set-3", "for") === true
+      r.sync.sadd("set-3", "bat") === true
+      r.sync.sadd("set-3", "bay") === true
 
-      r.sync.sunionstore("set-r", Set("set-1", "set-2")) should equal(4)
-      r.sync.scard("set-r") should equal(4)
-      r.sync.sunionstore("set-s", Set("set-1", "set-3")) should equal(6)
-      r.sync.scard("set-s") should equal(6)
+      r.sync.sinter(Set("set-1", "set-2")).parse[String] === (Set("foo", "baz"))
+      r.sync.sinter(Set("set-1", "set-3")).parse[String] === (Set.empty)
     }
-    it("should treat non-existing keys as empty sets") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sunionstore("set-r", Set("set-1", "set-4")) should equal(3)
-      r.sync.scard("set-r") should equal(3)
+    "should return empty set for non-existing key" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sinter(Set("set-1", "set-4")).parse[String] === (Set.empty)
     }
   }
 
-  describe("sdiff") {
-    it("should return diff") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
+  "sinterstore" >> {
+    "should store intersection" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
 
-      r.sync.sadd("set-2", "foo") should equal(true)
-      r.sync.sadd("set-2", "bat") should equal(true)
-      r.sync.sadd("set-2", "baz") should equal(true)
+      r.sync.sadd("set-2", "foo") === true
+      r.sync.sadd("set-2", "bat") === true
+      r.sync.sadd("set-2", "baz") === true
 
-      r.sync.sadd("set-3", "for") should equal(true)
-      r.sync.sadd("set-3", "bat") should equal(true)
-      r.sync.sadd("set-3", "bay") should equal(true)
+      r.sync.sadd("set-3", "for") === true
+      r.sync.sadd("set-3", "bat") === true
+      r.sync.sadd("set-3", "bay") === true
 
-      r.sync.sdiff("set-1", Set("set-2", "set-3")).parse[String] should equal(Set("bar"))
+      r.sync.sinterstore("set-r", Set("set-1", "set-2")) === (2)
+      r.sync.scard("set-r") === (2)
+      r.sync.sinterstore("set-s", Set("set-1", "set-3")) === (0)
+      r.sync.scard("set-s") === (0)
     }
-    it("should treat non-existing keys as empty sets") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.sdiff("set-1", Set("set-2")).parse[String] should equal(Set("foo", "bar", "baz"))
-    }
-  }
-
-  describe("smembers") {
-    it("should return members of a set") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.smembers("set-1").parse[String] should equal(Set("foo", "bar", "baz"))
-    }
-    it("should return None for an empty set") {
-      r.sync.smembers("set-1").parse[String] should equal(Set.empty)
+    "should return empty set for non-existing key" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sinterstore("set-r", Seq("set-1", "set-4")) === (0)
+      r.sync.scard("set-r") === (0)
     }
   }
 
-  describe("srandmember") {
-    it("should return a random member") {
-      r.sync.sadd("set-1", "foo") should equal(true)
-      r.sync.sadd("set-1", "bar") should equal(true)
-      r.sync.sadd("set-1", "baz") should equal(true)
-      r.sync.srandmember("set-1").parse[String] should (equal(Some("foo")) or equal(Some("bar")) or equal(Some("baz")))
+  "sunion" >> {
+    "should return union" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+
+      r.sync.sadd("set-2", "foo") === true
+      r.sync.sadd("set-2", "bat") === true
+      r.sync.sadd("set-2", "baz") === true
+
+      r.sync.sadd("set-3", "for") === true
+      r.sync.sadd("set-3", "bat") === true
+      r.sync.sadd("set-3", "bay") === true
+
+      r.sync.sunion(Set("set-1", "set-2")).parse[String] === (Set("foo", "bar", "baz", "bat"))
+      r.sync.sunion(Set("set-1", "set-3")).parse[String] === (Set("foo", "bar", "baz", "for", "bat", "bay"))
     }
-    it("should return None for a non-existing key") {
-      r.sync.srandmember("set-1").parse[String] should equal(None)
+    "should return empty set for non-existing key" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sunion(Seq("set-1", "set-2")).parse[String] === (Set("foo", "bar", "baz"))
+    }
+  }
+
+  "sunionstore" >> {
+    "should store union" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+
+      r.sync.sadd("set-2", "foo") === true
+      r.sync.sadd("set-2", "bat") === true
+      r.sync.sadd("set-2", "baz") === true
+
+      r.sync.sadd("set-3", "for") === true
+      r.sync.sadd("set-3", "bat") === true
+      r.sync.sadd("set-3", "bay") === true
+
+      r.sync.sunionstore("set-r", Set("set-1", "set-2")) === (4)
+      r.sync.scard("set-r") === (4)
+      r.sync.sunionstore("set-s", Set("set-1", "set-3")) === (6)
+      r.sync.scard("set-s") === (6)
+    }
+    "should treat non-existing keys as empty sets" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sunionstore("set-r", Set("set-1", "set-4")) === (3)
+      r.sync.scard("set-r") === (3)
+    }
+  }
+
+  "sdiff" >> {
+    "should return diff" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+
+      r.sync.sadd("set-2", "foo") === true
+      r.sync.sadd("set-2", "bat") === true
+      r.sync.sadd("set-2", "baz") === true
+
+      r.sync.sadd("set-3", "for") === true
+      r.sync.sadd("set-3", "bat") === true
+      r.sync.sadd("set-3", "bay") === true
+
+      r.sync.sdiff("set-1", Set("set-2", "set-3")).parse[String] === (Set("bar"))
+    }
+    "should treat non-existing keys as empty sets" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.sdiff("set-1", Set("set-2")).parse[String] === (Set("foo", "bar", "baz"))
+    }
+  }
+
+  "smembers" >> {
+    "should return members of a set" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.smembers("set-1").parse[String] === (Set("foo", "bar", "baz"))
+    }
+    "should return None for an empty set" ! client { r ⇒
+      r.sync.smembers("set-1").parse[String] === (Set.empty)
+    }
+  }
+
+  "srandmember" >> {
+    "should return a random member" ! client { r ⇒
+      r.sync.sadd("set-1", "foo") === true
+      r.sync.sadd("set-1", "bar") === true
+      r.sync.sadd("set-1", "baz") === true
+      r.sync.srandmember("set-1").parse[String] must beOneOf(Some("foo"), Some("bar"), Some("baz"))
+    }
+    "should return None for a non-existing key" ! client { r ⇒
+      r.sync.srandmember("set-1").parse[String] === (None)
     }
   }
 }
