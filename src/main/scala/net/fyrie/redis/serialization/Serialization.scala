@@ -10,6 +10,7 @@ trait Store[A] {
 }
 
 object Store {
+  sealed trait Dummy
 
   def apply[A](value: A)(implicit store: Store[A]): ByteString = store(value)
 
@@ -22,6 +23,7 @@ object Store {
   implicit val storeLong = Store.asString[Long]
   implicit val storeFloat = Store.asString[Float]
   implicit val storeDouble = Store.asString[Double]
+  implicit val storeDummy = new Store[Dummy] { def apply(value: Dummy) = sys.error("Don't store the Dummy!") }
   implicit val storeDate = new Store[Date] { def apply(value: Date) = storeLong(value.getTime) }
   implicit val storeScore = new Store[RedisScore] {
     def apply(score: RedisScore) = score match {
