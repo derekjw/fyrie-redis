@@ -27,6 +27,7 @@ private[redis] object Protocol {
   val DISCARD = ByteString("DISCARD")
   val ECHO = ByteString("ECHO")
   val EOL = ByteString("\r\n")
+  val EVAL = ByteString("EVAL")
   val EXEC = ByteString("EXEC")
   val EXISTS = ByteString("EXISTS")
   val EXPIRE = ByteString("EXPIRE")
