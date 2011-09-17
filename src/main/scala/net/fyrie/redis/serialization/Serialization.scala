@@ -5,7 +5,7 @@ import akka.util.ByteString
 
 import java.util.Date
 
-trait Store[A] {
+trait Store[-A] {
   def apply(value: A): ByteString
 }
 
@@ -24,6 +24,7 @@ object Store {
   implicit val storeFloat = Store.asString[Float]
   implicit val storeDouble = Store.asString[Double]
   implicit val storeDummy = new Store[Dummy] { def apply(value: Dummy) = sys.error("Don't store the Dummy!") }
+  implicit val storeLua = new Store[lua.Chunk] { def apply(value: lua.Chunk) = value.bytes }
   implicit val storeDate = new Store[Date] { def apply(value: Date) = storeLong(value.getTime) }
   implicit val storeScore = new Store[RedisScore] {
     def apply(score: RedisScore) = score match {
@@ -48,7 +49,7 @@ object Store {
   }
 }
 
-trait Parse[A] {
+trait Parse[+A] {
   def apply(bytes: ByteString): A
 }
 
