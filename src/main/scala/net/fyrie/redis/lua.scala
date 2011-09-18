@@ -69,16 +69,16 @@ case class If(test: Exp) {
 case class IfThen(test: Exp, then: Block, elseIf: Vector[ElseIfThen]) extends Stat {
   def ElseIf(test: Exp) = lua.ElseIf(test, this)
   def Else(block: Block) = IfThenElse(test, then, elseIf, block)
-  def bytes = ((IF ++ test.bytes ++ THEN ++ then.bytes) /: elseIf)(_ ++ _.bytes) ++ END
+  val bytes = ((IF ++ test.bytes ++ THEN ++ then.bytes) /: elseIf)(_ ++ _.bytes) ++ END
 }
 case class IfThenElse(test: Exp, then: Block, elseIf: Vector[ElseIfThen], `else`: Block) extends Stat {
-  def bytes = ((IF ++ test.bytes ++ THEN ++ then.bytes) /: elseIf)(_ ++ _.bytes) ++ ELSE ++ `else`.bytes ++ END
+  val bytes = ((IF ++ test.bytes ++ THEN ++ then.bytes) /: elseIf)(_ ++ _.bytes) ++ ELSE ++ `else`.bytes ++ END
 }
 case class ElseIf(test: Exp, parent: IfThen) {
   def Then(block: Block) = parent.copy(elseIf = parent.elseIf :+ ElseIfThen(test, block))
 }
 case class ElseIfThen(test: Exp, block: Block) {
-  def bytes = ELSEIF ++ test.bytes ++ THEN ++ block.bytes
+  val bytes = ELSEIF ++ test.bytes ++ THEN ++ block.bytes
 }
 
 sealed trait LastStat extends Block
@@ -93,21 +93,29 @@ case object End extends LastStat {
 }
 
 object Exp {
+  def apply(exp: Exp) = exp match {
+    case _: BinOp => Par(exp)
+    case _ => exp
+  }
   implicit def boolToExp(b: Boolean): Exp = if (b) True else False
   implicit def intToExp(n: Int): Exp = Num(n)
   implicit def strToExp(s: String): Exp = Str(s)
 }
+
 sealed trait Exp {
   def bytes: ByteString
-  def :+(that: Exp) = Add(this, that)
-  def :-(that: Exp) = Sub(this, that)
-  def :*(that: Exp) = Mult(this, that)
-  def :\(that: Exp) = Div(this, that)
-  def :<(that: Exp) = Lt(this, that)
-  def :<=(that: Exp) = LtEq(this, that)
-  def :>(that: Exp) = Lt(this, that)
-  def :>=(that: Exp) = LtEq(this, that)
-  def :==(that: Exp) = Eq(this, that)
+  def :+(that: Exp) = Add(this, Exp(that))
+  def :-(that: Exp) = Sub(this, Exp(that))
+  def :*(that: Exp) = Mult(this, Exp(that))
+  def :\(that: Exp) = Div(this, Exp(that))
+  def :<(that: Exp) = Lt(this, Exp(that))
+  def :<=(that: Exp) = LtEq(this, Exp(that))
+  def :>(that: Exp) = Lt(this, Exp(that))
+  def :>=(that: Exp) = LtEq(this, Exp(that))
+  def :==(that: Exp) = Eq(this, Exp(that))
+}
+case class Par(exp: Exp) extends Exp {
+  val bytes = PARENL ++ exp.bytes ++ PARENR
 }
 //case class Func
 case class Var(name: String) extends Exp {

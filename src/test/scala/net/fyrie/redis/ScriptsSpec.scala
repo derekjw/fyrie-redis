@@ -61,6 +61,16 @@ class ScriptsSpec extends mutable.Specification with UnstableClient {
       r.sync.eval(script("d")) === RedisInteger(8)
       r.sync.eval(script("e")) === RedisBulk(Some(Store("I don't know!")))
     }
+    "should produce valid arithmetic expressions" ! client { r =>
+      import lua._
+
+      val n = Var("n")
+
+      (n :+ 3 :* n :- 5).bytes.utf8String === "n + 3.0 * n - 5.0"
+      (Exp(n) :+ 3 :* n :- 5).bytes.utf8String === "n + 3.0 * n - 5.0"
+      (n :+ 3 :* (n :- 5)).bytes.utf8String === "n + 3.0 * (n - 5.0)"
+      (Exp(n :+ 3) :* (n :- 5)).bytes.utf8String === "(n + 3.0) * (n - 5.0)"
+    }
   }
 
 }
