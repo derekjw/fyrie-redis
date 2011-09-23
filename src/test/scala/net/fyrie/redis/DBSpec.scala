@@ -97,7 +97,7 @@ class KeysSpec extends mutable.Specification with TestClient {
       r.quit
       r.sync.get("key1").parse[String] must_== Some("value1")
     }
-    /*    ignore("should reconnect with many commands") { // ignore until fixed
+    /*"should reconnect with many commands" ! client { r ⇒
       (1 to 1000) foreach (_ ⇒ r.incr("incKey"))
       r.quit
       val result1 = r.get("incKey").parse[Int]
@@ -106,9 +106,9 @@ class KeysSpec extends mutable.Specification with TestClient {
       r.quit
       (1 to 1000) foreach (_ ⇒ r.incr("incKey"))
       val result3 = r.get("incKey").parse[Int]
-      result1.get must_==(Some(1000))
-      result2.get must_==(Some(2000))
-      result3.get must_==(Some(3000))
+      result1.get must_== Some(1000)
+      result2.get must_== Some(2000)
+      result3.get must_== Some(3000)
     }*/
   }
 
