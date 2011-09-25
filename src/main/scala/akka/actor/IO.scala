@@ -225,46 +225,63 @@ object IO {
    * setting 'inclusive' to be 'true'.
    */
   def takeUntil(delimiter: ByteString, inclusive: Boolean = false): Iteratee[ByteString] = {
-    def step(input: Input, start: Int): Iteratee[ByteString] = input match {
-      case Chunk(bytes) ⇒
-        val idx = bytes.indexOfSlice(delimiter, start)
+    def step(taken: ByteString)(input: Input): Iteratee[ByteString] = input match {
+      case Chunk(more) ⇒
+        val bytes = taken ++ more
+        val idx = bytes.indexOfSlice(delimiter, math.max(taken.length - delimiter.length, 0))
         if (idx >= 0) {
           val index = if (inclusive) idx + delimiter.length else idx
           Done(bytes take index, Chunk(bytes drop (index + delimiter.length)))
         } else {
-          Cont(more ⇒ step(input ++ more, math.max(bytes.length - delimiter.length, 0)))
+          Cont(step(bytes))
         }
-      case EOF(cause) ⇒ Failure(new RuntimeException("Unable to complete"), input)
+      case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
+      case eof @ EOF(None)        ⇒ Failure(new RuntimeException("Interrupted Iteratee"), eof)
     }
 
-    Cont(step(_, 0))
+    Cont(step(ByteString.empty))
   }
 
   /**
    * An Iteratee that returns a ByteString of the requested length.
    */
   def take(length: Int): Iteratee[ByteString] = {
-    def step(input: Input): Iteratee[ByteString] = input match {
-      case Chunk(bytes) ⇒
+    def step(taken: ByteString)(input: Input): Iteratee[ByteString] = input match {
+      case Chunk(more) ⇒
+        val bytes = taken ++ more
         if (bytes.length >= length)
           Done(bytes.take(length), Chunk(bytes.drop(length)))
         else
-          Cont(more ⇒ step(input ++ more))
-      case _ ⇒
-        Failure(new RuntimeException("Unable to complete"), input)
+          Cont(step(bytes))
+      case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
+      case eof @ EOF(None)        ⇒ Failure(new RuntimeException("Interrupted Iteratee, " + length + " bytes requested, only " + taken.length + " received"), eof)
     }
 
-    Cont(step)
+    Cont(step(ByteString.empty))
   }
 
   /**
-   * An Iteratee that returns the remaining ByteString. It will continue
-   * until a ByteString of length at least 1 can be returned.
+   * An Iteratee that returns the remaining ByteString until an EOF is given.
    */
-  val takeAll: Iteratee[ByteString] = Cont {
-    case Chunk(bytes) ⇒
-      if (bytes.nonEmpty) Done(bytes) else takeAll
-    case input ⇒ Failure(new RuntimeException("Unable to complete"), input)
+  val takeAll: Iteratee[ByteString] = {
+    def step(taken: ByteString)(input: Input): Iteratee[ByteString] = input match {
+      case Chunk(more) ⇒
+        val bytes = taken ++ more
+        Cont(step(bytes))
+      case eof @ EOF(None)        ⇒ Done(taken, eof)
+      case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
+    }
+
+    Cont(step(ByteString.empty))
+  }
+
+  /**
+   * An Iteratee that returns any input it receives
+   */
+  val takeAny: Iteratee[ByteString] = Cont {
+    case Chunk(bytes)           ⇒ Done(bytes)
+    case eof @ EOF(None)        ⇒ Done(ByteString.empty, eof)
+    case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
   }
 
   def takeList[A](length: Int)(iter: Iteratee[A]): Iteratee[List[A]] = {
