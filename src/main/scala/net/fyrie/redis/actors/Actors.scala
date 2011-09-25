@@ -9,7 +9,6 @@ import pubsub._
 import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
 import Actor.{ actorOf }
 import akka.util.ByteString
-import akka.util.cps._
 import akka.event.EventHandler
 
 import java.util.concurrent.TimeUnit
@@ -135,11 +134,10 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
 
 private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
   import Protocol._
-  import akka.util.iteratee._
 
   var socket: IO.SocketHandle = _
 
-  val state = new IterateeRef(Iteratee.unit)
+  val state = new IO.IterateeRef(IO.Iteratee.unit)
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
@@ -185,7 +183,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       for {
         _ ← state
         _ ← readResult
-        _ ← (Iteratee.unit /: msg.promises)((iter, promise) ⇒
+        _ ← (IO.Iteratee.unit /: msg.promises)((iter, promise) ⇒
           for (_ ← iter; result ← readResult) yield promise completeWithResult result)
         exec ← readResult
       } yield {
@@ -220,7 +218,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     }
   }
 
-  def subscriber(listener: ActorRef): Iteratee[Unit] = readResult flatMap { result ⇒
+  def subscriber(listener: ActorRef): IO.Iteratee[Unit] = readResult flatMap { result ⇒
     result match {
       case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
         listener ! pubsub.Message(channel, message)
@@ -240,35 +238,35 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     subscriber(listener)
   }
 
-  def readResult: Iteratee[RedisType] =
-    take(1) flatMap {
+  def readResult: IO.Iteratee[RedisType] =
+    IO take 1 flatMap {
       _.head.toChar match {
 
         case '+' ⇒
-          takeUntil(EOL) map (bytes ⇒ RedisString(bytes.utf8String))
+          IO takeUntil EOL map (bytes ⇒ RedisString(bytes.utf8String))
 
         case '-' ⇒
-          takeUntil(EOL) map (bytes ⇒ RedisError(bytes.utf8String))
+          IO takeUntil EOL map (bytes ⇒ RedisError(bytes.utf8String))
 
         case ':' ⇒
-          takeUntil(EOL) map (bytes ⇒ RedisInteger(bytes.utf8String.toLong))
+          IO takeUntil EOL map (bytes ⇒ RedisInteger(bytes.utf8String.toLong))
 
         case '$' ⇒
-          takeUntil(EOL) flatMap {
+          IO takeUntil EOL flatMap {
             _.utf8String.toInt match {
-              case -1 ⇒ Iteratee(RedisBulk.notfound)
-              case 0  ⇒ Iteratee(RedisBulk.empty)
-              case n  ⇒ for (bytes ← take(n); _ ← takeUntil(EOL)) yield RedisBulk(Some(bytes))
+              case -1 ⇒ IO.Iteratee(RedisBulk.notfound)
+              case 0  ⇒ IO.Iteratee(RedisBulk.empty)
+              case n  ⇒ for (bytes ← IO take n; _ ← IO takeUntil EOL) yield RedisBulk(Some(bytes))
             }
           }
 
         case '*' ⇒
-          takeUntil(EOL) flatMap {
+          IO takeUntil EOL flatMap {
             _.utf8String.toInt match {
-              case -1 ⇒ Iteratee(RedisMulti.notfound)
-              case 0  ⇒ Iteratee(RedisMulti.empty)
+              case -1 ⇒ IO.Iteratee(RedisMulti.notfound)
+              case 0  ⇒ IO.Iteratee(RedisMulti.empty)
               case n ⇒
-                ((Iteratee.unit map (_ ⇒ new Array[RedisType](n))) /: (0 until n)) { (iter, i) ⇒
+                ((IO.Iteratee.unit map (_ ⇒ new Array[RedisType](n))) /: (0 until n)) { (iter, i) ⇒
                   for (ar ← iter; r ← readResult) yield {
                     ar(i) = r
                     ar
