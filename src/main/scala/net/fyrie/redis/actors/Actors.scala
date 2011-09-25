@@ -137,7 +137,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
   var socket: IO.SocketHandle = _
 
-  val state = new IO.IterateeRef(IO.Iteratee.unit)
+  val state = IO.IterateeRef()
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
@@ -265,13 +265,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
             _.utf8String.toInt match {
               case -1 ⇒ IO Iteratee RedisMulti.notfound
               case 0  ⇒ IO Iteratee RedisMulti.empty
-              case n ⇒
-                ((IO.Iteratee.unit map (_ ⇒ new Array[RedisType](n))) /: (0 until n)) { (iter, i) ⇒
-                  for (ar ← iter; r ← readResult) yield {
-                    ar(i) = r
-                    ar
-                  }
-                } map (ar ⇒ RedisMulti(Some(ar.toList)))
+              case n  ⇒ IO.takeList(n)(readResult) map (x ⇒ RedisMulti(Some(x)))
             }
           }
 

@@ -25,8 +25,7 @@ import java.nio.channels.{
 import scala.collection.mutable
 import scala.collection.immutable.Queue
 import scala.annotation.tailrec
-import scala.util.continuations._
-
+import scala.collection.generic.CanBuildFrom
 import com.eaio.uuid.UUID
 
 object IO {
@@ -115,9 +114,13 @@ object IO {
 
   object Iteratee {
     def apply[A](value: A): Iteratee[A] = Done(value)
+    def apply(): Iteratee[Unit] = unit
     val unit: Iteratee[Unit] = Done(())
   }
 
+  /**
+   * A basic Iteratee implementation. It only supports ByteString input.
+   */
   sealed abstract class Iteratee[+A] {
 
     final def apply(bytes: ByteString): Iteratee[A] = this match {
@@ -129,79 +132,80 @@ object IO {
 
     final def get: A = this match {
       case Done(value, _) ⇒ value
-      case Cont(_)        ⇒ sys.error("Incomplete Iteratee")
+      case Cont(_)        ⇒ sys.error("Divergent Iteratee")
       case Failure(e, _)  ⇒ throw e
     }
 
     final def flatMap[B](f: A ⇒ Iteratee[B]): Iteratee[B] = this match {
-      case Done(value, rest)      ⇒ f(value)(rest)
-      case Cont(k: Cont.Chain[_]) ⇒ Cont(k :+ f)
-      case Cont(k)                ⇒ Cont(Cont.Chain(k, f))
-      case failure: Failure       ⇒ failure
+      case Done(value, rest) ⇒ f(value)(rest)
+      case Cont(k: Chain[_]) ⇒ Cont(k :+ f)
+      case Cont(k)           ⇒ Cont(Chain(k, f))
+      case failure: Failure  ⇒ failure
     }
 
     final def map[B](f: A ⇒ B): Iteratee[B] = this match {
-      case Done(value, rest)      ⇒ Done(f(value), rest)
-      case Cont(k: Cont.Chain[_]) ⇒ Cont(k :+ ((a: A) ⇒ Done(f(a))))
-      case Cont(k)                ⇒ Cont(Cont.Chain(k, (a: A) ⇒ Done(f(a))))
-      case failure: Failure       ⇒ failure
+      case Done(value, rest) ⇒ Done(f(value), rest)
+      case Cont(k: Chain[_]) ⇒ Cont(k :+ ((a: A) ⇒ Done(f(a))))
+      case Cont(k)           ⇒ Cont(Chain(k, (a: A) ⇒ Done(f(a))))
+      case failure: Failure  ⇒ failure
     }
 
   }
 
+  /**
+   * An Iteratee representing a result and the remaining ByteString. Also used to
+   * wrap any constants or precalculated values that need to be composed with
+   * other Iteratees.
+   */
   final case class Done[+A](result: A, remaining: ByteString = ByteString.empty) extends Iteratee[A]
 
-  object Cont {
-    private[akka] object Chain {
-      def apply[A](f: ByteString ⇒ Iteratee[A]) = new Chain[A](f, Queue.empty)
-      def apply[A, B](f: ByteString ⇒ Iteratee[A], k: A ⇒ Iteratee[B]) = new Chain[B](f, Queue(k.asInstanceOf[Any ⇒ Iteratee[Any]]))
-    }
-
-    private[akka] final class Chain[A] private (cur: ByteString ⇒ Iteratee[Any], queue: Queue[Any ⇒ Iteratee[Any]]) extends (ByteString ⇒ Iteratee[A]) {
-
-      def :+[B](f: A ⇒ Iteratee[B]) = new Chain[B](cur, queue enqueue f.asInstanceOf[Any ⇒ Iteratee[Any]])
-
-      def apply(input: ByteString): Iteratee[A] = {
-        @scala.annotation.tailrec
-        def run(prev: Any, rest: ByteString, queue: Queue[Any ⇒ Iteratee[Any]]): Iteratee[A] = {
-          if (queue.isEmpty) Done[A](prev.asInstanceOf[A], rest)
-          else {
-            val (head, tail) = queue.dequeue
-            head.apply(prev)(rest) match {
-              case Done(result, more) ⇒ run(result, more, tail)
-              case Cont(k)            ⇒ Cont(new Chain(k, tail))
-              case failure: Failure   ⇒ failure
-            }
-          }
-        }
-        cur(input) match {
-          case Done(result, rest) ⇒ run(result, rest, queue)
-          case Cont(k)            ⇒ Cont(new Chain(k, queue))
-          case failure: Failure   ⇒ failure
-        }
-      }
-    }
-
-  }
+  /**
+   * An Iteratee that still requires more input to calculate it's result.
+   */
   final case class Cont[+A](f: ByteString ⇒ Iteratee[A]) extends Iteratee[A]
 
+  /**
+   * An Iteratee representing a failure to calcualte a result.
+   */
   final case class Failure(exception: Throwable, remaining: ByteString = ByteString.empty) extends Iteratee[Nothing]
+
+  object IterateeRef {
+    def apply[A](initial: Iteratee[A]): IterateeRef[A] = new IterateeRef(initial)
+    def apply(): IterateeRef[Unit] = new IterateeRef(Iteratee.unit)
+
+    class Map[K, V] private (refFactory: ⇒ IterateeRef[V], underlying: mutable.Map[K, IterateeRef[V]] = mutable.Map.empty[K, IterateeRef[V]]) extends mutable.Map[K, IterateeRef[V]] {
+      def get(key: K) = Some(underlying.getOrElseUpdate(key, refFactory))
+      def iterator = underlying.iterator
+      def +=(kv: (K, IterateeRef[V])) = { underlying += kv; this }
+      def -=(key: K) = { underlying -= key; this }
+      override def empty = new Map[K, V](refFactory)
+    }
+    object Map {
+      def apply[K, V](refFactory: ⇒ IterateeRef[V]): IterateeRef.Map[K, V] = new Map(refFactory)
+      def apply[K](): IterateeRef.Map[K, Unit] = new Map(IterateeRef())
+    }
+  }
 
   /**
    * A mutable reference to an Iteratee. Not thread safe.
+   *
+   * Designed for use within an Actor.
+   *
+   * Includes mutable implementations of flatMap, map, and apply which
+   * update the internal reference and return Unit.
    */
   final class IterateeRef[A](initial: Iteratee[A]) {
-
     private var _value = initial
-
     def flatMap(f: A ⇒ Iteratee[A]): Unit = _value = _value flatMap f
-
     def map(f: A ⇒ A): Unit = _value = _value map f
-
     def apply(bytes: ByteString): Unit = _value = _value(bytes)
-
   }
 
+  /**
+   * An Iteratee that returns the ByteString prefix up until the supplied delimiter.
+   * The delimiter is dropped by default, but it can be returned with the result by
+   * setting 'inclusive' to be 'true'.
+   */
   def takeUntil(delimiter: ByteString, inclusive: Boolean = false): Iteratee[ByteString] = {
     def step(bytes: ByteString, start: Int): Iteratee[ByteString] = {
       val idx = bytes.indexOfSlice(delimiter, start)
@@ -216,6 +220,9 @@ object IO {
     Cont(step(_, 0))
   }
 
+  /**
+   * An Iteratee that returns a ByteString of the requested length.
+   */
   def take(length: Int): Iteratee[ByteString] = {
     def step(bytes: ByteString): Iteratee[ByteString] =
       if (bytes.length >= length)
@@ -226,8 +233,70 @@ object IO {
     Cont(step)
   }
 
+  /**
+   * An Iteratee that returns the remaining ByteString. It will continue
+   * until a ByteString of length at least 1 can be returned.
+   */
   val takeAll: Iteratee[ByteString] = Cont { bytes ⇒
     if (bytes.nonEmpty) Done(bytes) else takeAll
+  }
+
+  def takeList[A](length: Int)(iter: Iteratee[A]): Iteratee[List[A]] = {
+    def step(left: Int, list: List[A]): Iteratee[List[A]] =
+      if (left == 0) Done(list.reverse)
+      else iter flatMap (a ⇒ step(left - 1, a :: list))
+
+    step(length, Nil)
+  }
+
+  def repeat(iter: Iteratee[Unit]): Iteratee[Unit] =
+    iter flatMap (_ ⇒ repeat(iter))
+
+  def traverse[A, B, M[A] <: Traversable[A]](in: M[A])(fn: A ⇒ Iteratee[B])(implicit cbf: CanBuildFrom[M[A], B, M[B]]): Iteratee[M[B]] = {
+    (Iteratee(cbf(in)) /: in) { (iterBuilder, a) ⇒
+      for {
+        builder ← iterBuilder
+        b ← fn(a)
+      } yield (builder += b)
+    } map (_.result)
+  }
+
+  // private api
+
+  private[akka] object Chain {
+    def apply[A](f: ByteString ⇒ Iteratee[A]) = new Chain[A](f, Queue.empty)
+    def apply[A, B](f: ByteString ⇒ Iteratee[A], k: A ⇒ Iteratee[B]) = new Chain[B](f, Queue(k.asInstanceOf[Any ⇒ Iteratee[Any]]))
+  }
+
+  /**
+   * A function 'ByteString => Iteratee[A]' that composes with 'A => Iteratee[B]' functions
+   * in a stack-friendly manner.
+   *
+   * For internal use within Iteratee.
+   */
+  private[akka] final class Chain[A] private (cur: ByteString ⇒ Iteratee[Any], queue: Queue[Any ⇒ Iteratee[Any]]) extends (ByteString ⇒ Iteratee[A]) {
+
+    def :+[B](f: A ⇒ Iteratee[B]) = new Chain[B](cur, queue enqueue f.asInstanceOf[Any ⇒ Iteratee[Any]])
+
+    def apply(input: ByteString): Iteratee[A] = {
+      @tailrec
+      def run(prev: Any, rest: ByteString, queue: Queue[Any ⇒ Iteratee[Any]]): Iteratee[A] = {
+        if (queue.isEmpty) Done[A](prev.asInstanceOf[A], rest)
+        else {
+          val (head, tail) = queue.dequeue
+          head.apply(prev)(rest) match {
+            case Done(result, more) ⇒ run(result, more, tail)
+            case Cont(k)            ⇒ Cont(new Chain(k, tail))
+            case failure: Failure   ⇒ failure
+          }
+        }
+      }
+      cur(input) match {
+        case Done(result, rest) ⇒ run(result, rest, queue)
+        case Cont(k)            ⇒ Cont(new Chain(k, queue))
+        case failure: Failure   ⇒ failure
+      }
+    }
   }
 
 }
@@ -240,7 +309,7 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
 
   override def preStart: Unit = {
     worker = new IOWorker(self, bufferSize)
-    worker.start
+    worker.start()
   }
 
   def receive = {
@@ -289,7 +358,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
     addRequest(request)
 
   def start(): Unit =
-    thread.start
+    thread.start()
 
   // private
 
