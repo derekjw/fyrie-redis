@@ -112,6 +112,25 @@ object IO {
   def connect(ioManager: ActorRef, host: String, port: Int)(implicit sender: ScalaActorRef): SocketHandle =
     connect(ioManager, new InetSocketAddress(host, port), sender)
 
+  sealed trait Input {
+    def ++(that: Input): Input
+  }
+
+  object Chunk {
+    val empty = Chunk(ByteString.empty)
+  }
+
+  case class Chunk(bytes: ByteString) extends Input {
+    def ++(that: Input) = that match {
+      case Chunk(more) ⇒ Chunk(bytes ++ more)
+      case _: EOF      ⇒ that
+    }
+  }
+
+  case class EOF(cause: Option[Exception]) extends Input {
+    def ++(that: Input) = this
+  }
+
   object Iteratee {
     def apply[A](value: A): Iteratee[A] = Done(value)
     def apply(): Iteratee[Unit] = unit
@@ -123,11 +142,10 @@ object IO {
    */
   sealed abstract class Iteratee[+A] {
 
-    final def apply(bytes: ByteString): Iteratee[A] = this match {
-      case _ if bytes.isEmpty ⇒ this
-      case Done(value, rest)  ⇒ Done(value, rest ++ bytes)
-      case Cont(f)            ⇒ f(bytes)
-      case Failure(e, rest)   ⇒ Failure(e, rest ++ bytes)
+    final def apply(input: Input): Iteratee[A] = this match {
+      case Done(value, rest) ⇒ Done(value, rest ++ input)
+      case Cont(f)           ⇒ f(input)
+      case Failure(e, rest)  ⇒ Failure(e, rest ++ input)
     }
 
     final def get: A = this match {
@@ -157,17 +175,17 @@ object IO {
    * wrap any constants or precalculated values that need to be composed with
    * other Iteratees.
    */
-  final case class Done[+A](result: A, remaining: ByteString = ByteString.empty) extends Iteratee[A]
+  final case class Done[+A](result: A, remaining: Input = Chunk.empty) extends Iteratee[A]
 
   /**
    * An Iteratee that still requires more input to calculate it's result.
    */
-  final case class Cont[+A](f: ByteString ⇒ Iteratee[A]) extends Iteratee[A]
+  final case class Cont[+A](f: Input ⇒ Iteratee[A]) extends Iteratee[A]
 
   /**
    * An Iteratee representing a failure to calcualte a result.
    */
-  final case class Failure(exception: Throwable, remaining: ByteString = ByteString.empty) extends Iteratee[Nothing]
+  final case class Failure(exception: Throwable, remaining: Input = Chunk.empty) extends Iteratee[Nothing]
 
   object IterateeRef {
     def apply[A](initial: Iteratee[A]): IterateeRef[A] = new IterateeRef(initial)
@@ -198,7 +216,7 @@ object IO {
     private var _value = initial
     def flatMap(f: A ⇒ Iteratee[A]): Unit = _value = _value flatMap f
     def map(f: A ⇒ A): Unit = _value = _value map f
-    def apply(bytes: ByteString): Unit = _value = _value(bytes)
+    def apply(input: Input): Unit = _value = _value(input)
   }
 
   /**
@@ -207,14 +225,16 @@ object IO {
    * setting 'inclusive' to be 'true'.
    */
   def takeUntil(delimiter: ByteString, inclusive: Boolean = false): Iteratee[ByteString] = {
-    def step(bytes: ByteString, start: Int): Iteratee[ByteString] = {
-      val idx = bytes.indexOfSlice(delimiter, start)
-      if (idx >= 0) {
-        val index = if (inclusive) idx + delimiter.length else idx
-        Done(bytes take index, bytes drop (index + delimiter.length))
-      } else {
-        Cont(more ⇒ step(bytes ++ more, math.max(bytes.length - delimiter.length, 0)))
-      }
+    def step(input: Input, start: Int): Iteratee[ByteString] = input match {
+      case Chunk(bytes) ⇒
+        val idx = bytes.indexOfSlice(delimiter, start)
+        if (idx >= 0) {
+          val index = if (inclusive) idx + delimiter.length else idx
+          Done(bytes take index, Chunk(bytes drop (index + delimiter.length)))
+        } else {
+          Cont(more ⇒ step(input ++ more, math.max(bytes.length - delimiter.length, 0)))
+        }
+      case EOF(cause) ⇒ Failure(new RuntimeException("Unable to complete"), input)
     }
 
     Cont(step(_, 0))
@@ -224,11 +244,15 @@ object IO {
    * An Iteratee that returns a ByteString of the requested length.
    */
   def take(length: Int): Iteratee[ByteString] = {
-    def step(bytes: ByteString): Iteratee[ByteString] =
-      if (bytes.length >= length)
-        Done(bytes.take(length), bytes.drop(length))
-      else
-        Cont(more ⇒ step(bytes ++ more))
+    def step(input: Input): Iteratee[ByteString] = input match {
+      case Chunk(bytes) ⇒
+        if (bytes.length >= length)
+          Done(bytes.take(length), Chunk(bytes.drop(length)))
+        else
+          Cont(more ⇒ step(input ++ more))
+      case _ ⇒
+        Failure(new RuntimeException("Unable to complete"), input)
+    }
 
     Cont(step)
   }
@@ -237,8 +261,10 @@ object IO {
    * An Iteratee that returns the remaining ByteString. It will continue
    * until a ByteString of length at least 1 can be returned.
    */
-  val takeAll: Iteratee[ByteString] = Cont { bytes ⇒
-    if (bytes.nonEmpty) Done(bytes) else takeAll
+  val takeAll: Iteratee[ByteString] = Cont {
+    case Chunk(bytes) ⇒
+      if (bytes.nonEmpty) Done(bytes) else takeAll
+    case input ⇒ Failure(new RuntimeException("Unable to complete"), input)
   }
 
   def takeList[A](length: Int)(iter: Iteratee[A]): Iteratee[List[A]] = {
@@ -264,8 +290,8 @@ object IO {
   // private api
 
   private[akka] object Chain {
-    def apply[A](f: ByteString ⇒ Iteratee[A]) = new Chain[A](f, Queue.empty)
-    def apply[A, B](f: ByteString ⇒ Iteratee[A], k: A ⇒ Iteratee[B]) = new Chain[B](f, Queue(k.asInstanceOf[Any ⇒ Iteratee[Any]]))
+    def apply[A](f: Input ⇒ Iteratee[A]) = new Chain[A](f, Queue.empty)
+    def apply[A, B](f: Input ⇒ Iteratee[A], k: A ⇒ Iteratee[B]) = new Chain[B](f, Queue(k.asInstanceOf[Any ⇒ Iteratee[Any]]))
   }
 
   /**
@@ -274,13 +300,13 @@ object IO {
    *
    * For internal use within Iteratee.
    */
-  private[akka] final class Chain[A] private (cur: ByteString ⇒ Iteratee[Any], queue: Queue[Any ⇒ Iteratee[Any]]) extends (ByteString ⇒ Iteratee[A]) {
+  private[akka] final class Chain[A] private (cur: Input ⇒ Iteratee[Any], queue: Queue[Any ⇒ Iteratee[Any]]) extends (Input ⇒ Iteratee[A]) {
 
     def :+[B](f: A ⇒ Iteratee[B]) = new Chain[B](cur, queue enqueue f.asInstanceOf[Any ⇒ Iteratee[Any]])
 
-    def apply(input: ByteString): Iteratee[A] = {
+    def apply(input: Input): Iteratee[A] = {
       @tailrec
-      def run(prev: Any, rest: ByteString, queue: Queue[Any ⇒ Iteratee[Any]]): Iteratee[A] = {
+      def run(prev: Any, rest: Input, queue: Queue[Any ⇒ Iteratee[Any]]): Iteratee[A] = {
         if (queue.isEmpty) Done[A](prev.asInstanceOf[A], rest)
         else {
           val (head, tail) = queue.dequeue

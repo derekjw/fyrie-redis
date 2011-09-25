@@ -145,7 +145,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
   def receive = {
 
     case IO.Read(handle, bytes) ⇒
-      state(bytes)
+      state(IO Chunk bytes)
 
     case IO.Connected(handle) ⇒
 
@@ -167,6 +167,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     case IO.Closed(handle, cause) if socket == handle ⇒
       EventHandler info (this, "Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       sendToSupervisor(Disconnect)
+      state(IO EOF cause)
 
     case Run ⇒
       val source = self.channel
