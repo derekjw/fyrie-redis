@@ -254,8 +254,8 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
         case '$' ⇒
           IO takeUntil EOL flatMap {
             _.utf8String.toInt match {
-              case -1 ⇒ IO.Iteratee(RedisBulk.notfound)
-              case 0  ⇒ IO.Iteratee(RedisBulk.empty)
+              case -1 ⇒ IO Iteratee RedisBulk.notfound
+              case 0  ⇒ IO Iteratee RedisBulk.empty
               case n  ⇒ for (bytes ← IO take n; _ ← IO takeUntil EOL) yield RedisBulk(Some(bytes))
             }
           }
@@ -263,8 +263,8 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
         case '*' ⇒
           IO takeUntil EOL flatMap {
             _.utf8String.toInt match {
-              case -1 ⇒ IO.Iteratee(RedisMulti.notfound)
-              case 0  ⇒ IO.Iteratee(RedisMulti.empty)
+              case -1 ⇒ IO Iteratee RedisMulti.notfound
+              case 0  ⇒ IO Iteratee RedisMulti.empty
               case n ⇒
                 ((IO.Iteratee.unit map (_ ⇒ new Array[RedisType](n))) /: (0 until n)) { (iter, i) ⇒
                   for (ar ← iter; r ← readResult) yield {
