@@ -25,7 +25,7 @@ object RedisClient {
     actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config))
 }
 
-final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager())) extends RedisClientAsync {
+final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager())) extends RedisClientAsync(config) {
 
   protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config))
 
@@ -37,14 +37,14 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
     pool ! Disconnect
   }
 
-  val sync: RedisClientSync = new RedisClientSync {
+  val sync: RedisClientSync = new RedisClientSync(config) {
     val actor = RedisClient.this.actor
 
     val async: RedisClientAsync = RedisClient.this
     val quiet: RedisClientQuiet = RedisClient.this.quiet
   }
 
-  val quiet: RedisClientQuiet = new RedisClientQuiet {
+  val quiet: RedisClientQuiet = new RedisClientQuiet(config) {
     val actor = RedisClient.this.actor
 
     val async: RedisClientAsync = RedisClient.this
@@ -52,7 +52,7 @@ final class RedisClient(val host: String = "localhost", val port: Int = 6379, va
   }
 
   def multi[T](block: (RedisClientMulti) ⇒ Queued[T]): T = {
-    val rq = new RedisClientMulti { val actor = RedisClient.this.actor }
+    val rq = new RedisClientMulti(config) { val actor = RedisClient.this.actor }
     rq.exec(block(rq))
   }
 
@@ -99,25 +99,31 @@ sealed trait ConfigurableRedisClient {
 
 }
 
-sealed abstract class RedisClientAsync extends Commands[Future] with ConfigurableRedisClient {
+sealed abstract class RedisClientAsync(config: RedisClientConfig) extends Commands[Future] with ConfigurableRedisClient {
+  implicit private val timeout = config.timeout
+
   final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
   val async: RedisClientAsync = this
 }
 
-sealed abstract class RedisClientSync extends Commands[({ type λ[α] = α })#λ] with ConfigurableRedisClient {
+sealed abstract class RedisClientSync(config: RedisClientConfig) extends Commands[({ type λ[α] = α })#λ] with ConfigurableRedisClient {
+  implicit private val timeout = config.timeout
+
   final private[redis] def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
 
   val sync: RedisClientSync = this
 }
 
-sealed abstract class RedisClientQuiet extends Commands[({ type λ[_] = Unit })#λ] with ConfigurableRedisClient {
+sealed abstract class RedisClientQuiet(config: RedisClientConfig) extends Commands[({ type λ[_] = Unit })#λ] with ConfigurableRedisClient {
   final private[redis] def send(in: List[ByteString]) = actor ! Request(format(in))
 
   val quiet: RedisClientQuiet = this
 }
 
-sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
+sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
+  implicit private val timeout = config.timeout
+
   final private[redis] def send(in: List[ByteString]): Queued[Future[Any]] = {
     val result = Promise[RedisType]()
     Queued(result, (format(in), Promise[RedisType]()), result)
@@ -150,8 +156,9 @@ sealed abstract class RedisClientMulti extends Commands[({ type λ[α] = Queued[
   }
 }
 
-sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.async) {
+sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Commands[Future]()(ResultFunctor.async) {
   self: RedisClientPoolWorker ⇒
+  implicit private val timeout = config.timeout
 
   final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
@@ -193,7 +200,7 @@ sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.
     }
   }
 
-  private val rq = new RedisClientMulti { val actor = RedisClientWatch.this.actor }
+  private val rq = new RedisClientMulti(config) { val actor = RedisClientWatch.this.actor }
 
   def multi[T](block: (RedisClientMulti) ⇒ Queued[T]): Queued[T] = block(rq)
 
@@ -201,7 +208,7 @@ sealed abstract class RedisClientWatch extends Commands[Future]()(ResultFunctor.
 
 }
 
-private[redis] final class RedisClientPoolWorker(protected val actor: ActorRef, config: RedisClientConfig, pool: ActorRef) extends RedisClientWatch {
+private[redis] final class RedisClientPoolWorker(protected val actor: ActorRef, config: RedisClientConfig, pool: ActorRef) extends RedisClientWatch(config) {
   def disconnect = actor ! Disconnect
   def release = pool ! ReleaseClient(this)
 }
