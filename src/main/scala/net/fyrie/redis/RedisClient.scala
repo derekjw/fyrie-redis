@@ -247,6 +247,7 @@ private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunc
     ByteString("*" + count) ++ EOL ++ cmd
   }
 
+  final private[redis] implicit def resultAsRedisType(raw: Result[Any]): Result[RedisType] = rf.fmap(raw)(toRedisType)
   final private[redis] implicit def resultAsMultiBulk(raw: Result[Any]): Result[Option[List[Option[ByteString]]]] = rf.fmap(raw)(toMultiBulk)
   final private[redis] implicit def resultAsMultiBulkList(raw: Result[Any]): Result[List[Option[ByteString]]] = rf.fmap(raw)(toMultiBulkList)
   final private[redis] implicit def resultAsMultiBulkFlat(raw: Result[Any]): Result[Option[List[ByteString]]] = rf.fmap(raw)(toMultiBulkFlat)
@@ -265,6 +266,11 @@ private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunc
   final private[redis] implicit def resultAsBool(raw: Result[Any]): Result[Boolean] = rf.fmap(raw)(toBool)
   final private[redis] implicit def resultAsStatus(raw: Result[Any]): Result[String] = rf.fmap(raw)(toStatus)
   final private[redis] implicit def resultAsOkStatus(raw: Result[Any]): Result[Unit] = rf.fmap(raw)(toOkStatus)
+
+  final private[redis] val toRedisType: Any ⇒ RedisType = _ match {
+    case r: RedisType ⇒ r
+    case _            ⇒ throw RedisProtocolException("Unexpected response")
+  }
 
   final private[redis] val toMultiBulk: Any ⇒ Option[List[Option[ByteString]]] = _ match {
     case RedisMulti(m) ⇒ m map (_ map toBulk)
