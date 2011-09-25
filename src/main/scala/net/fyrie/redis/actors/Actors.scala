@@ -166,7 +166,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
     case Run ⇒
       val result = readResult
-      self tryReply result
+      tryReply(result)
       onResult()
 
     case msg: MultiRun ⇒
@@ -179,7 +179,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
         promise completeWithResult result
       }
       val exec = readResult
-      self tryReply exec
+      tryReply(exec)
       onResult()
 
     case Subscriber(listener) ⇒
