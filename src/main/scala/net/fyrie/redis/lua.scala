@@ -94,8 +94,8 @@ case object End extends LastStat {
 
 object Exp {
   def apply(exp: Exp) = exp match {
-    case _: BinOp => Par(exp)
-    case _ => exp
+    case _: BinOp ⇒ Par(exp)
+    case _        ⇒ exp
   }
   implicit def boolToExp(b: Boolean): Exp = if (b) True else False
   implicit def intToExp(n: Int): Exp = Num(n)
