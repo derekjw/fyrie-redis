@@ -1,8 +1,8 @@
 import sbt._
 import Keys._
 
-import scalariform.formatter.preferences._
-import ScalariformPlugin.formatPreferences
+import com.typesafe.sbtscalariform.ScalariformPlugin
+import ScalariformPlugin.{ format, formatPreferences }
 
 object FyrieRedisBuild extends Build {
   lazy val core = Project("fyrie-redis",
@@ -28,10 +28,13 @@ object FyrieRedisBuild extends Build {
       Some(if (version.trim.endsWith("SNAPSHOT")) repo("snapshots") else repo("releases"))
     })
 
-  val formattingPreferences = (FormattingPreferences()
-                               .setPreference(RewriteArrowSymbols, true)
-                               .setPreference(AlignParameters, true)
-                               .setPreference(AlignSingleLineCaseStatements, true))
+  val formattingPreferences = {
+    import scalariform.formatter.preferences._
+    FormattingPreferences()
+    .setPreference(RewriteArrowSymbols, true)
+    .setPreference(AlignParameters, true)
+    .setPreference(AlignSingleLineCaseStatements, true)
+  }
 
 }
 
