@@ -143,25 +143,28 @@ object IO {
   sealed abstract class Iteratee[+A] {
 
     final def apply(input: Input): Iteratee[A] = this match {
-      case Cont(f)           ⇒ f(input) match { case (iter, rest) => Cont(more => (iter, rest ++ more)) }
-      case iter => Cont(more => (iter, input ++ more))
+      case Cont(f) ⇒ f(input) match {
+        case (iter, rest @ Chunk(bytes)) if bytes.nonEmpty ⇒ Cont(more ⇒ (iter, rest ++ more))
+        case (iter, _)                                     ⇒ iter
+      }
+      case iter ⇒ Cont(more ⇒ (iter, input ++ more))
     }
 
-/*    final def get: A = this match {
-      case Done(value, _) ⇒ value
-      case Cont(_)        ⇒ sys.error("Divergent Iteratee")
-      case Failure(e, _)  ⇒ throw e
-    }*/
+    final def get: A = this(EOF(None)) match {
+      case Done(value) ⇒ value
+      case Cont(_)     ⇒ sys.error("Divergent Iteratee")
+      case Failure(e)  ⇒ throw e
+    }
 
     final def flatMap[B](f: A ⇒ Iteratee[B]): Iteratee[B] = this match {
-      case Done(value, rest) ⇒ f(value)(rest)
+      case Done(value)       ⇒ f(value)
       case Cont(k: Chain[_]) ⇒ Cont(k :+ f)
-      case Cont(k)           ⇒ Cont(Chain(k, f))
+      case Cont(k)           ⇒ Cont(Chain(k, f))(Chunk.empty) // FIXME: wake up!
       case failure: Failure  ⇒ failure
     }
 
     final def map[B](f: A ⇒ B): Iteratee[B] = this match {
-      case Done(value, rest) ⇒ Done(f(value), rest)
+      case Done(value)       ⇒ Done(f(value))
       case Cont(k: Chain[_]) ⇒ Cont(k :+ ((a: A) ⇒ Done(f(a))))
       case Cont(k)           ⇒ Cont(Chain(k, (a: A) ⇒ Done(f(a))))
       case failure: Failure  ⇒ failure
@@ -216,6 +219,7 @@ object IO {
     def flatMap(f: A ⇒ Iteratee[A]): Unit = _value = _value flatMap f
     def map(f: A ⇒ A): Unit = _value = _value map f
     def apply(input: Input): Unit = _value = _value(input)
+    def value: Iteratee[A] = _value
   }
 
   /**
@@ -224,18 +228,18 @@ object IO {
    * setting 'inclusive' to be 'true'.
    */
   def takeUntil(delimiter: ByteString, inclusive: Boolean = false): Iteratee[ByteString] = {
-    def step(taken: ByteString)(input: Input): Iteratee[ByteString] = input match {
+    def step(taken: ByteString)(input: Input): (Iteratee[ByteString], Input) = input match {
       case Chunk(more) ⇒
         val bytes = taken ++ more
-        val idx = bytes.indexOfSlice(delimiter, math.max(taken.length - delimiter.length, 0))
-        if (idx >= 0) {
-          val index = if (inclusive) idx + delimiter.length else idx
-          Done(bytes take index, Chunk(bytes drop (index + delimiter.length)))
+        val startIdx = bytes.indexOfSlice(delimiter, math.max(taken.length - delimiter.length, 0))
+        if (startIdx >= 0) {
+          val endIdx = startIdx + delimiter.length
+          (Done(bytes take (if (inclusive) endIdx else startIdx)), Chunk(bytes drop endIdx))
         } else {
-          Cont(step(bytes))
+          (Cont(step(bytes)), Chunk.empty)
         }
-      case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
-      case eof @ EOF(None)        ⇒ Failure(new RuntimeException("Interrupted Iteratee"), eof)
+      case eof @ EOF(Some(cause)) ⇒ (Failure(cause), eof) // return eof or taken bytes?
+      case eof @ EOF(None)        ⇒ (Cont(step(taken)), eof)
     }
 
     Cont(step(ByteString.empty))
@@ -245,15 +249,15 @@ object IO {
    * An Iteratee that returns a ByteString of the requested length.
    */
   def take(length: Int): Iteratee[ByteString] = {
-    def step(taken: ByteString)(input: Input): Iteratee[ByteString] = input match {
+    def step(taken: ByteString)(input: Input): (Iteratee[ByteString], Input) = input match {
       case Chunk(more) ⇒
         val bytes = taken ++ more
         if (bytes.length >= length)
-          Done(bytes.take(length), Chunk(bytes.drop(length)))
+          (Done(bytes.take(length)), Chunk(bytes.drop(length)))
         else
-          Cont(step(bytes))
-      case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
-      case eof @ EOF(None)        ⇒ Failure(new RuntimeException("Interrupted Iteratee, " + length + " bytes requested, only " + taken.length + " received"), eof)
+          (Cont(step(bytes)), Chunk.empty)
+      case eof @ EOF(Some(cause)) ⇒ (Failure(cause), eof)
+      case eof @ EOF(None)        ⇒ (Cont(step(taken)), eof)
     }
 
     Cont(step(ByteString.empty))
@@ -263,12 +267,11 @@ object IO {
    * An Iteratee that returns the remaining ByteString until an EOF is given.
    */
   val takeAll: Iteratee[ByteString] = {
-    def step(taken: ByteString)(input: Input): Iteratee[ByteString] = input match {
+    def step(taken: ByteString)(input: Input): (Iteratee[ByteString], Input) = input match {
       case Chunk(more) ⇒
         val bytes = taken ++ more
-        Cont(step(bytes))
-      case eof @ EOF(None)        ⇒ Done(taken, eof)
-      case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
+        (Cont(step(bytes)), Chunk.empty)
+      case eof ⇒ (Done(taken), eof)
     }
 
     Cont(step(ByteString.empty))
@@ -278,9 +281,8 @@ object IO {
    * An Iteratee that returns any input it receives
    */
   val takeAny: Iteratee[ByteString] = Cont {
-    case Chunk(bytes)           ⇒ Done(bytes)
-    case eof @ EOF(None)        ⇒ Done(ByteString.empty, eof)
-    case eof @ EOF(Some(cause)) ⇒ Failure(cause, eof)
+    case Chunk(bytes) ⇒ (Done(bytes), Chunk.empty)
+    case eof          ⇒ (Done(ByteString.empty), eof)
   }
 
   def takeList[A](length: Int)(iter: Iteratee[A]): Iteratee[List[A]] = {
@@ -306,8 +308,8 @@ object IO {
   // private api
 
   private[akka] object Chain {
-    def apply[A](f: Input ⇒ Iteratee[A]) = new Chain[A](f, Queue.empty)
-    def apply[A, B](f: Input ⇒ Iteratee[A], k: A ⇒ Iteratee[B]) = new Chain[B](f, Queue(k.asInstanceOf[Any ⇒ Iteratee[Any]]))
+    def apply[A](f: Input ⇒ (Iteratee[A], Input)) = new Chain[A](f, Queue.empty)
+    def apply[A, B](f: Input ⇒ (Iteratee[A], Input), k: A ⇒ Iteratee[B]) = new Chain[B](f, Queue(k.asInstanceOf[Any ⇒ Iteratee[Any]]))
   }
 
   /**
@@ -316,28 +318,27 @@ object IO {
    *
    * For internal use within Iteratee.
    */
-  private[akka] final class Chain[A] private (cur: Input ⇒ Iteratee[Any], queue: Queue[Any ⇒ Iteratee[Any]]) extends (Input ⇒ Iteratee[A]) {
+  private[akka] final class Chain[A] private (cur: Input ⇒ (Iteratee[Any], Input), queue: Queue[Any ⇒ Iteratee[Any]]) extends (Input ⇒ (Iteratee[A], Input)) {
 
     def :+[B](f: A ⇒ Iteratee[B]) = new Chain[B](cur, queue enqueue f.asInstanceOf[Any ⇒ Iteratee[Any]])
 
-    def apply(input: Input): Iteratee[A] = {
+    def apply(input: Input): (Iteratee[A], Input) = {
       @tailrec
-      def run(prev: Any, rest: Input, queue: Queue[Any ⇒ Iteratee[Any]]): Iteratee[A] = {
-        if (queue.isEmpty) Done[A](prev.asInstanceOf[A], rest)
-        else {
-          val (head, tail) = queue.dequeue
-          head.apply(prev)(rest) match {
-            case Done(result, more) ⇒ run(result, more, tail)
-            case Cont(k)            ⇒ Cont(new Chain(k, tail))
-            case failure: Failure   ⇒ failure
-          }
+      def run(result: (Iteratee[Any], Input), queue: Queue[Any ⇒ Iteratee[Any]]): (Iteratee[Any], Input) = {
+        if (queue.isEmpty) result
+        else result match {
+          case (Done(value), rest) ⇒
+            val (head, tail) = queue.dequeue
+            head(value) match {
+              case Cont(f) ⇒ run(f(rest), tail)
+              case iter    ⇒ run((iter, rest), tail)
+            }
+          case (Cont(f), rest) ⇒
+            (Cont(new Chain(f, queue)), rest)
+          case _ ⇒ result
         }
       }
-      cur(input) match {
-        case Done(result, rest) ⇒ run(result, rest, queue)
-        case Cont(k)            ⇒ Cont(new Chain(k, queue))
-        case failure: Failure   ⇒ failure
-      }
+      run(cur(input), queue).asInstanceOf[(Iteratee[A], Input)]
     }
   }
 

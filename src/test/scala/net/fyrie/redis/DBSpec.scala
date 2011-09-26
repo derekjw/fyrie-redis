@@ -249,4 +249,5 @@ class KeysSpec extends mutable.Specification with TestClient {
           (Some("item4"), Some("data4"), Some(4))))
     }
   }
+
 }
