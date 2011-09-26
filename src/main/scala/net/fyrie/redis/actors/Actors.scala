@@ -43,13 +43,13 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
       worker forward msg
 
     case req: Request ⇒
-      socket write req.bytes
       worker forward Run
+      socket write req.bytes
       onRequest(req)
 
     case req: MultiRequest ⇒
-      sendMulti(req)
       worker forward MultiRun(req.cmds.map(_._2))
+      sendMulti(req)
       onRequest(req)
 
     case Received ⇒

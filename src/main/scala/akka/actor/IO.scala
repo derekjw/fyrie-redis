@@ -159,7 +159,7 @@ object IO {
     final def flatMap[B](f: A ⇒ Iteratee[B]): Iteratee[B] = this match {
       case Done(value)       ⇒ f(value)
       case Cont(k: Chain[_]) ⇒ Cont(k :+ f)
-      case Cont(k)           ⇒ Cont(Chain(k, f))(Chunk.empty) // FIXME: wake up!
+      case Cont(k)           ⇒ Cont(Chain(k, f)) //(Chunk.empty) FIXME: wake up!
       case failure: Failure  ⇒ failure
     }
 
