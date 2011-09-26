@@ -143,16 +143,15 @@ object IO {
   sealed abstract class Iteratee[+A] {
 
     final def apply(input: Input): Iteratee[A] = this match {
-      case Done(value, rest) ⇒ Done(value, rest ++ input)
-      case Cont(f)           ⇒ f(input)
-      case Failure(e, rest)  ⇒ Failure(e, rest ++ input)
+      case Cont(f)           ⇒ f(input) match { case (iter, rest) => Cont(more => (iter, rest ++ more)) }
+      case iter => Cont(more => (iter, input ++ more))
     }
 
-    final def get: A = this match {
+/*    final def get: A = this match {
       case Done(value, _) ⇒ value
       case Cont(_)        ⇒ sys.error("Divergent Iteratee")
       case Failure(e, _)  ⇒ throw e
-    }
+    }*/
 
     final def flatMap[B](f: A ⇒ Iteratee[B]): Iteratee[B] = this match {
       case Done(value, rest) ⇒ f(value)(rest)
@@ -175,17 +174,17 @@ object IO {
    * wrap any constants or precalculated values that need to be composed with
    * other Iteratees.
    */
-  final case class Done[+A](result: A, remaining: Input = Chunk.empty) extends Iteratee[A]
+  final case class Done[+A](result: A) extends Iteratee[A]
 
   /**
    * An Iteratee that still requires more input to calculate it's result.
    */
-  final case class Cont[+A](f: Input ⇒ Iteratee[A]) extends Iteratee[A]
+  final case class Cont[+A](f: Input ⇒ (Iteratee[A], Input)) extends Iteratee[A]
 
   /**
    * An Iteratee representing a failure to calcualte a result.
    */
-  final case class Failure(exception: Throwable, remaining: Input = Chunk.empty) extends Iteratee[Nothing]
+  final case class Failure(exception: Throwable) extends Iteratee[Nothing]
 
   object IterateeRef {
     def apply[A](initial: Iteratee[A]): IterateeRef[A] = new IterateeRef(initial)
