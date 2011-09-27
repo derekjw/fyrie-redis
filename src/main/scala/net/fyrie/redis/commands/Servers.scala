@@ -6,7 +6,7 @@ import akka.util.ByteString
 
 private[redis] trait Servers[Result[_]] {
   this: Commands[Result] ⇒
-  import Protocol._
+  import protocol.Constants._
 
   def save(): Result[Unit] = send(SAVE :: Nil)
 

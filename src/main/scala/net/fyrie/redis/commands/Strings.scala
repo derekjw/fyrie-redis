@@ -6,7 +6,7 @@ import akka.util.ByteString
 
 private[redis] trait Strings[Result[_]] {
   this: Commands[Result] ⇒
-  import Protocol._
+  import protocol.Constants._
 
   def append[K: Store, V: Store](key: K, value: V): Result[Int] =
     send(APPEND :: Store(key) :: Store(value) :: Nil)

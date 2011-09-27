@@ -295,14 +295,11 @@ object IO {
   def repeat(iter: Iteratee[Unit]): Iteratee[Unit] =
     iter flatMap (_ ⇒ repeat(iter))
 
-  def traverse[A, B, M[A] <: Traversable[A]](in: M[A])(fn: A ⇒ Iteratee[B])(implicit cbf: CanBuildFrom[M[A], B, M[B]]): Iteratee[M[B]] = {
-    (Iteratee(cbf(in)) /: in) { (iterBuilder, a) ⇒
-      for {
-        builder ← iterBuilder
-        b ← fn(a)
-      } yield (builder += b)
-    } map (_.result)
-  }
+  def traverse[A, B, M[A] <: Traversable[A]](in: M[A])(f: A ⇒ Iteratee[B])(implicit cbf: CanBuildFrom[M[A], B, M[B]]): Iteratee[M[B]] =
+    fold(cbf(in), in)((b, a) ⇒ f(a) map (b += _)) map (_.result)
+
+  def fold[A, B, M[A] <: Traversable[A]](initial: B, in: M[A])(f: (B, A) ⇒ Iteratee[B]): Iteratee[B] =
+    (Iteratee(initial) /: in)((ib, a) ⇒ ib flatMap (b ⇒ f(b, a)))
 
   // private api
 

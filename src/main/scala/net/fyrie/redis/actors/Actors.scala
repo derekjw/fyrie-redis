@@ -5,6 +5,7 @@ package actors
 import messages._
 import types._
 import pubsub._
+import protocol._
 
 import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
 import Actor.{ actorOf }
@@ -133,7 +134,8 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
 }
 
 private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
-  import Protocol._
+  import Constants._
+  import Iteratees._
 
   var socket: IO.SocketHandle = _
 
@@ -184,8 +186,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       for {
         _ ← state
         _ ← readResult
-        _ ← (IO.Iteratee.unit /: msg.promises)((iter, promise) ⇒
-          for (_ ← iter; result ← readResult) yield promise completeWithResult result)
+        _ ← IO.fold((), msg.promises)((_, p) ⇒ readResult map (p completeWithResult))
         exec ← readResult
       } yield {
         source tryTell exec
@@ -221,56 +222,22 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
   def subscriber(listener: ActorRef): IO.Iteratee[Unit] = readResult flatMap { result ⇒
     result match {
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
         listener ! pubsub.Message(channel, message)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
         listener ! pubsub.PMessage(pattern, channel, message)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
         listener ! pubsub.Subscribed(channel, count)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
         listener ! pubsub.Unsubscribed(channel, count)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
         listener ! pubsub.PSubscribed(pattern, count)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
         listener ! pubsub.PUnsubscribed(pattern, count)
       case other ⇒
         throw RedisProtocolException("Unexpected response")
     }
     subscriber(listener)
-  }
-
-  val readResult: IO.Iteratee[RedisType] = IO take 1 flatMap readType
-
-  def readType(bytes: ByteString) = bytes.head.toChar match {
-    case '+' ⇒ readString
-    case '-' ⇒ readError
-    case ':' ⇒ readInteger
-    case '$' ⇒ readBulk
-    case '*' ⇒ readMulti
-    case x   ⇒ throw RedisProtocolException("Invalid result type: " + x.toByte)
-  }
-
-  val readString = IO takeUntil EOL map bytesToString
-  def bytesToString(bytes: ByteString) = RedisString(bytes.utf8String)
-
-  val readError = IO takeUntil EOL map bytesToError
-  def bytesToError(bytes: ByteString) = RedisError(bytes.utf8String)
-
-  val readInteger = IO takeUntil EOL map bytesToInteger
-  def bytesToInteger(bytes: ByteString) = RedisInteger(bytes.utf8String.toLong)
-
-  val readBulk = IO takeUntil EOL flatMap bytesToBulk
-  def bytesToBulk(bytes: ByteString) = bytes.utf8String.toInt match {
-    case -1 ⇒ IO Iteratee RedisBulk.notfound
-    case 0  ⇒ IO Iteratee RedisBulk.empty
-    case n  ⇒ for (bytes ← IO take n; _ ← IO takeUntil EOL) yield RedisBulk(Some(bytes))
-  }
-
-  val readMulti = IO takeUntil EOL flatMap bytesToMulti
-  def bytesToMulti(bytes: ByteString) = bytes.utf8String.toInt match {
-    case -1 ⇒ IO Iteratee RedisMulti.notfound
-    case 0  ⇒ IO Iteratee RedisMulti.empty
-    case n  ⇒ IO.takeList(n)(readResult) map (x ⇒ RedisMulti(Some(x)))
   }
 
 }

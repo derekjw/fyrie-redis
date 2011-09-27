@@ -1,6 +1,8 @@
 package net.fyrie.redis
 package serialization
 
+import protocol.Constants
+
 import akka.util.ByteString
 
 import java.util.Date
@@ -28,23 +30,23 @@ object Store {
   implicit val storeDate = new Store[Date] { def apply(value: Date) = storeLong(value.getTime) }
   implicit val storeScore = new Store[RedisScore] {
     def apply(score: RedisScore) = score match {
-      case _ if score.value == Double.PositiveInfinity ⇒ Protocol.INFPOS
-      case _ if score.value == Double.NegativeInfinity ⇒ Protocol.INFNEG
+      case _ if score.value == Double.PositiveInfinity ⇒ Constants.INFPOS
+      case _ if score.value == Double.NegativeInfinity ⇒ Constants.INFNEG
       case InclusiveScore(d)                           ⇒ ByteString(d.toString)
       case ExclusiveScore(d)                           ⇒ ByteString("(" + d.toString)
     }
   }
   implicit val storeAggregate = new Store[Aggregate] {
     def apply(value: Aggregate) = value match {
-      case Aggregate.Sum ⇒ Protocol.SUM
-      case Aggregate.Min ⇒ Protocol.MIN
-      case Aggregate.Max ⇒ Protocol.MAX
+      case Aggregate.Sum ⇒ Constants.SUM
+      case Aggregate.Min ⇒ Constants.MIN
+      case Aggregate.Max ⇒ Constants.MAX
     }
   }
   implicit val storeSortOrder = new Store[SortOrder] {
     def apply(value: SortOrder) = value match {
-      case SortOrder.Asc  ⇒ Protocol.ASC
-      case SortOrder.Desc ⇒ Protocol.DESC
+      case SortOrder.Asc  ⇒ Constants.ASC
+      case SortOrder.Desc ⇒ Constants.DESC
     }
   }
 }

@@ -6,7 +6,7 @@ import akka.util.ByteString
 
 private[redis] trait Hashes[Result[_]] {
   this: Commands[Result] ⇒
-  import Protocol._
+  import protocol.Constants._
 
   def hdel[K: Store, F: Store](key: K, field: F): Result[Boolean] =
     send(HDEL :: Store(key) :: Store(field) :: Nil)

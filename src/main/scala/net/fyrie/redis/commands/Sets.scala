@@ -6,7 +6,7 @@ import akka.util.ByteString
 
 private[redis] trait Sets[Result[_]] {
   this: Commands[Result] ⇒
-  import Protocol._
+  import protocol.Constants._
 
   def sadd[K: Store, V: Store](key: K, value: V): Result[Boolean] =
     send(SADD :: Store(key) :: Store(value) :: Nil)
