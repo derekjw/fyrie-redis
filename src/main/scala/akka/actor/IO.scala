@@ -293,8 +293,9 @@ object IO {
    * An Iteratee that returns any input it receives
    */
   val takeAny: Iteratee[ByteString] = Cont {
-    case Chunk(bytes) ⇒ (Done(bytes), Chunk.empty)
-    case eof          ⇒ (Done(ByteString.empty), eof)
+    case Chunk(bytes) if bytes.nonEmpty ⇒ (Done(bytes), Chunk.empty)
+    case Chunk(bytes)                   ⇒ (takeAny, Chunk.empty)
+    case eof                            ⇒ (Done(ByteString.empty), eof)
   }
 
   def takeList[A](length: Int)(iter: Iteratee[A]): Iteratee[List[A]] = {
@@ -327,7 +328,7 @@ object IO {
    *
    * For internal use within Iteratee.
    */
-  private[akka] final class Chain[A] private (cur: Input ⇒ (Iteratee[Any], Input), queue: Queue[Any ⇒ Iteratee[Any]]) extends (Input ⇒ (Iteratee[A], Input)) {
+  private[akka] final case class Chain[A] private (cur: Input ⇒ (Iteratee[Any], Input), queue: Queue[Any ⇒ Iteratee[Any]]) extends (Input ⇒ (Iteratee[A], Input)) {
 
     def :+[B](f: A ⇒ Iteratee[B]) = new Chain[B](cur, queue enqueue f.asInstanceOf[Any ⇒ Iteratee[Any]])
 
@@ -339,6 +340,7 @@ object IO {
           case (Done(value), rest) ⇒
             val (head, tail) = queue.dequeue
             head(value) match {
+              //case Cont(Chain(f, q)) ⇒ run(f(rest), q ++ tail) <- can cause big slowdown, need to test if needed
               case Cont(f) ⇒ run(f(rest), tail)
               case iter    ⇒ run((iter, rest), tail)
             }
@@ -359,7 +361,7 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
 
   var worker: IOWorker = _
 
-  override def preStart: Unit = {
+  override def preStart {
     worker = new IOWorker(self, bufferSize)
     worker.start()
   }
@@ -382,7 +384,7 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
     case IO.Close(handle)          ⇒ worker(Close(handle))
   }
 
-  override def postStop: Unit = {
+  override def postStop {
     worker(Shutdown)
   }
 
@@ -427,7 +429,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   private val buffer = ByteBuffer.allocate(bufferSize)
 
   private val thread = new Thread("io-worker") {
-    override def run(): Unit = {
+    override def run() {
       while (selector.isOpen) {
         selector select ()
         val keys = selector.selectedKeys.iterator
@@ -462,7 +464,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
     }
   }
 
-  private def process(key: SelectionKey): Unit = {
+  private def process(key: SelectionKey) {
     val handle = key.attachment.asInstanceOf[IO.Handle]
     try {
       if (key.isConnectable) key.channel match {
@@ -490,7 +492,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
     }
   }
 
-  private def cleanup(handle: IO.Handle, cause: Option[Exception]): Unit = {
+  private def cleanup(handle: IO.Handle, cause: Option[Exception]) {
     handle match {
       case server: IO.ServerHandle  ⇒ accepted -= server
       case writable: IO.WriteHandle ⇒ writes -= writable
@@ -512,19 +514,19 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   private def setOps(handle: IO.Handle, ops: Int): Unit =
     channels(handle) keyFor selector interestOps ops
 
-  private def addOps(handle: IO.Handle, ops: Int): Unit = {
+  private def addOps(handle: IO.Handle, ops: Int) {
     val key = channels(handle) keyFor selector
     val cur = key.interestOps
     key interestOps (cur | ops)
   }
 
-  private def removeOps(handle: IO.Handle, ops: Int): Unit = {
+  private def removeOps(handle: IO.Handle, ops: Int) {
     val key = channels(handle) keyFor selector
     val cur = key.interestOps
     key interestOps (cur - (cur & ops))
   }
 
-  private def connect(socket: IO.SocketHandle, channel: SocketChannel): Unit = {
+  private def connect(socket: IO.SocketHandle, channel: SocketChannel) {
     if (channel.finishConnect) {
       removeOps(socket, OP_CONNECT)
       socket.owner ! IO.Connected(socket)
@@ -534,7 +536,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   }
 
   @tailrec
-  private def accept(server: IO.ServerHandle, channel: ServerSocketChannel): Unit = {
+  private def accept(server: IO.ServerHandle, channel: ServerSocketChannel) {
     val socket = channel.accept
     if (socket ne null) {
       socket configureBlocking false
@@ -545,7 +547,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   }
 
   @tailrec
-  private def read(handle: IO.ReadHandle, channel: ReadChannel): Unit = {
+  private def read(handle: IO.ReadHandle, channel: ReadChannel) {
     buffer.clear
     val readLen = channel read buffer
     if (readLen == -1) {
@@ -558,7 +560,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   }
 
   @tailrec
-  private def write(handle: IO.WriteHandle, channel: WriteChannel): Unit = {
+  private def write(handle: IO.WriteHandle, channel: WriteChannel) {
     val queue = writes(handle)
     if (queue.nonEmpty) {
       val (buf, bufs) = queue.dequeue
@@ -576,7 +578,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   }
 
   @tailrec
-  private def addRequest(req: Request): Unit = {
+  private def addRequest(req: Request) {
     val requests = _requests.get
     if (_requests compareAndSet (requests, req :: requests))
       selector wakeup ()
