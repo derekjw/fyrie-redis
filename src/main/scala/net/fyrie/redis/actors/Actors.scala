@@ -239,39 +239,38 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     subscriber(listener)
   }
 
-  def readResult: IO.Iteratee[RedisType] =
-    IO take 1 flatMap {
-      _.head.toChar match {
+  val readResult: IO.Iteratee[RedisType] = IO take 1 flatMap readType
 
-        case '+' ⇒
-          IO takeUntil EOL map (bytes ⇒ RedisString(bytes.utf8String))
+  def readType(bytes: ByteString) = bytes.head.toChar match {
+    case '+' ⇒ readString
+    case '-' ⇒ readError
+    case ':' ⇒ readInteger
+    case '$' ⇒ readBulk
+    case '*' ⇒ readMulti
+    case x   ⇒ throw RedisProtocolException("Invalid result type: " + x.toByte)
+  }
 
-        case '-' ⇒
-          IO takeUntil EOL map (bytes ⇒ RedisError(bytes.utf8String))
+  val readString = IO takeUntil EOL map bytesToString
+  def bytesToString(bytes: ByteString) = RedisString(bytes.utf8String)
 
-        case ':' ⇒
-          IO takeUntil EOL map (bytes ⇒ RedisInteger(bytes.utf8String.toLong))
+  val readError = IO takeUntil EOL map bytesToError
+  def bytesToError(bytes: ByteString) = RedisError(bytes.utf8String)
 
-        case '$' ⇒
-          IO takeUntil EOL flatMap {
-            _.utf8String.toInt match {
-              case -1 ⇒ IO Iteratee RedisBulk.notfound
-              case 0  ⇒ IO Iteratee RedisBulk.empty
-              case n  ⇒ for (bytes ← IO take n; _ ← IO takeUntil EOL) yield RedisBulk(Some(bytes))
-            }
-          }
+  val readInteger = IO takeUntil EOL map bytesToInteger
+  def bytesToInteger(bytes: ByteString) = RedisInteger(bytes.utf8String.toLong)
 
-        case '*' ⇒
-          IO takeUntil EOL flatMap {
-            _.utf8String.toInt match {
-              case -1 ⇒ IO Iteratee RedisMulti.notfound
-              case 0  ⇒ IO Iteratee RedisMulti.empty
-              case n  ⇒ IO.takeList(n)(readResult) map (x ⇒ RedisMulti(Some(x)))
-            }
-          }
+  val readBulk = IO takeUntil EOL flatMap bytesToBulk
+  def bytesToBulk(bytes: ByteString) = bytes.utf8String.toInt match {
+    case -1 ⇒ IO Iteratee RedisBulk.notfound
+    case 0  ⇒ IO Iteratee RedisBulk.empty
+    case n  ⇒ for (bytes ← IO take n; _ ← IO takeUntil EOL) yield RedisBulk(Some(bytes))
+  }
 
-        case x ⇒
-          throw RedisProtocolException("Invalid result type: " + x.toByte)
-      }
-    }
+  val readMulti = IO takeUntil EOL flatMap bytesToMulti
+  def bytesToMulti(bytes: ByteString) = bytes.utf8String.toInt match {
+    case -1 ⇒ IO Iteratee RedisMulti.notfound
+    case 0  ⇒ IO Iteratee RedisMulti.empty
+    case n  ⇒ IO.takeList(n)(readResult) map (x ⇒ RedisMulti(Some(x)))
+  }
+
 }
