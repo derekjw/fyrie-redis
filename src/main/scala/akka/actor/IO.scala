@@ -4,7 +4,6 @@
 package akka.actor
 
 import akka.util.ByteString
-import akka.dispatch.MessageInvocation
 import akka.event.EventHandler
 
 import java.net.InetSocketAddress
