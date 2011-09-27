@@ -137,7 +137,8 @@ object IO {
   }
 
   /**
-   * A basic Iteratee implementation. It only supports ByteString input.
+   * A basic Iteratee implementation of Oleg's Iteratee (http://okmij.org/ftp/Streams.html).
+   * No support for Enumerator or Input types other then ByteString at the moment.
    */
   sealed abstract class Iteratee[+A] {
 
@@ -146,7 +147,20 @@ object IO {
         case (iter, rest @ Chunk(bytes)) if bytes.nonEmpty ⇒ Cont(more ⇒ (iter, rest ++ more))
         case (iter, _)                                     ⇒ iter
       }
-      case iter ⇒ Cont(more ⇒ (iter, input ++ more))
+      case iter ⇒ input match {
+        /**
+         * FIXME: will not automatically feed input into next continuation until 'apply'
+         * is called again with more Input. Possibly need to implment Enumerator to make
+         * this automatic, as it would then be able to store unused Input. Another solution
+         * is to add a 'rest: Input' variable to Done, although this can have weird edge
+         * cases (my original implementation did that, I did not like it).
+         *
+         * As a workaround, an empty Chunk can be input to the Iteratee once it is able to
+         * process the waiting Input (see 'flatMap' for an automatic workaround).
+         */
+        case _: Chunk ⇒ Cont(more ⇒ (iter, input ++ more))
+        case _        ⇒ iter
+      }
     }
 
     final def get: A = this(EOF(None)) match {
@@ -158,7 +172,7 @@ object IO {
     final def flatMap[B](f: A ⇒ Iteratee[B]): Iteratee[B] = this match {
       case Done(value)       ⇒ f(value)
       case Cont(k: Chain[_]) ⇒ Cont(k :+ f)
-      case Cont(k)           ⇒ Cont(Chain(k, f)) //(Chunk.empty) FIXME: wake up!
+      case Cont(k)           ⇒ Cont(Chain(k, f)) //(Chunk.empty) <- uncomment for workaround to above FIXME
       case failure: Failure  ⇒ failure
     }
 
@@ -185,6 +199,7 @@ object IO {
 
   /**
    * An Iteratee representing a failure to calcualte a result.
+   * FIXME: move into 'Cont' as in Oleg's implementation
    */
   final case class Failure(exception: Throwable) extends Iteratee[Nothing]
 
@@ -237,8 +252,7 @@ object IO {
         } else {
           (Cont(step(bytes)), Chunk.empty)
         }
-      case eof @ EOF(Some(cause)) ⇒ (Failure(cause), eof) // return eof or taken bytes?
-      case eof @ EOF(None)        ⇒ (Cont(step(taken)), eof)
+      case eof ⇒ (Cont(step(taken)), eof)
     }
 
     Cont(step(ByteString.empty))
@@ -255,8 +269,7 @@ object IO {
           (Done(bytes.take(length)), Chunk(bytes.drop(length)))
         else
           (Cont(step(bytes)), Chunk.empty)
-      case eof @ EOF(Some(cause)) ⇒ (Failure(cause), eof)
-      case eof @ EOF(None)        ⇒ (Cont(step(taken)), eof)
+      case eof ⇒ (Cont(step(taken)), eof)
     }
 
     Cont(step(ByteString.empty))
