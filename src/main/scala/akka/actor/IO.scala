@@ -399,7 +399,7 @@ private[akka] object IOWorker {
   case object Shutdown extends Request
 }
 
-private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int, dispatcher: akka.dispatch.MessageDispatcher) {
+private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dispatcher: akka.dispatch.MessageDispatcher) {
   import SelectionKey.{ OP_READ, OP_WRITE, OP_ACCEPT, OP_CONNECT }
   import IOWorker._
 

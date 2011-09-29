@@ -5,16 +5,13 @@ import org.specs2._
 import akka.actor.Actor.Timeout
 import akka.dispatch.{ Future, Futures }
 
-class PatternsSpec extends mutable.Specification {
-
-  implicit val arguments = args(sequential = true)
+class PatternsSpec extends mutable.Specification with TestClient {
 
   implicit val timeout = Timeout(60000)
 
   val timeoutMs = timeout.duration.toMillis
 
-  def scatterGatherWithList(ops: Int) = {
-    val client = RedisClient(config = RedisClientConfig(timeout = timeout))
+  def scatterGatherWithList(ops: Int, client: RedisClient) = {
 
     client.sync.flushdb
 
@@ -49,15 +46,13 @@ class PatternsSpec extends mutable.Specification {
 
     println("Operations per run: " + ops * 100 * 2 + " elapsed: " + elapsed + " ops per second: " + opsPerSec)
 
-    client.disconnect
-
     result === ((1 to ops).sum * 100)
   }
 
   "Scatter/Gather" >> {
-    "100 lists x 2000 items" ! { scatterGatherWithList(2000) }
-    "100 lists x 5000 items" ! { scatterGatherWithList(5000) }
-    "100 lists x 10000 items" ! { scatterGatherWithList(10000) }
+    "100 lists x 2000 items" ! client { r ⇒ scatterGatherWithList(2000, r) }
+    "100 lists x 5000 items" ! client { r ⇒ scatterGatherWithList(5000, r) }
+    "100 lists x 10000 items" ! client { r ⇒ scatterGatherWithList(10000, r) }
   }
 
 }
