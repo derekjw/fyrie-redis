@@ -6,7 +6,7 @@ import akka.util.ByteString
 
 private[redis] trait SortedSets[Result[_]] {
   this: Commands[Result] ⇒
-  import Protocol._
+  import protocol.Constants._
 
   def zadd[K: Store, M: Store](key: K, member: M, score: Double = 1.0): Result[Boolean] =
     send(ZADD :: Store(key) :: Store(score) :: Store(member) :: Nil)

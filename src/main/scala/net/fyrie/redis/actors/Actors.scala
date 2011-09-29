@@ -5,6 +5,7 @@ package actors
 import messages._
 import types._
 import pubsub._
+import protocol._
 
 import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
 import Actor.{ actorOf }
@@ -42,13 +43,13 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
       worker forward msg
 
     case req: Request ⇒
-      socket write req.bytes
       worker forward Run
+      socket write req.bytes
       onRequest(req)
 
     case req: MultiRequest ⇒
-      sendMulti(req)
       worker forward MultiRun(req.cmds.map(_._2))
+      sendMulti(req)
       onRequest(req)
 
     case Received ⇒
@@ -131,12 +132,12 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
 }
 
 private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
-  import Protocol._
-  import akka.util.iteratee._
+  import Constants._
+  import Iteratees._
 
   var socket: IO.SocketHandle = _
 
-  val state = new IterateeRef(Iteratee.unit)
+  val state = IO.IterateeRef()
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
@@ -144,7 +145,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
   def receive = {
 
     case IO.Read(handle, bytes) ⇒
-      state(bytes)
+      state(IO Chunk bytes)
 
     case IO.Connected(handle) ⇒
 
@@ -166,6 +167,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     case IO.Closed(handle, cause) if socket == handle ⇒
       EventHandler info (this, "Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       sendToSupervisor(Disconnect)
+      state(IO EOF cause)
 
     case Run ⇒
       val source = channel
@@ -182,8 +184,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       for {
         _ ← state
         _ ← readResult
-        _ ← (Iteratee.unit /: msg.promises)((iter, promise) ⇒
-          for (_ ← iter; result ← readResult) yield promise completeWithResult result)
+        _ ← IO.fold((), msg.promises)((_, p) ⇒ readResult map (p completeWithResult))
         exec ← readResult
       } yield {
         source tryTell exec
@@ -217,19 +218,19 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     }
   }
 
-  def subscriber(listener: ActorRef): Iteratee[Unit] = readResult flatMap { result ⇒
+  def subscriber(listener: ActorRef): IO.Iteratee[Unit] = readResult flatMap { result ⇒
     result match {
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.message)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
         listener ! pubsub.Message(channel, message)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.pmessage)), RedisBulk(Some(pattern)), RedisBulk(Some(channel)), RedisBulk(Some(message))))) ⇒
         listener ! pubsub.PMessage(pattern, channel, message)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.subscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
         listener ! pubsub.Subscribed(channel, count)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.unsubscribe)), RedisBulk(Some(channel)), RedisInteger(count)))) ⇒
         listener ! pubsub.Unsubscribed(channel, count)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.psubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
         listener ! pubsub.PSubscribed(pattern, count)
-      case RedisMulti(Some(List(RedisBulk(Some(Protocol.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
+      case RedisMulti(Some(List(RedisBulk(Some(Constants.punsubscribe)), RedisBulk(Some(pattern)), RedisInteger(count)))) ⇒
         listener ! pubsub.PUnsubscribed(pattern, count)
       case other ⇒
         throw RedisProtocolException("Unexpected response")
@@ -237,45 +238,4 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
     subscriber(listener)
   }
 
-  def readResult: Iteratee[RedisType] =
-    take(1) flatMap {
-      _.head.toChar match {
-
-        case '+' ⇒
-          takeUntil(EOL) map (bytes ⇒ RedisString(bytes.utf8String))
-
-        case '-' ⇒
-          takeUntil(EOL) map (bytes ⇒ RedisError(bytes.utf8String))
-
-        case ':' ⇒
-          takeUntil(EOL) map (bytes ⇒ RedisInteger(bytes.utf8String.toLong))
-
-        case '$' ⇒
-          takeUntil(EOL) flatMap {
-            _.utf8String.toInt match {
-              case -1 ⇒ Iteratee(RedisBulk.notfound)
-              case 0  ⇒ Iteratee(RedisBulk.empty)
-              case n  ⇒ for (bytes ← take(n); _ ← takeUntil(EOL)) yield RedisBulk(Some(bytes))
-            }
-          }
-
-        case '*' ⇒
-          takeUntil(EOL) flatMap {
-            _.utf8String.toInt match {
-              case -1 ⇒ Iteratee(RedisMulti.notfound)
-              case 0  ⇒ Iteratee(RedisMulti.empty)
-              case n ⇒
-                ((Iteratee.unit map (_ ⇒ new Array[RedisType](n))) /: (0 until n)) { (iter, i) ⇒
-                  for (ar ← iter; r ← readResult) yield {
-                    ar(i) = r
-                    ar
-                  }
-                } map (ar ⇒ RedisMulti(Some(ar.toList)))
-            }
-          }
-
-        case x ⇒
-          throw RedisProtocolException("Invalid result type: " + x.toByte)
-      }
-    }
 }

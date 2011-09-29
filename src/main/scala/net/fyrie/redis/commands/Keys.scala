@@ -6,7 +6,7 @@ import akka.util.ByteString
 
 private[redis] trait Keys[Result[_]] {
   this: Commands[Result] ⇒
-  import Protocol._
+  import protocol.Constants._
 
   /**
    * Request keys matching `pattern`.

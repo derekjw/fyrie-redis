@@ -3,17 +3,17 @@ package net.fyrie.redis
 import org.specs2._
 
 import akka.util.ByteString
+import akka.actor.IO
 
 class IterSpec extends Specification {
 
   def is = "iteratee" ! {
-    import akka.util.iteratee._
     val iter = for {
-      a ← takeUntil(ByteString(" "))
-      b ← take(5)
-      c ← takeAll
+      a ← IO takeUntil ByteString(" ")
+      b ← IO take 5
+      c ← IO takeAll
     } yield (a.utf8String, b.utf8String, c.utf8String)
-    iter(ByteString("Hel"))(ByteString("lo W"))(ByteString("orld!")) === Done(("Hello", "World", "!"))
+    iter(IO Chunk ByteString("Hel"))(IO Chunk ByteString("lo W"))(IO Chunk ByteString("orld!")).get === ("Hello", "World", "!")
   }
 
 }

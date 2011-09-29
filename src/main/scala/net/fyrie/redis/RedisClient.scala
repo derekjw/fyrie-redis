@@ -3,7 +3,8 @@ package redis
 
 import actors._
 import messages.{ Request, MultiRequest, Disconnect, RequestCallback, ResultCallback, ReleaseClient, RequestClient }
-import Protocol.EOL
+import protocol.Constants
+import Constants.EOL
 import types._
 import serialization.{ Parse, Store }
 
@@ -130,7 +131,7 @@ sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Comman
   }
 
   final private[redis] def exec[T](q: Queued[T]): T = {
-    actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
+    actor ? MultiRequest(format(List(Constants.MULTI)), q.requests, format(List(Constants.EXEC))) foreach {
       case RedisMulti(m) ⇒
         var responses = q.responses
         (q.responses.iterator zip (q.requests.iterator map (_._2.value))) foreach {
@@ -170,7 +171,7 @@ sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Comman
 
   final private[redis] def exec[T](promise: Promise[T], block: (RedisClientWatch) ⇒ Future[Queued[T]]): Unit = {
     block(this) onException { case e ⇒ promise complete Left(e) } foreach { q ⇒
-      actor ? MultiRequest(format(List(Protocol.MULTI)), q.requests, format(List(Protocol.EXEC))) foreach {
+      actor ? MultiRequest(format(List(Constants.MULTI)), q.requests, format(List(Constants.EXEC))) foreach {
         case RedisMulti(None) ⇒
           if (!promise.isExpired) exec(promise, block) else this.release
         case RedisMulti(m) ⇒
@@ -204,7 +205,7 @@ sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Comman
 
   def multi[T](block: (RedisClientMulti) ⇒ Queued[T]): Queued[T] = block(rq)
 
-  def watch[A: serialization.Store](key: A): Future[Unit] = send(Protocol.WATCH :: serialization.Store(key) :: Nil)
+  def watch[A: serialization.Store](key: A): Future[Unit] = send(Constants.WATCH :: serialization.Store(key) :: Nil)
 
 }
 
@@ -214,7 +215,7 @@ private[redis] final class RedisClientPoolWorker(protected val actor: ActorRef, 
 }
 
 private[redis] final class RedisClientSub(protected val actor: ActorRef, config: RedisClientConfig) extends Commands[({ type X[_] = ByteString })#X] {
-  import Protocol._
+  import Constants._
 
   final def send(in: List[ByteString]): ByteString = format(in)
 
