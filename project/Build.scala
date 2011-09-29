@@ -10,9 +10,9 @@ object FyrieRedisBuild extends Build {
                           dependencies = Seq(akkaActor, akkaTestKit % "test"),
                           settings = coreSettings)
 
-  lazy val akkaActor = ProjectRef(uri("git://github.com/jboner/akka.git"), "akka-actor")
+  lazy val akkaActor = ProjectRef(uri("git://github.com/jboner/akka.git#wip-923-derekjw"), "akka-actor")
 
-  lazy val akkaTestKit = ProjectRef(uri("git://github.com/jboner/akka.git"), "akka-testkit")
+  lazy val akkaTestKit = ProjectRef(uri("git://github.com/jboner/akka.git#wip-923-derekjw"), "akka-testkit")
 
   val coreSettings = Defaults.defaultSettings /* ++ ScalariformPlugin.settings */ ++ Seq(
     scalaVersion := "2.9.1",
