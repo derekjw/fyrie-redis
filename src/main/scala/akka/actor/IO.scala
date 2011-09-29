@@ -362,8 +362,8 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
   var worker: IOWorker = _
 
   override def preStart {
-    worker = new IOWorker(self, bufferSize)
-    worker.start()
+    worker = new IOWorker(self, bufferSize, self.dispatcher)
+    worker.run
   }
 
   def receive = {
@@ -399,7 +399,7 @@ private[akka] object IOWorker {
   case object Shutdown extends Request
 }
 
-private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
+private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int, dispatcher: akka.dispatch.MessageDispatcher) {
   import SelectionKey.{ OP_READ, OP_WRITE, OP_ACCEPT, OP_CONNECT }
   import IOWorker._
 
@@ -410,9 +410,6 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
 
   def apply(request: Request): Unit =
     addRequest(request)
-
-  def start(): Unit =
-    thread.start()
 
   // private
 
@@ -428,41 +425,42 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
 
   private val buffer = ByteBuffer.allocate(bufferSize)
 
-  private val thread = new Thread("io-worker") {
-    override def run() {
-      while (selector.isOpen) {
-        selector select ()
-        val keys = selector.selectedKeys.iterator
-        while (keys.hasNext) {
-          val key = keys next ()
-          keys remove ()
-          if (key.isValid) { process(key) }
-        }
-        _requests.getAndSet(Nil).reverse foreach {
-          case Register(handle, channel, ops) ⇒
-            channels += (handle -> channel)
-            channel register (selector, ops, handle)
-          case Accepted(socket, server) ⇒
-            val (channel, rest) = accepted(server).dequeue
-            if (rest.isEmpty) accepted -= server
-            else accepted += (server -> rest)
-            channels += (socket -> channel)
-            channel register (selector, OP_READ, socket)
-          case Write(handle, data) ⇒
-            if (channels contains handle) {
-              val queue = writes(handle)
-              if (queue.isEmpty) addOps(handle, OP_WRITE)
-              writes += (handle -> queue.enqueue(data))
-            }
-          case Close(handle) ⇒
-            cleanup(handle, None)
-          case Shutdown ⇒
-            channels.values foreach (_.close)
-            selector.close
-        }
+  val select = { () ⇒
+    if (selector.isOpen) {
+      selector selectNow ()
+      val keys = selector.selectedKeys.iterator
+      while (keys.hasNext) {
+        val key = keys next ()
+        keys remove ()
+        if (key.isValid) { process(key) }
       }
+      _requests.getAndSet(Nil).reverse foreach {
+        case Register(handle, channel, ops) ⇒
+          channels += (handle -> channel)
+          channel register (selector, ops, handle)
+        case Accepted(socket, server) ⇒
+          val (channel, rest) = accepted(server).dequeue
+          if (rest.isEmpty) accepted -= server
+          else accepted += (server -> rest)
+          channels += (socket -> channel)
+          channel register (selector, OP_READ, socket)
+        case Write(handle, data) ⇒
+          if (channels contains handle) {
+            val queue = writes(handle)
+            if (queue.isEmpty) addOps(handle, OP_WRITE)
+            writes += (handle -> queue.enqueue(data))
+          }
+        case Close(handle) ⇒
+          cleanup(handle, None)
+        case Shutdown ⇒
+          channels.values foreach (_.close)
+          selector.close
+      }
+      run()
     }
   }
+
+  def run() { dispatcher dispatchTask select }
 
   private def process(key: SelectionKey) {
     val handle = key.attachment.asInstanceOf[IO.Handle]
@@ -580,9 +578,7 @@ private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int) {
   @tailrec
   private def addRequest(req: Request) {
     val requests = _requests.get
-    if (_requests compareAndSet (requests, req :: requests))
-      selector wakeup ()
-    else
+    if (!(_requests compareAndSet (requests, req :: requests)))
       addRequest(req)
   }
 }
