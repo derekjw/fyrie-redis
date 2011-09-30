@@ -10,15 +10,13 @@ trait TestClient { self: mutable.Specification ⇒
 
   def client = new AroundOutside[RedisClient] {
 
-    val ioManager = akka.actor.Actor.actorOf(new akka.actor.IOManager()).start
-    val r = RedisClient(ioManager = ioManager)
+    val r = RedisClient()
     r.sync.flushall
 
     def around[T <% Result](t: ⇒ T) = {
       val result = t
       r.sync.flushall
       r.disconnect
-      ioManager.stop
       result
     }
 
