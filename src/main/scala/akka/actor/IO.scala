@@ -8,7 +8,7 @@ import akka.event.EventHandler
 
 import java.net.InetSocketAddress
 import java.io.IOException
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.{ AtomicReference, AtomicBoolean }
 import java.nio.ByteBuffer
 import java.nio.channels.{
   SelectableChannel,
@@ -363,7 +363,6 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
 
   override def preStart {
     worker = new IOWorker(self, bufferSize, self.dispatcher)
-    worker.run
   }
 
   def receive = {
@@ -417,6 +416,8 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
 
   private val _requests = new AtomicReference(List.empty[Request])
 
+  private val _running = new AtomicBoolean(false)
+
   private var accepted = Map.empty[IO.ServerHandle, Queue[SelectableChannel]].withDefaultValue(Queue.empty)
 
   private var channels = Map.empty[IO.Handle, SelectableChannel]
@@ -453,14 +454,26 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
         case Close(handle) ⇒
           cleanup(handle, None)
         case Shutdown ⇒
-          channels.values foreach (_.close)
+          channels.keys foreach (handle ⇒ cleanup(handle, None))
           selector.close
       }
+      if (channels.isEmpty && (_requests.get eq Nil)) {
+        stop()
+        if (_requests.get ne Nil) start()
+      }
       run()
-    }
+    } else stop()
   }
 
-  def run() { dispatcher dispatchTask select }
+  def start() {
+    if (!(_running.get || _running.getAndSet(true))) run()
+  }
+
+  def stop() {
+    _running.set(false)
+  }
+
+  def run() { if (_running.get) dispatcher dispatchTask select }
 
   private def process(key: SelectionKey) {
     val handle = key.attachment.asInstanceOf[IO.Handle]
@@ -578,7 +591,9 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
   @tailrec
   private def addRequest(req: Request) {
     val requests = _requests.get
-    if (!(_requests compareAndSet (requests, req :: requests)))
+    if (_requests compareAndSet (requests, req :: requests))
+      start()
+    else
       addRequest(req)
   }
 }
