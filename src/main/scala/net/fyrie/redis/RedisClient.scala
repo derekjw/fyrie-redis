@@ -21,14 +21,14 @@ case class RedisClientConfig(timeout: Timeout = Actor.defaultTimeout,
                              poolSize: Range = 10 to 50)
 
 object RedisClient {
-  def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start) =
+  def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = IOManager.global) =
     new RedisClient(host, port, config, ioManager)
 
-  def subscriber(listener: ActorRef)(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = actorOf(new IOManager()).start): ActorRef =
+  def subscriber(listener: ActorRef)(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig(), ioManager: ActorRef = IOManager.global): ActorRef =
     actorOf(new RedisSubscriberSession(listener)(ioManager, host, port, config)).start
 }
 
-final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = actorOf(new IOManager()).start) extends RedisClientAsync(config) {
+final class RedisClient(val host: String = "localhost", val port: Int = 6379, val config: RedisClientConfig = RedisClientConfig(), val ioManager: ActorRef = IOManager.global) extends RedisClientAsync(config) {
 
   protected val actor = actorOf(new RedisClientSession(ioManager, host, port, config)).start
 

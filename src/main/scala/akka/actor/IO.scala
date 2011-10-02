@@ -54,11 +54,11 @@ object IO {
     def write(bytes: ByteString): Unit = ioManager ! Write(this, bytes)
   }
 
-  case class SocketHandle(owner: ActorRef, ioManager: ActorRef, uuid: UUID = new UUID()) extends ReadHandle with WriteHandle {
+  case class SocketHandle(owner: ActorRef, ioManager: ActorRef = IOManager.global, uuid: UUID = new UUID()) extends ReadHandle with WriteHandle {
     override def asSocket = this
   }
 
-  case class ServerHandle(owner: ActorRef, ioManager: ActorRef, uuid: UUID = new UUID()) extends Handle {
+  case class ServerHandle(owner: ActorRef, ioManager: ActorRef = IOManager.global, uuid: UUID = new UUID()) extends Handle {
     override def asServer = this
 
     def accept(socketOwner: ActorRef): SocketHandle = {
@@ -353,6 +353,10 @@ object IO {
     }
   }
 
+}
+
+object IOManager {
+  val global = akka.actor.Actor.actorOf(new IOManager()).start
 }
 
 class IOManager(bufferSize: Int = 8192) extends Actor {
