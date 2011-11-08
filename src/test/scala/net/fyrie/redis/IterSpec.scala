@@ -13,7 +13,7 @@ class IterSpec extends Specification {
       b ← IO take 5
       c ← IO takeAll
     } yield (a.utf8String, b.utf8String, c.utf8String)
-    iter(IO Chunk ByteString("Hel"))(IO Chunk ByteString("lo W"))(IO Chunk ByteString("orld!")).get === ("Hello", "World", "!")
+    iter(IO Chunk ByteString("Hel"))._1(IO Chunk ByteString("lo W"))._1(IO Chunk ByteString("orld!"))._1.get === ("Hello", "World", "!")
   }
 
 }

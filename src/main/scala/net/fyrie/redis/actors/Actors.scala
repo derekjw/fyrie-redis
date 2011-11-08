@@ -139,7 +139,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
   var socket: IO.SocketHandle = _
 
-  val state = IO.IterateeRef()
+  val state = IO.IterateeRef.sync()
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]

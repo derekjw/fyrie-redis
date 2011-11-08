@@ -5,7 +5,6 @@ package akka.actor
 
 import akka.util.ByteString
 import akka.event.EventHandler
-
 import java.net.InetSocketAddress
 import java.io.IOException
 import java.util.concurrent.atomic.{ AtomicReference, AtomicBoolean }
@@ -20,7 +19,6 @@ import java.nio.channels.{
   SelectionKey,
   CancelledKeyException
 }
-
 import scala.collection.mutable
 import scala.collection.immutable.Queue
 import scala.annotation.tailrec
@@ -96,6 +94,12 @@ object IO {
   def listen(ioManager: ActorRef, host: String, port: Int)(implicit sender: ScalaActorRef): ServerHandle =
     listen(ioManager, new InetSocketAddress(host, port), sender)
 
+  def listen(ioManager: ActorRef, port: Int, owner: ActorRef): ServerHandle =
+    listen(ioManager, new InetSocketAddress(port), owner)
+
+  def listen(ioManager: ActorRef, port: Int)(implicit sender: ScalaActorRef): ServerHandle =
+    listen(ioManager, new InetSocketAddress(port), sender)
+
   def connect(ioManager: ActorRef, address: InetSocketAddress, owner: ActorRef): SocketHandle = {
     val socket = SocketHandle(owner, ioManager)
     ioManager ! Connect(socket, address)
@@ -142,28 +146,16 @@ object IO {
    */
   sealed abstract class Iteratee[+A] {
 
-    final def apply(input: Input): Iteratee[A] = this match {
-      case Cont(f) ⇒ f(input) match {
-        case (iter, rest @ Chunk(bytes)) if bytes.nonEmpty ⇒ Cont(more ⇒ (iter, rest ++ more))
-        case (iter, _)                                     ⇒ iter
-      }
-      case iter ⇒ input match {
-        /**
-         * FIXME: will not automatically feed input into next continuation until 'apply'
-         * is called again with more Input. Possibly need to implment Enumerator to make
-         * this automatic, as it would then be able to store unused Input. Another solution
-         * is to add a 'rest: Input' variable to Done, although this can have weird edge
-         * cases (my original implementation did that, I did not like it).
-         *
-         * As a workaround, an empty Chunk can be input to the Iteratee once it is able to
-         * process the waiting Input (see 'flatMap' for an automatic workaround).
-         */
-        case _: Chunk ⇒ Cont(more ⇒ (iter, input ++ more))
-        case _        ⇒ iter
-      }
+    /**
+     * Applies the given input to the Iteratee, returning the resulting Iteratee
+     * and the unused Input.
+     */
+    final def apply(input: Input): (Iteratee[A], Input) = this match {
+      case Cont(f) ⇒ f(input)
+      case iter    ⇒ (iter, input)
     }
 
-    final def get: A = this(EOF(None)) match {
+    final def get: A = this(EOF(None))._1 match {
       case Done(value) ⇒ value
       case Cont(_)     ⇒ sys.error("Divergent Iteratee")
       case Failure(e)  ⇒ throw e
@@ -172,7 +164,7 @@ object IO {
     final def flatMap[B](f: A ⇒ Iteratee[B]): Iteratee[B] = this match {
       case Done(value)       ⇒ f(value)
       case Cont(k: Chain[_]) ⇒ Cont(k :+ f)
-      case Cont(k)           ⇒ Cont(Chain(k, f)) //(Chunk.empty) <- uncomment for workaround to above FIXME
+      case Cont(k)           ⇒ Cont(Chain(k, f))
       case failure: Failure  ⇒ failure
     }
 
@@ -204,8 +196,11 @@ object IO {
   final case class Failure(exception: Throwable) extends Iteratee[Nothing]
 
   object IterateeRef {
-    def apply[A](initial: Iteratee[A]): IterateeRef[A] = new IterateeRef(initial)
-    def apply(): IterateeRef[Unit] = new IterateeRef(Iteratee.unit)
+    def sync[A](initial: Iteratee[A]): IterateeRefSync[A] = new IterateeRefSync(initial)
+    def sync(): IterateeRefSync[Unit] = new IterateeRefSync(Iteratee.unit)
+
+    def async[A](initial: Iteratee[A]): IterateeRefAsync[A] = new IterateeRefAsync(initial)
+    def async(): IterateeRefAsync[Unit] = new IterateeRefAsync(Iteratee.unit)
 
     class Map[K, V] private (refFactory: ⇒ IterateeRef[V], underlying: mutable.Map[K, IterateeRef[V]] = mutable.Map.empty[K, IterateeRef[V]]) extends mutable.Map[K, IterateeRef[V]] {
       def get(key: K) = Some(underlying.getOrElseUpdate(key, refFactory))
@@ -216,7 +211,8 @@ object IO {
     }
     object Map {
       def apply[K, V](refFactory: ⇒ IterateeRef[V]): IterateeRef.Map[K, V] = new Map(refFactory)
-      def apply[K](): IterateeRef.Map[K, Unit] = new Map(IterateeRef())
+      def sync[K](): IterateeRef.Map[K, Unit] = new Map(IterateeRef.sync())
+      def async[K](): IterateeRef.Map[K, Unit] = new Map(IterateeRef.async())
     }
   }
 
@@ -228,12 +224,33 @@ object IO {
    * Includes mutable implementations of flatMap, map, and apply which
    * update the internal reference and return Unit.
    */
-  final class IterateeRef[A](initial: Iteratee[A]) {
-    private var _value = initial
-    def flatMap(f: A ⇒ Iteratee[A]): Unit = _value = _value flatMap f
-    def map(f: A ⇒ A): Unit = _value = _value map f
-    def apply(input: Input): Unit = _value = _value(input)
-    def value: Iteratee[A] = _value
+  trait IterateeRef[A] {
+    def flatMap(f: A ⇒ Iteratee[A]): Unit
+    def map(f: A ⇒ A): Unit
+    def apply(input: Input): Unit
+  }
+
+  final class IterateeRefSync[A](initial: Iteratee[A]) extends IterateeRef[A] {
+    private var _value: (Iteratee[A], Input) = (initial, Chunk.empty)
+    def flatMap(f: A ⇒ Iteratee[A]): Unit = _value = _value match {
+      case (iter, chunk @ Chunk(bytes)) if bytes.nonEmpty ⇒ (iter flatMap f)(chunk)
+      case (iter, input)                                  ⇒ (iter flatMap f, input)
+    }
+    def map(f: A ⇒ A): Unit = _value = (_value._1 map f, _value._2)
+    def apply(input: Input): Unit = _value = _value._1(_value._2 ++ input)
+    def value: (Iteratee[A], Input) = _value
+  }
+
+  final class IterateeRefAsync[A](initial: Iteratee[A]) extends IterateeRef[A] {
+    import akka.dispatch.Future
+    private var _value: Future[(Iteratee[A], Input)] = Future((initial, Chunk.empty))
+    def flatMap(f: A ⇒ Iteratee[A]): Unit = _value = _value map {
+      case (iter, chunk @ Chunk(bytes)) if bytes.nonEmpty ⇒ (iter flatMap f)(chunk)
+      case (iter, input)                                  ⇒ (iter flatMap f, input)
+    }
+    def map(f: A ⇒ A): Unit = _value = _value map (v ⇒ (v._1 map f, v._2))
+    def apply(input: Input): Unit = _value = _value map (v ⇒ v._1(v._2 ++ input))
+    def future: Future[(Iteratee[A], Input)] = _value
   }
 
   /**
@@ -258,6 +275,20 @@ object IO {
     Cont(step(ByteString.empty))
   }
 
+  def takeWhile(p: (Byte) ⇒ Boolean): Iteratee[ByteString] = {
+    def step(taken: ByteString)(input: Input): (Iteratee[ByteString], Input) = input match {
+      case Chunk(more) ⇒
+        val (found, rest) = more span p
+        if (rest.isEmpty)
+          (Cont(step(taken ++ found)), Chunk.empty)
+        else
+          (Done(taken ++ found), Chunk(rest))
+      case eof ⇒ (Done(taken), eof)
+    }
+
+    Cont(step(ByteString.empty))
+  }
+
   /**
    * An Iteratee that returns a ByteString of the requested length.
    */
@@ -273,6 +304,22 @@ object IO {
     }
 
     Cont(step(ByteString.empty))
+  }
+
+  /**
+   * An Iteratee that ignores the specified number of bytes.
+   */
+  def drop(length: Int): Iteratee[Unit] = {
+    def step(left: Int)(input: Input): (Iteratee[Unit], Input) = input match {
+      case Chunk(more) ⇒
+        if (left > more.length)
+          (Cont(step(left - more.length)), Chunk.empty)
+        else
+          (Done(), Chunk(more drop left))
+      case eof ⇒ (Done(), eof)
+    }
+
+    Cont(step(length))
   }
 
   /**
@@ -304,6 +351,20 @@ object IO {
       else iter flatMap (a ⇒ step(left - 1, a :: list))
 
     step(length, Nil)
+  }
+
+  def peek(length: Int): Iteratee[ByteString] = {
+    def step(taken: ByteString)(input: Input): (Iteratee[ByteString], Input) = input match {
+      case Chunk(more) ⇒
+        val bytes = taken ++ more
+        if (bytes.length >= length)
+          (Done(bytes.take(length)), Chunk(bytes))
+        else
+          (Cont(step(bytes)), Chunk.empty)
+      case eof ⇒ (Cont(step(taken)), eof)
+    }
+
+    Cont(step(ByteString.empty))
   }
 
   def repeat(iter: Iteratee[Unit]): Iteratee[Unit] =
@@ -339,13 +400,9 @@ object IO {
         else result match {
           case (Done(value), rest) ⇒
             val (head, tail) = queue.dequeue
-            head(value) match {
-              //case Cont(Chain(f, q)) ⇒ run(f(rest), q ++ tail) <- can cause big slowdown, need to test if needed
-              case Cont(f) ⇒ run(f(rest), tail)
-              case iter    ⇒ run((iter, rest), tail)
-            }
+            run(head(value)(rest), tail)
           case (Cont(f), rest) ⇒
-            (Cont(new Chain(f, queue)), rest)
+            (Cont(Chain(f, queue)), rest)
           case _ ⇒ result
         }
       }
@@ -359,6 +416,7 @@ object IOManager {
   val global = akka.actor.Actor.actorOf(new IOManager()).start
 }
 
+// TODO: Support a pool of workers
 class IOManager(bufferSize: Int = 8192) extends Actor {
   import SelectionKey.{ OP_READ, OP_WRITE, OP_ACCEPT, OP_CONNECT }
   import IOWorker._
@@ -373,7 +431,7 @@ class IOManager(bufferSize: Int = 8192) extends Actor {
     case IO.Listen(server, address) ⇒
       val channel = ServerSocketChannel open ()
       channel configureBlocking false
-      channel.socket bind address
+      channel.socket bind (address, 1000) // TODO: make backlog configurable
       worker(Register(server, channel, OP_ACCEPT))
 
     case IO.Connect(socket, address) ⇒
@@ -402,7 +460,7 @@ private[akka] object IOWorker {
   case object Shutdown extends Request
 }
 
-private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dispatcher: akka.dispatch.MessageDispatcher) {
+private[akka] class IOWorker(ioManager: ActorRef, val bufferSize: Int, dispatcher: akka.dispatch.MessageDispatcher) {
   import SelectionKey.{ OP_READ, OP_WRITE, OP_ACCEPT, OP_CONNECT }
   import IOWorker._
 
@@ -428,11 +486,15 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
 
   private var writes = Map.empty[IO.WriteHandle, Queue[ByteBuffer]].withDefaultValue(Queue.empty)
 
+  private var closing = Set.empty[IO.Handle]
+
   private val buffer = ByteBuffer.allocate(bufferSize)
 
   val select = { () ⇒
     if (selector.isOpen) {
-      selector selectNow ()
+      // TODO: Make select behaviour configurable. Blocking 1ms reduces allocations during idle times
+      //selector selectNow ()
+      selector select 1
       val keys = selector.selectedKeys.iterator
       while (keys.hasNext) {
         val key = keys next ()
@@ -454,6 +516,12 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
             val queue = writes(handle)
             if (queue.isEmpty) addOps(handle, OP_WRITE)
             writes += (handle -> queue.enqueue(data))
+          }
+        case Close(handle: IO.WriteHandle) ⇒
+          if (writes contains handle) {
+            closing += handle
+          } else {
+            cleanup(handle, None)
           }
         case Close(handle) ⇒
           cleanup(handle, None)
@@ -508,6 +576,7 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
   }
 
   private def cleanup(handle: IO.Handle, cause: Option[Exception]) {
+    closing -= handle
     handle match {
       case server: IO.ServerHandle  ⇒ accepted -= server
       case writable: IO.WriteHandle ⇒ writes -= writable
@@ -520,7 +589,6 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
           handle.owner ! IO.Closed(handle, cause)
         } catch {
           case e: ActorInitializationException ⇒
-            EventHandler debug (this, "IO.Handle's owner not running")
         }
       case None ⇒
     }
@@ -582,8 +650,12 @@ private[akka] final class IOWorker(ioManager: ActorRef, val bufferSize: Int, dis
       val writeLen = channel write buf
       if (buf.remaining == 0) {
         if (bufs.isEmpty) {
-          writes -= handle
-          removeOps(handle, OP_WRITE)
+          if (closing(handle)) {
+            cleanup(handle, None)
+          } else {
+            writes -= handle
+            removeOps(handle, OP_WRITE)
+          }
         } else {
           writes += (handle -> bufs)
           write(handle, channel)

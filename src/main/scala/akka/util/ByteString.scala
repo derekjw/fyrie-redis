@@ -1,6 +1,7 @@
 package akka.util
 
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 import scala.collection.IndexedSeqOptimized
 import scala.collection.mutable.{ Builder, ArrayBuilder }
@@ -77,8 +78,8 @@ object ByteString {
       else buffer
     }
 
-    def utf8String: String =
-      new String(if (startIndex == 0 && endIndex == bytes.length) bytes else toArray, "UTF-8")
+    def decodeString(charset: String): String =
+      new String(if (startIndex == 0 && endIndex == bytes.length) bytes else toArray, charset)
 
     def ++(that: ByteString): ByteString = that match {
       case b: ByteString1  ⇒ ByteStrings(this, b)
@@ -200,7 +201,8 @@ object ByteString {
 
     def asByteBuffer: ByteBuffer = compact.asByteBuffer
 
-    def utf8String: String = compact.utf8String
+    def decodeString(charset: String): String = compact.decodeString(charset)
+
   }
 
 }
@@ -210,7 +212,8 @@ sealed trait ByteString extends IndexedSeq[Byte] with IndexedSeqOptimized[Byte, 
   def ++(that: ByteString): ByteString
   def compact: ByteString
   def asByteBuffer: ByteBuffer
-  def toByteBuffer: ByteBuffer = ByteBuffer.wrap(toArray)
-  def utf8String: String
-  def mapI(f: Byte ⇒ Int): ByteString = map(f andThen (_.toByte))
+  final def toByteBuffer: ByteBuffer = ByteBuffer.wrap(toArray)
+  final def utf8String: String = decodeString("UTF-8")
+  def decodeString(charset: String): String
+  final def mapI(f: Byte ⇒ Int): ByteString = map(f andThen (_.toByte))
 }
