@@ -7,7 +7,6 @@ import specification._
 import akka.dispatch.{ Future, PromiseStream }
 import akka.testkit.{ filterEvents, EventFilter }
 import akka.actor.{ Actor, ActorRef }
-import Actor.actorOf
 import pubsub._
 import serialization.Parse
 
@@ -35,9 +34,10 @@ class PubSubSpec extends Specification with PubSubHelper {
 
 trait PubSubHelper { self: Specification ⇒
   val pubsub = new {
+    implicit val system = TestSystem.system
     val redis = RedisClient()
     val ps = PromiseStream[String]()
-    val sub = actorOf(new TestSubscriber(redis, ps))
+    val sub = system.actorOf(new TestSubscriber(redis, ps))
 
     def get(msgs: String*) = ((success: Result) /: msgs)((r, m) ⇒ r and (ps.dequeue.get must_== m))
 

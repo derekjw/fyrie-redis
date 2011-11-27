@@ -3,8 +3,15 @@ package net.fyrie.redis
 import org.specs2._
 import specification._
 import execute._
+import akka.actor.ActorSystem
+
+object TestSystem {
+  val system = ActorSystem()
+}
 
 trait TestClient { self: mutable.Specification ⇒
+
+  implicit val system = TestSystem.system
 
   implicit val arguments = args(sequential = true)
 
@@ -27,6 +34,8 @@ trait TestClient { self: mutable.Specification ⇒
 }
 
 trait UnstableClient { self: mutable.Specification ⇒
+
+  implicit val system = TestSystem.system
 
   implicit val arguments = args(sequential = true)
 

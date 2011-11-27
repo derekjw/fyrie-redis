@@ -8,16 +8,15 @@ import pubsub._
 import protocol._
 
 import akka.actor.{ Actor, ActorRef, IO, IOManager, Scheduler, ActorInitializationException }
-import Actor.{ actorOf }
 import akka.util.ByteString
-import akka.event.EventHandler
+import akka.util.duration._
 
 import java.util.concurrent.TimeUnit
 import java.net.ConnectException
 
 import scala.collection.mutable.Queue
 
-private[redis] final class RedisClientSession(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
+private[redis] final class RedisClientSession(host: String, port: Int, config: RedisClientConfig) extends Actor {
 
   var socket: IO.SocketHandle = _
   var worker: ActorRef = _
@@ -27,10 +26,9 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
   var requestCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
 
   override def preStart = {
-    EventHandler info (this, "Connecting")
-    worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
-    self link worker
-    socket = IO.connect(ioManager, host, port, worker)
+    // EventHandler info (this, "Connecting")
+    worker = system.actorOf(new RedisClientWorker(host, port, config, self))
+    socket = IO.connect(host, port, worker)
     worker ! Socket(socket)
   }
 
@@ -62,11 +60,11 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
           case req: Request      ⇒ socket write req.bytes
           case req: MultiRequest ⇒ sendMulti(req)
         }
-        if (waiting.nonEmpty) EventHandler info (this, "Retrying " + waiting.length + " commands")
+        // if (waiting.nonEmpty) EventHandler info (this, "Retrying " + waiting.length + " commands")
       }
 
     case Disconnect ⇒
-      EventHandler info (this, "Shutting down")
+      // EventHandler info (this, "Shutting down")
       worker ! Disconnect
       self.stop()
 
@@ -91,7 +89,7 @@ private[redis] final class RedisClientSession(ioManager: ActorRef, host: String,
 
 }
 
-private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
+private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: String, port: Int, config: RedisClientConfig) extends Actor {
 
   var socket: IO.SocketHandle = _
   var worker: ActorRef = _
@@ -100,10 +98,9 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
 
   override def preStart = {
     client = new RedisClientSub(self, config)
-    EventHandler info (this, "Connecting")
-    worker = actorOf(new RedisClientWorker(ioManager, host, port, config))
-    self link worker
-    socket = IO.connect(ioManager, host, port, worker)
+    // EventHandler info (this, "Connecting")
+    worker = system.actorOf(new RedisClientWorker(host, port, config, self))
+    socket = IO.connect(host, port, worker)
     worker ! Socket(socket)
     worker ! Subscriber(listener)
   }
@@ -123,7 +120,7 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
       socket write (client.punsubscribe(patterns))
 
     case Disconnect ⇒
-      EventHandler info (this, "Shutting down")
+      // EventHandler info (this, "Shutting down")
       socket.close
       self.stop()
 
@@ -131,13 +128,13 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(ioManager:
 
 }
 
-private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, port: Int, config: RedisClientConfig) extends Actor {
+private[redis] final class RedisClientWorker(host: String, port: Int, config: RedisClientConfig, parent: ActorRef) extends Actor {
   import Constants._
   import Iteratees._
 
   var socket: IO.SocketHandle = _
 
-  val state = IO.IterateeRef()
+  val state = IO.IterateeRef.sync()
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
@@ -156,38 +153,38 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
       socket = handle
 
     case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect ⇒
-      EventHandler info (this, "Connection refused, retrying in 1 second")
-      Scheduler.scheduleOnce(self, IO.Closed(handle, None), 1, TimeUnit.SECONDS)
+      // EventHandler info (this, "Connection refused, retrying in 1 second")
+      system.scheduler.scheduleOnce(self, IO.Closed(handle, None), 1 second)
 
     case IO.Closed(handle, cause) if socket == handle && config.autoReconnect ⇒
-      EventHandler info (this, "Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
-      socket = IO.connect(ioManager, host, port, self)
+      // EventHandler info (this, "Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
+      socket = IO.connect(host, port, self)
       sendToSupervisor(Socket(socket))
 
     case IO.Closed(handle, cause) if socket == handle ⇒
-      EventHandler info (this, "Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
+      // EventHandler info (this, "Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       sendToSupervisor(Disconnect)
       state(IO EOF cause)
 
     case Run ⇒
-      val source = channel
+      val source = sender
       for {
         _ ← state
         result ← readResult
       } yield {
-        source tryTell result
+        source ! result
         onResult()
       }
 
     case msg: MultiRun ⇒
-      val source = channel
+      val source = sender
       for {
         _ ← state
         _ ← readResult
         _ ← IO.fold((), msg.promises)((_, p) ⇒ readResult map (p completeWithResult))
         exec ← readResult
       } yield {
-        source tryTell exec
+        source ! exec
         onResult()
       }
 
@@ -212,7 +209,7 @@ private[redis] final class RedisClientWorker(ioManager: ActorRef, host: String, 
 
   def sendToSupervisor(msg: Any) {
     try {
-      self.supervisor foreach (_ ! msg)
+      parent ! msg
     } catch {
       case e: ActorInitializationException ⇒ // ignore, probably shutting down
     }

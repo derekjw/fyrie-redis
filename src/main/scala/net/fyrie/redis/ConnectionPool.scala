@@ -3,7 +3,6 @@ package redis
 
 import messages.{ RequestClient, ReleaseClient, Disconnect }
 import akka.actor._
-import akka.actor.Actor.actorOf
 import akka.dispatch.{ Promise, Future }
 import collection.immutable.Queue
 
