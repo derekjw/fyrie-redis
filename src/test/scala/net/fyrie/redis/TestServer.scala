@@ -4,9 +4,24 @@ import org.specs2._
 import specification._
 import execute._
 import akka.actor.ActorSystem
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigParseOptions
 
 object TestSystem {
-  val system = ActorSystem()
+  val config = ActorSystem.DefaultConfigurationLoader.defaultConfig.withFallback(
+    ConfigFactory.parseString("""
+      akka {
+        actor {
+          default-dispatcher {
+            core-pool-size-factor = 1.0
+            max-pool-size-factor  = 1.0
+            throughput = 100
+          }
+        }
+      }
+      """, ConfigParseOptions.defaults))
+
+  val system = ActorSystem("test system", config)
 }
 
 trait TestClient { self: mutable.Specification ⇒

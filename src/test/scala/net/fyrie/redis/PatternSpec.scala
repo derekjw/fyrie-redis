@@ -13,8 +13,6 @@ class PatternsSpec extends mutable.Specification {
 
   implicit val timeout = Timeout(60000)
 
-  val timeoutMs = timeout.duration.toMillis
-
   def scatterGatherWithList(ops: Int) = {
     val client = RedisClient(config = RedisClientConfig(timeout = timeout))
 
@@ -40,8 +38,8 @@ class PatternsSpec extends mutable.Specification {
     }
 
     val future = for {
-      _ ← Future.traverse(keys, timeoutMs)(scatter)
-      n ← Future.traverse(keys, timeoutMs)(gather)
+      _ ← Future.traverse(keys)(scatter)
+      n ← Future.traverse(keys)(gather)
     } yield n.sum
 
     val result = future.get
@@ -57,9 +55,9 @@ class PatternsSpec extends mutable.Specification {
   }
 
   "Scatter/Gather" >> { success
-    //"100 lists x 2000 items" ! { scatterGatherWithList(2000) }
-    //"100 lists x 5000 items" ! { scatterGatherWithList(5000) }
-    //"100 lists x 10000 items" ! { scatterGatherWithList(10000) }
+    "100 lists x 2000 items" ! { scatterGatherWithList(2000) }
+    "100 lists x 5000 items" ! { scatterGatherWithList(5000) }
+    "100 lists x 10000 items" ! { scatterGatherWithList(10000) }
   }
 
 }

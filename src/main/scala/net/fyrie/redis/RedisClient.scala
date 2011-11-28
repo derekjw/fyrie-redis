@@ -8,7 +8,7 @@ import Constants.EOL
 import types._
 import serialization.{ Parse, Store }
 
-import akka.actor.{ Actor, ActorRef, PoisonPill, Timeout, ActorSystem }
+import akka.actor.{ Actor, ActorRef, PoisonPill, Timeout, ActorSystem, Props }
 import akka.util.ByteString
 import akka.dispatch.{ Future, Promise }
 
@@ -25,9 +25,9 @@ object RedisClient {
     system.actorOf(new RedisSubscriberSession(listener)(host, port, config))
 }
 
-final class RedisClient(val host: String, val port: Int, config: RedisClientConfig)(implicit val system: ActorSystem) extends RedisClientAsync(config) {
+final class RedisClient(val host: String, val port: Int, val config: RedisClientConfig)(implicit val system: ActorSystem) extends RedisClientAsync(config) {
 
-  protected val actor = system.actorOf(new RedisClientSession(host, port, config))
+  protected val actor = system.actorOf(Props(creator = () => new RedisClientSession(host, port, config), timeout = timeout))
 
   protected val pool: ActorRef = system.actorOf(new ConnectionPool(config.poolSize, () ⇒
     new RedisClientPoolWorker(system.actorOf(new RedisClientSession(host, port, config)), config, pool)))
@@ -105,7 +105,7 @@ sealed trait ConfigurableRedisClient {
 }
 
 sealed abstract class RedisClientAsync(config: RedisClientConfig) extends Commands[Future] with ConfigurableRedisClient {
-  implicit private val timeout = if (config.timeout == NoTimeout) implicitly[Timeout] else config.timeout
+  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
 
   final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
@@ -113,7 +113,7 @@ sealed abstract class RedisClientAsync(config: RedisClientConfig) extends Comman
 }
 
 sealed abstract class RedisClientSync(config: RedisClientConfig) extends Commands[({ type λ[α] = α })#λ] with ConfigurableRedisClient {
-  implicit private val timeout = if (config.timeout == NoTimeout) implicitly[Timeout] else config.timeout
+  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
 
   final private[redis] def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
 
@@ -121,13 +121,15 @@ sealed abstract class RedisClientSync(config: RedisClientConfig) extends Command
 }
 
 sealed abstract class RedisClientQuiet(config: RedisClientConfig) extends Commands[({ type λ[_] = Unit })#λ] with ConfigurableRedisClient {
+  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
+
   final private[redis] def send(in: List[ByteString]) = actor ! Request(format(in))
 
   val quiet: RedisClientQuiet = this
 }
 
 sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
-  implicit private val timeout = if (config.timeout == NoTimeout) implicitly[Timeout] else config.timeout
+  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
 
   final private[redis] def send(in: List[ByteString]): Queued[Future[Any]] = {
     val result = Promise[RedisType]()
@@ -163,7 +165,7 @@ sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Comman
 
 sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Commands[Future]()(ResultFunctor.async) {
   self: RedisClientPoolWorker ⇒
-  implicit private val timeout = if (config.timeout == NoTimeout) implicitly[Timeout] else config.timeout
+  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
 
   final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
 
@@ -226,6 +228,8 @@ private[redis] final class RedisClientSub(protected val actor: ActorRef, config:
 
   final def send(in: List[ByteString]): ByteString = format(in)
 
+  implicit def timeout = system.settings.ActorTimeout
+
   def subscribe[A: Store](channels: Iterable[A]): ByteString = send(SUBSCRIBE :: (channels.map(Store(_))(collection.breakOut): List[ByteString]))
 
   def unsubscribe[A: Store](channels: Iterable[A]): ByteString = send(UNSUBSCRIBE :: (channels.map(Store(_))(collection.breakOut): List[ByteString]))
@@ -240,6 +244,8 @@ import commands._
 private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunctor[Result]) extends Keys[Result] with Servers[Result] with Strings[Result] with Lists[Result] with Sets[Result] with SortedSets[Result] with Hashes[Result] with PubSub[Result] with Scripts[Result] {
 
   implicit def system: ActorSystem
+
+  implicit def timeout: Timeout
 
   protected def actor: ActorRef
 
