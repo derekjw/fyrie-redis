@@ -1,14 +1,11 @@
 package net.fyrie
 
-import akka.actor.Timeout
 import akka.util.{ByteString, Duration}
 import akka.dispatch.{ Future, Promise }
 import redis.serialization.Parse
 
 package object redis extends ParseResult {
   implicit def doubleToRedisScore(value: Double): RedisScore = InclusiveScore(value)
-
-  val NoTimeout = Timeout(Duration.MinusInf)
 }
 
 package redis {

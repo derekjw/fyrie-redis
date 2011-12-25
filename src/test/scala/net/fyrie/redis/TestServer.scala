@@ -1,30 +1,34 @@
 package net.fyrie.redis
 
 import org.specs2._
-import specification._
-import execute._
+import org.specs2.specification._
+import org.specs2.execute._
 import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
-import com.typesafe.config.ConfigParseOptions
+import akka.dispatch.{ Future, Await }
+import akka.util.Duration
 
 object TestSystem {
-  val config = ActorSystem.DefaultConfigurationLoader.defaultConfig.withFallback(
-    ConfigFactory.parseString("""
+  val config = com.typesafe.config.ConfigFactory.parseString("""
       akka {
+        event-handlers = ["akka.testkit.TestEventListener"]
+        loglevel = "WARNING"
         actor {
           default-dispatcher {
+            core-pool-size-min = 4
             core-pool-size-factor = 1.0
-            max-pool-size-factor  = 1.0
-            throughput = 100
+            throughput = 10
           }
         }
       }
-      """, ConfigParseOptions.defaults))
+      """)
 
-  val system = ActorSystem("test system", config)
+  val system = ActorSystem("TestSystem", config)
 }
 
 trait TestClient { self: mutable.Specification ⇒
+
+  implicit def futureResult[T](future: Future[T])(implicit toResult: T => Result): Result =
+    Await.result(future map toResult, akka.util.Timeout(1000).duration) //Duration.Inf)
 
   implicit val system = TestSystem.system
 

@@ -74,3 +74,4 @@ class ScriptsSpec extends mutable.Specification with UnstableClient {
   }
 
 }
+

@@ -6,7 +6,7 @@ import akka.actor._
 import akka.dispatch.{ Promise, Future }
 import collection.immutable.Queue
 
-private[redis] class ConnectionPool(initialSize: Range, factory: () ⇒ RedisClientPoolWorker) extends Actor {
+private[redis] class ConnectionPool(initialSize: Range, factory: (ActorRefFactory) ⇒ RedisClientPoolWorker) extends Actor {
   var ready: List[RedisClientPoolWorker] = Nil
   var active: Set[RedisClientPoolWorker] = Set.empty
   var limit: Range = initialSize
@@ -24,7 +24,7 @@ private[redis] class ConnectionPool(initialSize: Range, factory: () ⇒ RedisCli
             h
           case _ ⇒
             size += 1
-            factory()
+            factory(context)
         }
         active += client
         promise complete Right(client)
@@ -48,7 +48,6 @@ private[redis] class ConnectionPool(initialSize: Range, factory: () ⇒ RedisCli
       active foreach (_.disconnect)
       active = Set.empty
       queue foreach (_ complete Left(RedisConnectionException("Connection pool shutting down")))
-      self.stop
 
   }
 

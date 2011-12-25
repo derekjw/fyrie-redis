@@ -2,18 +2,17 @@ package net.fyrie
 package redis
 
 import actors._
-import messages.{ Request, MultiRequest, Disconnect, RequestCallback, ResultCallback, ReleaseClient, RequestClient }
+import messages._
 import protocol.Constants
 import Constants.EOL
 import types._
 import serialization.{ Parse, Store }
 
-import akka.actor.{ Actor, ActorRef, PoisonPill, Timeout, ActorSystem, Props }
-import akka.util.ByteString
-import akka.dispatch.{ Future, Promise }
+import akka.actor._
+import akka.dispatch.{ Future, Promise, Await }
+import akka.util.{ ByteString, Duration }
 
-case class RedisClientConfig(timeout: Timeout = NoTimeout,
-                             autoReconnect: Boolean = true,
+case class RedisClientConfig(autoReconnect: Boolean = true,
                              retryOnReconnect: Boolean = true,
                              poolSize: Range = 10 to 50)
 
@@ -22,25 +21,23 @@ object RedisClient {
     new RedisClient(host, port, config)
 
   def subscriber(listener: ActorRef)(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig())(implicit system: ActorSystem): ActorRef =
-    system.actorOf(new RedisSubscriberSession(listener)(host, port, config))
+    system.actorOf(Props(new RedisSubscriberSession(listener)(host, port, config)))
 }
 
 final class RedisClient(val host: String, val port: Int, val config: RedisClientConfig)(implicit val system: ActorSystem) extends RedisClientAsync(config) {
 
-  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
+  protected val actor = system.actorOf(Props(new RedisClientSession(host, port, config)))
 
-  protected val actor = system.actorOf(Props(creator = () => new RedisClientSession(host, port, config), timeout = timeout))
-
-  protected val pool: ActorRef = system.actorOf(new ConnectionPool(config.poolSize, () ⇒
-    new RedisClientPoolWorker(system.actorOf(new RedisClientSession(host, port, config)), config, pool)))
+  protected val pool: ActorRef = system.actorOf(Props(new ConnectionPool(config.poolSize, parent ⇒
+    new RedisClientPoolWorker(parent.actorOf(Props(new RedisClientSession(host, port, config))), config, pool))))
 
   def disconnect = {
-    actor ! Disconnect
-    pool ! Disconnect
+    system stop actor
+    system stop pool
   }
 
   val sync: RedisClientSync = new RedisClientSync(config) {
-    def timeout = RedisClient.this.timeout
+    def system = RedisClient.this.system
     def actor = RedisClient.this.actor
 
     def async: RedisClientAsync = RedisClient.this
@@ -48,6 +45,7 @@ final class RedisClient(val host: String, val port: Int, val config: RedisClient
   }
 
   val quiet: RedisClientQuiet = new RedisClientQuiet(config) {
+    def system = RedisClient.this.system
     def actor = RedisClient.this.actor
 
     def async: RedisClientAsync = RedisClient.this
@@ -56,7 +54,6 @@ final class RedisClient(val host: String, val port: Int, val config: RedisClient
 
   def multi[T](block: (RedisClientMulti) ⇒ Queued[T]): T = {
     val rq = new RedisClientMulti(config) {
-      def timeout = RedisClient.this.timeout
       def system = RedisClient.this.system
       def actor = RedisClient.this.actor
     }
@@ -70,7 +67,7 @@ final class RedisClient(val host: String, val port: Int, val config: RedisClient
   }
 
   def subscriber(listener: ActorRef): ActorRef =
-    system.actorOf(new RedisSubscriberSession(listener)(host, port, config))
+    system.actorOf(Props(new RedisSubscriberSession(listener)(host, port, config)))
 
   /**
    * Callback to be run when a request is sent to the server. The callback
@@ -107,29 +104,32 @@ sealed trait ConfigurableRedisClient {
 }
 
 sealed abstract class RedisClientAsync(config: RedisClientConfig) extends Commands[Future] with ConfigurableRedisClient {
-  implicit def timeout: Timeout
-
-  final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
-
   val async: RedisClientAsync = this
+
+  final private[redis] def send(in: List[ByteString]): Future[Any] = {
+    val promise = Promise[RedisType]()
+    actor ! Request(PromiseRequestor(promise), format(in))
+    promise
+  }
 }
 
 sealed abstract class RedisClientSync(config: RedisClientConfig) extends Commands[({ type λ[α] = α })#λ] with ConfigurableRedisClient {
-  implicit def timeout: Timeout
-
-  final private[redis] def send(in: List[ByteString]): Any = (actor ? Request(format(in))).get
-
   val sync: RedisClientSync = this
+
+  final private[redis] def send(in: List[ByteString]): Any = {
+    val promise = Promise[RedisType]()
+    actor ! Request(PromiseRequestor(promise), format(in))
+    Await.result(promise, Duration.Inf)
+  }
 }
 
 sealed abstract class RedisClientQuiet(config: RedisClientConfig) extends Commands[({ type λ[_] = Unit })#λ] with ConfigurableRedisClient {
-  final private[redis] def send(in: List[ByteString]) = actor ! Request(format(in))
-
   val quiet: RedisClientQuiet = this
+
+  final private[redis] def send(in: List[ByteString]) = actor ! Request(NoRequestor, format(in))
 }
 
 sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Commands[({ type λ[α] = Queued[Future[α]] })#λ]()(ResultFunctor.multi) {
-  implicit def timeout: Timeout
 
   implicit def system: ActorSystem
 
@@ -139,7 +139,8 @@ sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Comman
   }
 
   final private[redis] def exec[T](q: Queued[T]): T = {
-    actor ? MultiRequest(format(List(Constants.MULTI)), q.requests, format(List(Constants.EXEC))) foreach {
+    val promise = Promise[RedisType]()
+    promise foreach {
       case RedisMulti(m) ⇒
         var responses = q.responses
         (q.responses.iterator zip (q.requests.iterator map (_._2.value))) foreach {
@@ -161,6 +162,7 @@ sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Comman
         val re = RedisProtocolException("Unexpected response")
         q.responses foreach (_.complete(Left(re)))
     }
+    actor ! MultiRequest(PromiseRequestor(promise), format(List(Constants.MULTI)), q.requests, format(List(Constants.EXEC)))
     q.value
   }
 }
@@ -168,7 +170,11 @@ sealed abstract class RedisClientMulti(config: RedisClientConfig) extends Comman
 sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Commands[Future]()(ResultFunctor.async) {
   self: RedisClientPoolWorker ⇒
 
-  final private[redis] def send(in: List[ByteString]): Future[Any] = actor ? Request(format(in))
+  final private[redis] def send(in: List[ByteString]): Future[Any] = {
+    val promise = Promise[RedisType]()
+    actor ! Request(PromiseRequestor(promise), format(in))
+    promise
+  }
 
   final private[redis] def run[T](block: (RedisClientWatch) ⇒ Future[Queued[T]]): Future[T] = {
     val promise = Promise[T]()
@@ -177,10 +183,11 @@ sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Comman
   }
 
   final private[redis] def exec[T](promise: Promise[T], block: (RedisClientWatch) ⇒ Future[Queued[T]]): Unit = {
-    block(this) onException { case e ⇒ promise complete Left(e) } foreach { q ⇒
-      actor ? MultiRequest(format(List(Constants.MULTI)), q.requests, format(List(Constants.EXEC))) foreach {
+    block(this) onFailure { case e ⇒ promise complete Left(e) } foreach { q ⇒
+      val multiPromise = Promise[RedisType]()
+      multiPromise foreach {
         case RedisMulti(None) ⇒
-          if (!promise.isExpired) exec(promise, block) else this.release
+          exec(promise, block) // TODO: add timeout?
         case RedisMulti(m) ⇒
           var responses = q.responses
           (q.responses.iterator zip (q.requests.iterator map (_._2.value))) foreach {
@@ -205,11 +212,11 @@ sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Comman
           q.responses foreach (_.complete(Left(re)))
           promise complete Left(re)
       }
+      actor ! MultiRequest(PromiseRequestor(multiPromise), format(List(Constants.MULTI)), q.requests, format(List(Constants.EXEC)))
     }
   }
 
   private val rq = new RedisClientMulti(config) {
-    def timeout = RedisClientWatch.this.timeout
     def system = RedisClientWatch.this.system
     def actor = RedisClientWatch.this.actor
   }
@@ -221,12 +228,11 @@ sealed abstract class RedisClientWatch(config: RedisClientConfig) extends Comman
 }
 
 private[redis] final class RedisClientPoolWorker(protected val actor: ActorRef, config: RedisClientConfig, pool: ActorRef)(implicit val system: ActorSystem) extends RedisClientWatch(config) {
-  implicit val timeout = if (config.timeout == NoTimeout) system.settings.ActorTimeout else config.timeout
   def disconnect = actor ! Disconnect
   def release = pool ! ReleaseClient(this)
 }
 
-private[redis] final class RedisClientSub(protected val actor: ActorRef, config: RedisClientConfig) extends Commands[({ type X[_] = ByteString })#X] {
+private[redis] final class RedisClientSub(protected val actor: ActorRef, config: RedisClientConfig, val system: ActorSystem) extends Commands[({ type X[_] = ByteString })#X] {
   import Constants._
 
   final def send(in: List[ByteString]): ByteString = format(in)
@@ -243,6 +249,8 @@ private[redis] final class RedisClientSub(protected val actor: ActorRef, config:
 
 import commands._
 private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunctor[Result]) extends Keys[Result] with Servers[Result] with Strings[Result] with Lists[Result] with Sets[Result] with SortedSets[Result] with Hashes[Result] with PubSub[Result] with Scripts[Result] {
+
+  implicit def system: ActorSystem
 
   protected def actor: ActorRef
 

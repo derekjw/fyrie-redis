@@ -9,13 +9,25 @@ import akka.dispatch.Promise
 import types.RedisType
 import serialization.Store
 
+private[redis] sealed trait Requestor {
+  def respond(value: RedisType): Unit
+  def failure(err: Exception): Unit
+}
+private[redis] case object NoRequestor extends Requestor {
+  def respond(value: RedisType) = ()
+  def failure(err: Exception) = ()
+}
+private[redis] case class PromiseRequestor(promise: Promise[RedisType]) extends Requestor {
+  def respond(value: RedisType) = promise success value
+  def failure(err: Exception) = promise failure err
+}
+
 private[redis] sealed trait Message
 private[redis] sealed trait RequestMessage extends Message
-private[redis] case class Request(bytes: ByteString) extends RequestMessage
-private[redis] case class MultiRequest(multi: ByteString, cmds: Seq[(ByteString, Promise[RedisType])], exec: ByteString) extends RequestMessage
+private[redis] case class Request(requestor: Requestor, bytes: ByteString) extends RequestMessage
+private[redis] case class MultiRequest(requestor: Requestor, multi: ByteString, cmds: Seq[(ByteString, Promise[RedisType])], exec: ByteString) extends RequestMessage
 private[redis] case object Disconnect extends Message
-private[redis] case object Run extends Message
-private[redis] case class MultiRun(promises: Seq[Promise[RedisType]]) extends Message
+private[redis] case class MultiRun(requestor: Requestor, promises: Seq[Promise[RedisType]]) extends Message
 private[redis] case class Socket(handle: IO.SocketHandle) extends Message
 private[redis] case object Received extends Message
 private[redis] case class Subscriber(listener: ActorRef) extends Message

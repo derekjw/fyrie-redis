@@ -2,8 +2,8 @@ package net.fyrie.redis
 
 import org.specs2._
 
-import akka.actor.Timeout
-import akka.dispatch.Future
+import akka.dispatch.{ Future, Await }
+import akka.util.Duration
 
 class PatternsSpec extends mutable.Specification {
 
@@ -11,10 +11,8 @@ class PatternsSpec extends mutable.Specification {
 
   implicit val arguments = args(sequential = true)
 
-  implicit val timeout = Timeout(60000)
-
   def scatterGatherWithList(ops: Int) = {
-    val client = RedisClient(config = RedisClientConfig(timeout = timeout))
+    val client = RedisClient(config = RedisClientConfig(retryOnReconnect = false))
 
     client.sync.flushdb
 
@@ -42,7 +40,7 @@ class PatternsSpec extends mutable.Specification {
       n ← Future.traverse(keys)(gather)
     } yield n.sum
 
-    val result = future.get
+    val result = Await.result(future, Duration.Inf)
 
     val elapsed = (System.nanoTime - start) / 1000000000.0
     val opsPerSec = (100 * ops * 2) / elapsed
@@ -54,10 +52,30 @@ class PatternsSpec extends mutable.Specification {
     result === ((1 to ops).sum * 100)
   }
 
-  "Scatter/Gather" >> { success
+  def incrBench(ops: Int) = {
+    val client = RedisClient(config = RedisClientConfig(retryOnReconnect = false))
+
+    client.sync.flushdb
+
+    val start = System.nanoTime
+
+    (1 to ops) foreach (_ => client.quiet incr "inctest")
+    val result = client.sync get "inctest"
+
+    val elapsed = (System.nanoTime - start) / 1000000000.0
+    val opsPerSec = ops / elapsed
+
+    println("Operations per run: " + ops + " elapsed: " + elapsed + " ops per second: " + opsPerSec.toInt)
+
+    client.disconnect
+
+    result.parse[Int] === Some(ops)
+  }
+
+  "Scatter/Gather" >> {
     "100 lists x 2000 items" ! { scatterGatherWithList(2000) }
     "100 lists x 5000 items" ! { scatterGatherWithList(5000) }
-    "100 lists x 10000 items" ! { scatterGatherWithList(10000) }
+    "1000000" ! { incrBench(1000000) }
   }
 
 }

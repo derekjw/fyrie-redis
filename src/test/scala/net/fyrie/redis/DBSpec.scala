@@ -115,28 +115,27 @@ class KeysSpec extends mutable.Specification with TestClient {
 
   "Multi exec commands" >> {
     "should work with single commands" ! client { r ⇒
-      val result = r.multi { rq ⇒
+      r.multi { rq ⇒
         rq.set("testkey1", "testvalue1")
-      }
-      result.get must_== ()
+      } map (_ === ())
     }
     "should work with several commands" ! client { r ⇒
-      val result = r.multi { rq ⇒
+      r.multi { rq ⇒
         for {
           _ ← rq.set("testkey1", "testvalue1")
           _ ← rq.set("testkey2", "testvalue2")
           x ← rq.mget(List("testkey1", "testkey2")).parse[String]
         } yield x
-      }
-      result.get must_== List(Some("testvalue1"), Some("testvalue2"))
+      } map (_ === List(Some("testvalue1"), Some("testvalue2")))
     }
     "should work with a list of commands" ! client { r ⇒
       val values = List.range(1, 100)
-      val result = r.multi { rq ⇒
-        val setq = (Queued[Any](()) /: values)((q, v) ⇒ q flatMap (_ ⇒ rq.set(v, v * 2)))
-        (setq.map(_ ⇒ List[Future[Option[Int]]]()) /: values)((q, v) ⇒ q flatMap (l ⇒ rq.get(v).parse[Int].map(_ :: l))).map(_.reverse)
-      }
-      Future.sequence(result).get.flatten must_== values.map(2*)
+      Future sequence {
+        r.multi { rq ⇒
+          val setq = (Queued[Any](()) /: values)((q, v) ⇒ q flatMap (_ ⇒ rq.set(v, v * 2)))
+          (setq.map(_ ⇒ List[Future[Option[Int]]]()) /: values)((q, v) ⇒ q flatMap (l ⇒ rq.get(v).parse[Int].map(_ :: l))).map(_.reverse)
+        }
+      } map (_.flatten === values.map(2*))
     }
     "should throw an error" ! client { r ⇒
       filterEvents(EventFilter[RedisErrorException]("ERR Operation against a key holding the wrong kind of value")) {
@@ -147,32 +146,44 @@ class KeysSpec extends mutable.Specification with TestClient {
             y ← rq.get("a").parse[String]
           } yield (x, y)
         }
-        result._1.get must throwA[RedisErrorException]
-        result._2.get must_== Some("abc")
+        for {
+          a <- result._1 recover { case _: RedisErrorException => success }
+          b <- result._2
+        } yield {
+          b === Some("abc")
+        }
       }
     }
     "should handle invalid requests" ! client { r ⇒
-      val result = r.multi { rq ⇒
+      filterEvents(EventFilter[RedisErrorException]("ERR Operation against a key holding the wrong kind of value")) {
+        val result = r.multi { rq ⇒
+          for {
+            _ ← rq.set("testkey1", "testvalue1")
+            _ ← rq.set("testkey2", "testvalue2")
+            x ← rq.mget(List[String]()).parse[String]
+            y ← rq.mget(List("testkey1", "testkey2")).parse[String]
+          } yield (x, y)
+        }
         for {
-          _ ← rq.set("testkey1", "testvalue1")
-          _ ← rq.set("testkey2", "testvalue2")
-          x ← rq.mget(List[String]()).parse[String]
-          y ← rq.mget(List("testkey1", "testkey2")).parse[String]
-        } yield (x, y)
+          a <- result._1 recover { case _: RedisErrorException => success }
+          b <- result._2
+        } yield {
+          b === List(Some("testvalue1"), Some("testvalue2"))
+        }
       }
-      result._1.get must throwA[RedisErrorException]
-      result._2.get must_== List(Some("testvalue1"), Some("testvalue2"))
     }
   }
 
   "watch" >> {
     "should fail without watch" ! client { r ⇒
-      r.sync.set("key", 0)
-      val clients = List.fill(10)(RedisClient())
-      val futures = for (client ← clients; _ ← 1 to 10) yield client.get("key").parse[Int] flatMap { n ⇒ client.set("key", n.get + 1) }
-      Future.sequence(futures).await
-      clients foreach (_.disconnect)
-      r.sync.get("key").parse[Int] must_!= Some(100)
+      r.set("key", 0) flatMap { _ =>
+        val clients = List.fill(10)(RedisClient())
+        val futures = for (client ← clients; _ ← 1 to 10) yield client.get("key").parse[Int] flatMap { n ⇒ client.set("key", n.get + 1) }
+        Future sequence futures flatMap { _ =>
+          clients foreach (_.disconnect)
+          r.get("key").parse[Int] map (_ must_!= Some(100))
+        }
+      }
     }
     "should succeed with watch" ! client { r ⇒
       r.sync.set("key", 0)
@@ -184,8 +195,9 @@ class KeysSpec extends mutable.Specification with TestClient {
           } yield rw multi (_.set("key", n + 1))
         }
       }
-      Future.sequence(futures).await
-      r.sync.get("key").parse[Int] must_== (Some(100))
+      Future sequence futures flatMap { _ =>
+        r.get("key").parse[Int] map (_ === Some(100))
+      }
     }
     "should handle complex request" ! client { r ⇒
       r.sync.rpush("mykey1", 5)
@@ -206,9 +218,15 @@ class KeysSpec extends mutable.Specification with TestClient {
           } yield (a, b, c)
         }
       }
-      result.get must_== (5, "hello", 7)
-      r.sync.lrange("mykey1").parse[Int] must_== Some(List(5, 6))
-      r.sync.hget("mykey3", "hello").parse[Int] must_== Some(8)
+      for {
+        a <- result
+        b <- r.lrange("mykey1").parse[Int] 
+        c <- r.hget("mykey3", "hello").parse[Int] 
+      } yield {
+        a === (5, "hello", 7)
+        b === Some(List(5, 6))
+        c === Some(8)
+      }
     }
   }
 
@@ -254,3 +272,4 @@ class KeysSpec extends mutable.Specification with TestClient {
   }
 
 }
+

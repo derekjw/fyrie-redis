@@ -1,4 +1,4 @@
-package net.fyrie.redis
+/* package net.fyrie.redis
 
 import org.specs2._
 import execute._
@@ -83,3 +83,5 @@ class TestSubscriber(redisClient: RedisClient, ps: PromiseStream[String]) extend
     case PMessage(pattern, channel, bytes) ⇒ ps enqueue ("[" + Parse[String](pattern) + "][" + Parse[String](channel) + "] Message: " + Parse[String](bytes))
   }
 }
+
+*/

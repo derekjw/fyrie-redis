@@ -6,27 +6,38 @@ class StringSpec extends mutable.Specification with TestClient {
 
   "set" >> {
     "should set key/value pairs" ! client { r ⇒
-      r.sync.set("anshin-1", "debasish") === ()
-      r.sync.set("anshin-2", "maulindu") === ()
+      for {
+        a <- r.set("anshin-1", "debasish")
+        b <- r.set("anshin-2", "maulindu")
+      } yield {
+        a === ()
+        b === ()
+      }
     }
   }
 
   "get" >> {
     "should retrieve key/value pairs for existing keys" ! client { r ⇒
       r.quiet.set("anshin-1", "debasish")
-      r.sync.get("anshin-1").parse[String] === (Some("debasish"))
+      r.get("anshin-1").parse[String] map (_ === Some("debasish"))
     }
     "should fail for non-existent keys" ! client { r ⇒
-      r.sync.get("anshin-2").parse[String] === (None)
+      r.get("anshin-2").parse[String] map (_ === None)
     }
   }
 
   "getset" >> {
     "should set new values and return old values" ! client { r ⇒
-      r.set("anshin-1", "debasish")
-      r.sync.get("anshin-1").parse[String] === (Some("debasish"))
-      r.sync.getset("anshin-1", "maulindu").parse[String] === (Some("debasish"))
-      r.sync.get("anshin-1").parse[String] === (Some("maulindu"))
+      for {
+        _ <- r.set("anshin-1", "debasish")
+        a <- r.get("anshin-1").parse[String]
+        b <- r.getset("anshin-1", "maulindu").parse[String]
+        c <- r.get("anshin-1").parse[String]
+      } yield {
+        a === Some("debasish")
+        b === Some("debasish")
+        c === Some("maulindu")
+      }
     }
   }
 
@@ -146,3 +157,4 @@ class StringSpec extends mutable.Specification with TestClient {
     }
   }
 }
+

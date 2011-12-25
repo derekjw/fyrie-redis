@@ -261,3 +261,4 @@ class SetSpec extends mutable.Specification with TestClient {
     }
   }
 }
+

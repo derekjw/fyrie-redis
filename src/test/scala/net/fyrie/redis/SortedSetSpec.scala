@@ -73,3 +73,4 @@ class SortedSetSpec extends mutable.Specification with TestClient {
     }
   }
 }
+
