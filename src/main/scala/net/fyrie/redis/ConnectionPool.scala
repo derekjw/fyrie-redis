@@ -42,19 +42,16 @@ private[redis] class ConnectionPool(initialSize: Range, factory: (ActorRefFactor
         ready ::= client
         active -= client
       }
-    case Disconnect ⇒
-      ready foreach (_.disconnect)
-      ready = Nil
-      active foreach (_.disconnect)
-      active = Set.empty
-      queue foreach (_ complete Left(RedisConnectionException("Connection pool shutting down")))
-
   }
 
   def killClient(client: RedisClientPoolWorker) {
     client.disconnect
     active -= client
     size -= 1
+  }
+
+  override def postStop {
+    queue foreach (_ complete Left(RedisConnectionException("Connection pool shutting down")))
   }
 
 }

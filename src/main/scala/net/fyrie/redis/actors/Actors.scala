@@ -22,7 +22,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
   val log = Logging(context.system, this)
 
   var socket: IO.SocketHandle = _
-  val worker: ActorRef = context.actorOf(Props(new RedisClientWorker(host, port, config, self)))
+  val worker: ActorRef = context.actorOf(Props(new RedisClientWorker(host, port, config)), "worker")
 
   val waiting = Queue.empty[RequestMessage]
   var requests = 0L
@@ -84,6 +84,10 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
     socket write req.exec
   }
 
+  override def postStop() {
+    log info ("Shutting down")
+  }
+
 }
 
 private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: String, port: Int, config: RedisClientConfig) extends Actor {
@@ -91,7 +95,7 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: Stri
   val log = Logging(context.system, this)
 
   var socket: IO.SocketHandle = _
-  val worker = context.actorOf(Props(new RedisClientWorker(host, port, config, self)))
+  val worker = context.actorOf(Props(new RedisClientWorker(host, port, config)))
 
   val client = new RedisClientSub(self, config, context.system)
 
@@ -124,7 +128,7 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: Stri
 
 }
 
-private[redis] final class RedisClientWorker(host: String, port: Int, config: RedisClientConfig, parent: ActorRef) extends Actor {
+private[redis] final class RedisClientWorker(host: String, port: Int, config: RedisClientConfig) extends Actor {
   import Constants._
   import Iteratees._
 
@@ -157,7 +161,7 @@ private[redis] final class RedisClientWorker(host: String, port: Int, config: Re
     case IO.Closed(handle, cause) if socket == handle && config.autoReconnect ⇒
       log info ("Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       socket = IO.connect(host, port, self)
-      sendToSupervisor(Socket(socket))
+      context.parent ! Socket(socket)
 
     case IO.Closed(handle, cause) if socket == handle ⇒
       log info ("Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
@@ -196,19 +200,11 @@ private[redis] final class RedisClientWorker(host: String, port: Int, config: Re
   }
 
   def onResult() {
-    if (config.retryOnReconnect) sendToSupervisor(Received)
+    if (config.retryOnReconnect) context.parent ! Received
     results += 1L
     if (resultCallbacks.nonEmpty) {
       val atTime = System.currentTimeMillis
       resultCallbacks foreach (_(results, atTime))
-    }
-  }
-
-  def sendToSupervisor(msg: Any) {
-    try {
-      parent ! msg
-    } catch {
-      case e: ActorInitializationException ⇒ // ignore, probably shutting down
     }
   }
 
