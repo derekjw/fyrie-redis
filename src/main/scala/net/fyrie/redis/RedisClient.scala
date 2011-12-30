@@ -10,7 +10,7 @@ import serialization.{ Parse, Store }
 
 import akka.actor._
 import akka.dispatch.{ Future, Promise, Await }
-import akka.util.{ ByteString, Timeout, Duration }
+import akka.util.{ ByteString, ByteStringBuilder, Timeout, Duration }
 
 case class RedisClientConfig(autoReconnect: Boolean = true,
                              retryOnReconnect: Boolean = true,
@@ -257,19 +257,17 @@ private[redis] sealed abstract class Commands[Result[_]](implicit rf: ResultFunc
   private[redis] def send(in: List[ByteString]): Result[Any]
 
   final private[redis] def format(in: Seq[ByteString]): ByteString = {
+    val builder = new ByteStringBuilder
     val count = in.length
-    val cmd = new Array[ByteString](count * 4 + 2)
-    cmd(0) = ByteString("*" + count)
-    cmd(1) = EOL
-    var idx = 2
+    builder ++= ByteString("*" + count)
+    builder ++= EOL
     in foreach { bytes ⇒
-      cmd(idx) = ByteString("$" + bytes.length)
-      cmd(idx + 1) = EOL
-      cmd(idx + 2) = bytes
-      cmd(idx + 3) = EOL
-      idx += 4
+      builder ++= ByteString("$" + bytes.length)
+      builder ++= EOL
+      builder ++= bytes
+      builder ++= EOL
     }
-    ByteString.concat(cmd: _*).compact
+    builder.result.compact
   }
 
   final private[redis] implicit def resultAsRedisType(raw: Result[Any]): Result[RedisType] = rf.fmap(raw)(toRedisType)

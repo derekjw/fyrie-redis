@@ -18,45 +18,71 @@ import java.net.ConnectException
 import scala.collection.mutable.Queue
 
 private[redis] final class RedisClientSession(host: String, port: Int, config: RedisClientConfig) extends Actor {
+  import Constants._
+  import Iteratees._
 
   val log = Logging(context.system, this)
 
   var socket: IO.SocketHandle = _
-  val worker: ActorRef = context.actorOf(Props(new RedisClientWorker(host, port, config)), "worker")
+
+  val state = IO.IterateeRef.async()(context.system)
+
+  var results = 0L
+  var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
+  var requestCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
 
   val waiting = Queue.empty[RequestMessage]
   var requests = 0L
-  var requestCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
 
   override def preStart = {
     log info ("Connecting")
-    socket = IO.connect(host, port, worker)
-    worker ! Socket(socket)
+    socket = IO.connect(host, port)
   }
 
   def receive = {
 
+    case req @ Request(requestor, bytes) ⇒
+      socket write bytes
+      onRequest(req)
+      for {
+        _ ← state
+        result ← readResult
+      } yield {
+        requestor respond result
+        onResult()
+      }
+
+    case req @ MultiRequest(requestor, _, cmds, _) ⇒
+      sendMulti(req)
+      onRequest(req)
+      for {
+        _ ← state
+        _ ← readResult
+        _ ← IO.fold((), cmds.map(_._2))((_, p) ⇒ readResult map (p success))
+        exec ← readResult
+      } yield {
+        requestor respond exec
+        onResult()
+      }
+
+    case IO.Read(handle, bytes) ⇒
+      state(IO Chunk bytes)
+
+    case IO.Connected(handle) ⇒
+
     case RequestCallback(callback) ⇒
       requestCallbacks +:= callback
 
-    case msg: ResultCallback ⇒
-      worker ! msg
+    case ResultCallback(callback) ⇒
+      resultCallbacks +:= callback
 
-    case req @ Request(requestor, bytes) ⇒
-      worker ! requestor
-      socket write bytes
-      onRequest(req)
+    case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect ⇒
+      log info ("Connection refused, retrying in 1 second")
+      context.system.scheduler.scheduleOnce(1 second, self, IO.Closed(handle, None))
 
-    case req: MultiRequest ⇒
-      worker ! MultiRun(req.requestor, req.cmds.map(_._2))
-      sendMulti(req)
-      onRequest(req)
-
-    case Received ⇒
-      waiting.dequeue
-
-    case Socket(handle) ⇒
-      socket = handle
+    case IO.Closed(handle, cause) if socket == handle && config.autoReconnect ⇒
+      log info ("Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
+      socket = IO.connect(host, port, self)
       if (config.retryOnReconnect) {
         waiting foreach {
           case req: Request      ⇒ socket write req.bytes
@@ -64,6 +90,15 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
         }
         if (waiting.nonEmpty) log info ("Retrying " + waiting.length + " commands")
       }
+
+    case IO.Closed(handle, cause) if socket == handle ⇒
+      log info ("Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
+      // FIXME: stop actors
+      // sendToSupervisor(Disconnect)
+      state(IO EOF cause)
+
+    case Received ⇒
+      waiting.dequeue
 
   }
 
@@ -84,26 +119,37 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
     socket write req.exec
   }
 
+  def onResult() {
+    if (config.retryOnReconnect) self ! Received
+    results += 1L
+    if (resultCallbacks.nonEmpty) {
+      val atTime = System.currentTimeMillis
+      resultCallbacks foreach (_(results, atTime))
+    }
+  }
+
   override def postStop() {
     log info ("Shutting down")
+    socket.close
+    // TODO: Complete all waiting requests with a RedisConnectionException
   }
 
 }
 
 private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: String, port: Int, config: RedisClientConfig) extends Actor {
+  import Iteratees._
 
   val log = Logging(context.system, this)
 
   var socket: IO.SocketHandle = _
-  val worker = context.actorOf(Props(new RedisClientWorker(host, port, config)))
+  val state = IO.IterateeRef.async()(context.system)
 
   val client = new RedisClientSub(self, config, context.system)
 
   override def preStart = {
     log info ("Connecting")
-    socket = IO.connect(host, port, worker)
-    worker ! Socket(socket)
-    worker ! Subscriber(listener)
+    socket = IO.connect(host, port)
+    state flatMap (_ ⇒ subscriber(listener))
   }
 
   def receive = {
@@ -120,92 +166,20 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: Stri
     case PUnsubscribe(patterns) ⇒
       socket write (client.punsubscribe(patterns))
 
-  }
-
-  override def postStop() {
-    socket.close
-  }
-
-}
-
-private[redis] final class RedisClientWorker(host: String, port: Int, config: RedisClientConfig) extends Actor {
-  import Constants._
-  import Iteratees._
-
-  val log = Logging(context.system, this)
-
-  var socket: IO.SocketHandle = _
-
-  val state = IO.IterateeRef.sync()
-
-  var results = 0L
-  var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
-
-  def receive = {
-
     case IO.Read(handle, bytes) ⇒
       state(IO Chunk bytes)
 
     case IO.Connected(handle) ⇒
-
-    case ResultCallback(callback) ⇒
-      resultCallbacks +:= callback
-
-    case Socket(handle) ⇒
-      socket = handle
-
-    case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect ⇒
-      log info ("Connection refused, retrying in 1 second")
-      context.system.scheduler.scheduleOnce(1 second, self, IO.Closed(handle, None))
-
-    case IO.Closed(handle, cause) if socket == handle && config.autoReconnect ⇒
-      log info ("Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
-      socket = IO.connect(host, port, self)
-      context.parent ! Socket(socket)
 
     case IO.Closed(handle, cause) if socket == handle ⇒
       log info ("Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       // FIXME: stop actors
       // sendToSupervisor(Disconnect)
       state(IO EOF cause)
-
-    case req: Requestor ⇒
-      for {
-        _ ← state
-        result ← readResult
-      } yield {
-        req respond result
-        onResult()
-      }
-
-    case MultiRun(req, promises) ⇒
-      for {
-        _ ← state
-        _ ← readResult
-        _ ← IO.fold((), promises)((_, p) ⇒ readResult map (p success))
-        exec ← readResult
-      } yield {
-        req respond exec
-        onResult()
-      }
-
-    case Subscriber(listener) ⇒
-      state flatMap (_ ⇒ subscriber(listener))
-
   }
 
   override def postStop() {
-    // TODO: Complete all waiting requests with a RedisConnectionException
     socket.close
-  }
-
-  def onResult() {
-    if (config.retryOnReconnect) context.parent ! Received
-    results += 1L
-    if (resultCallbacks.nonEmpty) {
-      val atTime = System.currentTimeMillis
-      resultCallbacks foreach (_(results, atTime))
-    }
   }
 
   def subscriber(listener: ActorRef): IO.Iteratee[Unit] = readResult flatMap { result ⇒

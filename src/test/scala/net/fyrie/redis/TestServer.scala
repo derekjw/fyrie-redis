@@ -15,7 +15,7 @@ object TestSystem {
         actor {
           default-dispatcher {
             core-pool-size-min = 4
-            core-pool-size-factor = 1.0
+            core-pool-size-factor = 2.0
             throughput = 10
           }
         }
