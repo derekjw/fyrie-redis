@@ -12,7 +12,11 @@ import com.google.caliper.{
 }
 
 object Main extends App {
-  CaliperRunner.main(classOf[Benchmark], (args :+ "--warmupMillis" :+ "10000" :+ "--runMillis" :+ "1000" /* :+ "-JmaxMem=-Xmx512m,-Xmx1g" */ :+ "--vm" :+ "java -XX:+TieredCompilation -Xmx2g"): _*)
+  //CaliperRunner.main(classOf[Benchmark], (args :+ "--vm" :+ "java -XX:+TieredCompilation"): _*)
+
+  CaliperRunner.main(classOf[Benchmark], (args :+ "--vm" :+ "java -XX:+UseParallelOldGC -XX:+TieredCompilation -Xmn1g -Xms2g -Xmx2g"): _*)
+
+  //CaliperRunner.main(classOf[Benchmark], (args :+ "-Jgc=-XX:+UseParallelOldGC,-XX:+UseConcMarkSweepGC,-XX:+UseG1GC"  :+ "--vm" :+ "java -XX:+TieredCompilation -Xmn1g -Xms2g -Xmx2g"): _*)
 
 /*
   val bm = new Benchmark
