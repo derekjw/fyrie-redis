@@ -14,20 +14,21 @@ import com.google.caliper.{
 object Main extends App {
   //CaliperRunner.main(classOf[Benchmark], (args :+ "--vm" :+ "java -XX:+TieredCompilation"): _*)
 
-  CaliperRunner.main(classOf[Benchmark], (args :+ "--vm" :+ "java -XX:+UseParallelOldGC -XX:+TieredCompilation -Xmn1g -Xms2g -Xmx2g"): _*)
+  CaliperRunner.main(classOf[Benchmark], (args :+ "--vm" :+ "java -XX:+UseParallelOldGC -XX:+TieredCompilation -XX:SurvivorRatio=1 -Xmn1g -Xms2g -Xmx2g"): _*)
 
-  //CaliperRunner.main(classOf[Benchmark], (args :+ "-Jgc=-XX:+UseParallelOldGC,-XX:+UseConcMarkSweepGC,-XX:+UseG1GC"  :+ "--vm" :+ "java -XX:+TieredCompilation -Xmn1g -Xms2g -Xmx2g"): _*)
+  //CaliperRunner.main(classOf[Benchmark], (args :+ "-Jgc=-XX:+UseParallelOldGC,-XX:+UseConcMarkSweepGC,-XX:+UseG1GC"  :+ "--vm" :+ "java -XX:+TieredCompilation -XX:SurvivorRatio=1 -Xmn1g -Xms2g -Xmx2g"): _*)
 
 /*
   val bm = new Benchmark
   bm.setUp
 
-  bm.repeat(10) {
-    val ops = 10000000
+  while(true) {
+    val ops = 100000
     val start = System.nanoTime
-    bm.timeIncr(ops)
+    bm.timeScatterGather(ops)
     val end = System.nanoTime
     println("ops/sec: " + (ops.toDouble / ((end - start).toDouble / 1000000000.0)).toInt)
+    System.gc
   }
 
   bm.system.shutdown

@@ -58,7 +58,7 @@ class BenchmarkRunner(subproject: String, config: ForkScalaRun) extends sbt.Scal
     val javaOptions = classpathOption(classpath) ::: mainClass :: options.toList                 
     val strategy = config.outputStrategy getOrElse LoggedOutput(log)                              
     val process =  Fork.java.fork(config.javaHome, 
-                                  /* Seq("-XX:+TieredCompilation", "-Xmx1g") ++ */ config.runJVMOptions ++ javaOptions,
+                                  /* Seq("-XX:+UseConcMarkSweepGC", "-XX:+TieredCompilation", "-XX:SurvivorRatio=1", "-Xmn1g", "-Xms2g", "-Xmx2g") ++ */ config.runJVMOptions ++ javaOptions,
                                   config.workingDirectory,
                                   Map.empty,
                                   config.connectInput,
