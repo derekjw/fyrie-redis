@@ -25,7 +25,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
   var socket: IO.SocketHandle = _
 
-  val state = IO.IterateeRef.async()(context.system)
+  val state = IO.IterateeRef.async()(context.dispatcher)
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
@@ -36,7 +36,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
   override def preStart = {
     log info ("Connecting")
-    socket = IO.connect(host, port)
+    socket = IOManager(context.system).connect(host, port)
   }
 
   def receive = {
@@ -82,7 +82,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
     case IO.Closed(handle, cause) if socket == handle && config.autoReconnect ⇒
       log info ("Reconnecting" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
-      socket = IO.connect(host, port, self)
+      socket = IOManager(context.system).connect(host, port)
       if (config.retryOnReconnect) {
         waiting foreach {
           case req: Request      ⇒ socket write req.bytes
@@ -142,13 +142,13 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: Stri
   val log = Logging(context.system, this)
 
   var socket: IO.SocketHandle = _
-  val state = IO.IterateeRef.async()(context.system)
+  val state = IO.IterateeRef.async()(context.dispatcher)
 
   val client = new RedisClientSub(self, config, context.system)
 
   override def preStart = {
     log info ("Connecting")
-    socket = IO.connect(host, port)
+    socket = IOManager(context.system).connect(host, port)
     state flatMap (_ ⇒ subscriber(listener))
   }
 

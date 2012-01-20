@@ -16,7 +16,7 @@ private[redis] object Iteratees {
     case 58 /* ':' */ ⇒ readInteger
     case 36 /* '$' */ ⇒ readBulk
     case 42 /* '*' */ ⇒ readMulti
-    case x   ⇒ IO Failure RedisProtocolException("Invalid result type: " + x)
+    case x            ⇒ IO throwErr RedisProtocolException("Invalid result type: " + x)
   }
 
   final val readResult: IO.Iteratee[RedisType] = IO take 1 flatMap readType
