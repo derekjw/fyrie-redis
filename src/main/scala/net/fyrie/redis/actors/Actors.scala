@@ -23,9 +23,11 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
   val log = Logging(context.system, this)
 
-  var socket: IO.SocketHandle = _
+  var sockets: Vector[IO.SocketHandle] = _
 
-  val state = IO.IterateeRef.async()(context.dispatcher)
+  var nextSocket: Int = 0
+
+  val state = IO.IterateeRef.Map.async[IO.Handle]()(context.dispatcher)
 
   var results = 0L
   var resultCallbacks = Seq.empty[(Long, Long) ⇒ Unit]
@@ -36,16 +38,18 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
   override def preStart = {
     log info ("Connecting")
-    socket = IOManager(context.system).connect(host, port)
+    sockets = Vector.fill(config.connections)(IOManager(context.system).connect(host, port))
   }
 
   def receive = {
 
     case req @ Request(requestor, bytes) ⇒
+      val socket = sockets(nextSocket)
+      nextSocket = (nextSocket + 1) % config.connections
       socket write bytes
       onRequest(req)
       for {
-        _ ← state
+        _ ← state(socket)
         result ← readResult
       } yield {
         requestor respond result
@@ -53,10 +57,12 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
       }
 
     case req @ MultiRequest(requestor, _, cmds, _) ⇒
-      sendMulti(req)
+      val socket = sockets(nextSocket)
+      nextSocket = (nextSocket + 1) % config.connections
+      sendMulti(req, socket)
       onRequest(req)
       for {
-        _ ← state
+        _ ← state(socket)
         _ ← readResult
         _ ← IO.fold((), cmds.map(_._2))((_, p) ⇒ readResult map (p success))
         exec ← readResult
@@ -66,7 +72,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
       }
 
     case IO.Read(handle, bytes) ⇒
-      state(IO Chunk bytes)
+      state(handle)(IO Chunk bytes)
 
     case IO.Connected(handle) ⇒
 
@@ -75,7 +81,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
     case ResultCallback(callback) ⇒
       resultCallbacks +:= callback
-
+/*
     case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect ⇒
       log info ("Connection refused, retrying in 1 second")
       context.system.scheduler.scheduleOnce(1 second, self, IO.Closed(handle, None))
@@ -89,21 +95,21 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
           case req: MultiRequest ⇒ sendMulti(req)
         }
         if (waiting.nonEmpty) log info ("Retrying " + waiting.length + " commands")
-      }
+      } */
 
-    case IO.Closed(handle, cause) if socket == handle ⇒
+    case IO.Closed(handle, cause) if sockets contains handle ⇒
       log info ("Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
       // FIXME: stop actors
       // sendToSupervisor(Disconnect)
-      state(IO EOF cause)
+      state(handle)(IO EOF cause)
 
     case Received ⇒
-      waiting.dequeue
+      //waiting.dequeue
 
   }
 
   def onRequest(req: RequestMessage): Unit = {
-    if (config.retryOnReconnect) waiting enqueue req
+    //if (config.retryOnReconnect) waiting enqueue req
     requests += 1L
     if (requestCallbacks.nonEmpty) {
       val atTime = System.currentTimeMillis
@@ -111,7 +117,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
     }
   }
 
-  def sendMulti(req: MultiRequest): Unit = {
+  def sendMulti(req: MultiRequest, socket: IO.SocketHandle): Unit = {
     socket write req.multi
     req.cmds foreach { cmd ⇒
       socket write cmd._1
@@ -120,7 +126,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
   }
 
   def onResult() {
-    if (config.retryOnReconnect) self ! Received
+    //if (config.retryOnReconnect) self ! Received
     results += 1L
     if (resultCallbacks.nonEmpty) {
       val atTime = System.currentTimeMillis
@@ -130,7 +136,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
   override def postStop() {
     log info ("Shutting down")
-    socket.close
+    sockets.foreach(_.close)
     // TODO: Complete all waiting requests with a RedisConnectionException
   }
 

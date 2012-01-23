@@ -91,7 +91,7 @@ class KeysSpec extends mutable.Specification with TestClient {
     }
   }
 
-  "quit" >> {
+  /* "quit" >> {
     "should reconnect" ! client { r ⇒
       r.quit
       r.set("key1", "value1")
@@ -111,7 +111,7 @@ class KeysSpec extends mutable.Specification with TestClient {
       result2.get must_==(Some(2000))
       result3.get must_==(Some(3000))
     }*/
-  }
+  } */
 
   "Multi exec commands" >> {
     "should work with single commands" ! client { r ⇒
@@ -220,8 +220,8 @@ class KeysSpec extends mutable.Specification with TestClient {
       }
       for {
         a <- result
-        b <- r.lrange("mykey1").parse[Int] 
-        c <- r.hget("mykey3", "hello").parse[Int] 
+        b <- r.lrange("mykey1").parse[Int]
+        c <- r.hget("mykey3", "hello").parse[Int]
       } yield {
         a === (5, "hello", 7)
         b === Some(List(5, 6))

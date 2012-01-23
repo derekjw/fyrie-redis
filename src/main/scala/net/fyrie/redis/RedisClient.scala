@@ -12,9 +12,10 @@ import akka.actor._
 import akka.dispatch.{ Future, Promise, Await }
 import akka.util.{ ByteString, ByteStringBuilder, Timeout, Duration }
 
-case class RedisClientConfig(autoReconnect: Boolean = true,
+case class RedisClientConfig(connections: Int = 1,
+                             autoReconnect: Boolean = true,
                              retryOnReconnect: Boolean = true,
-                             poolSize: Range = 10 to 50)
+                             poolSize: Range = 50 to 50)
 
 object RedisClient {
   def apply(host: String = "localhost", port: Int = 6379, config: RedisClientConfig = RedisClientConfig())(implicit system: ActorSystem) =
