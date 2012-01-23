@@ -34,9 +34,11 @@ trait TestClient { self: mutable.Specification ⇒
 
   implicit val arguments = args(sequential = true)
 
+  val config = RedisClientConfig(connections = 1)
+
   def client = new AroundOutside[RedisClient] {
 
-    val r = RedisClient()
+    val r = RedisClient(config = config)
     r.sync.flushall
 
     def around[T <% Result](t: ⇒ T) = {
