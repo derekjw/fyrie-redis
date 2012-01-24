@@ -20,7 +20,7 @@ object FyrieRedisBuild extends Build {
     libraryDependencies ++= Seq("com.typesafe.akka" % "akka-actor" % "2.0-20120124-000638",
                                 "com.typesafe.akka" % "akka-testkit" % "2.0-20120124-000638" % "test",
                                 "org.specs2" % "specs2_2.9.1" % "1.6.1",
-                                "org.specs2" % "specs2-scalaz-core_2.9.1" % "6.0.1" % "test"),
+                                "org.specs2" % "specs2-scalaz-core_2.9.1" % "6.0.1" % "test",
                                 "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" % "benchmark",
                                 "com.google.code.gson" % "gson" % "1.7.1" % "benchmark"),
     parallelExecution := false,
