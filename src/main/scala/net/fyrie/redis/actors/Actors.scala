@@ -79,7 +79,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
 
     case ResultCallback(callback) ⇒
       resultCallbacks +:= callback
-/*
+    /*
     case IO.Closed(handle, Some(cause: ConnectException)) if socket == handle && config.autoReconnect ⇒
       log info ("Connection refused, retrying in 1 second")
       context.system.scheduler.scheduleOnce(1 second, self, IO.Closed(handle, None))
@@ -102,7 +102,7 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
       state(handle)(IO EOF cause)
 
     case Received ⇒
-      //waiting.dequeue
+    //waiting.dequeue
 
   }
 

@@ -27,7 +27,7 @@ object TestSystem {
 
 trait TestClient { self: mutable.Specification ⇒
 
-  implicit def futureResult[T](future: Future[T])(implicit toResult: T => Result): Result =
+  implicit def futureResult[T](future: Future[T])(implicit toResult: T ⇒ Result): Result =
     Await.result(future map toResult, akka.util.Timeout(1000).duration) //Duration.Inf)
 
   implicit val system = TestSystem.system

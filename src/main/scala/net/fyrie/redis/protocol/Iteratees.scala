@@ -21,13 +21,13 @@ private[redis] object Iteratees {
 
   final val readResult: IO.Iteratee[RedisType] = IO take 1 flatMap readType
 
-  final val bytesToString = (bytes: ByteString) => RedisString(bytes.utf8String)
+  final val bytesToString = (bytes: ByteString) ⇒ RedisString(bytes.utf8String)
   final val readString: IO.Iteratee[RedisString] = readUntilEOL map bytesToString
 
-  final val bytesToError = (bytes: ByteString) => RedisError(bytes.utf8String)
+  final val bytesToError = (bytes: ByteString) ⇒ RedisError(bytes.utf8String)
   final val readError: IO.Iteratee[RedisError] = readUntilEOL map bytesToError
 
-  final val bytesToInteger = (bytes: ByteString) => RedisInteger(bytes.utf8String.toLong)
+  final val bytesToInteger = (bytes: ByteString) ⇒ RedisInteger(bytes.utf8String.toLong)
   final val readInteger: IO.Iteratee[RedisInteger] = readUntilEOL map bytesToInteger
 
   final val notFoundBulk = IO Done RedisBulk.notfound
@@ -41,7 +41,7 @@ private[redis] object Iteratees {
 
   final val notFoundMulti = IO Done RedisMulti.notfound
   final val emptyMulti = IO Done RedisMulti.empty
-  final val bytesToMulti = (bytes: ByteString) => bytes.utf8String.toInt match {
+  final val bytesToMulti = (bytes: ByteString) ⇒ bytes.utf8String.toInt match {
     case -1 ⇒ notFoundMulti
     case 0  ⇒ emptyMulti
     case n  ⇒ IO.takeList(n)(readResult) map (x ⇒ RedisMulti(Some(x)))

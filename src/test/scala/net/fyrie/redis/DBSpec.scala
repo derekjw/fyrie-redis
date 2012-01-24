@@ -147,8 +147,8 @@ class KeysSpec extends mutable.Specification with TestClient {
           } yield (x, y)
         }
         for {
-          a <- result._1 recover { case _: RedisErrorException => success }
-          b <- result._2
+          a ← result._1 recover { case _: RedisErrorException ⇒ success }
+          b ← result._2
         } yield {
           b === Some("abc")
         }
@@ -165,8 +165,8 @@ class KeysSpec extends mutable.Specification with TestClient {
           } yield (x, y)
         }
         for {
-          a <- result._1 recover { case _: RedisErrorException => success }
-          b <- result._2
+          a ← result._1 recover { case _: RedisErrorException ⇒ success }
+          b ← result._2
         } yield {
           b === List(Some("testvalue1"), Some("testvalue2"))
         }
@@ -176,10 +176,10 @@ class KeysSpec extends mutable.Specification with TestClient {
 
   "watch" >> {
     "should fail without watch" ! client { r ⇒
-      r.set("key", 0) flatMap { _ =>
+      r.set("key", 0) flatMap { _ ⇒
         val clients = List.fill(10)(RedisClient())
         val futures = for (client ← clients; _ ← 1 to 10) yield client.get("key").parse[Int] flatMap { n ⇒ client.set("key", n.get + 1) }
-        Future sequence futures flatMap { _ =>
+        Future sequence futures flatMap { _ ⇒
           clients foreach (_.disconnect)
           r.get("key").parse[Int] map (_ must_!= Some(100))
         }
@@ -195,7 +195,7 @@ class KeysSpec extends mutable.Specification with TestClient {
           } yield rw multi (_.set("key", n + 1))
         }
       }
-      Future sequence futures flatMap { _ =>
+      Future sequence futures flatMap { _ ⇒
         r.get("key").parse[Int] map (_ === Some(100))
       }
     }
@@ -219,9 +219,9 @@ class KeysSpec extends mutable.Specification with TestClient {
         }
       }
       for {
-        a <- result
-        b <- r.lrange("mykey1").parse[Int]
-        c <- r.hget("mykey3", "hello").parse[Int]
+        a ← result
+        b ← r.lrange("mykey1").parse[Int]
+        c ← r.hget("mykey3", "hello").parse[Int]
       } yield {
         a === (5, "hello", 7)
         b === Some(List(5, 6))

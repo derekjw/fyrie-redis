@@ -7,8 +7,8 @@ class StringSpec extends mutable.Specification with TestClient {
   "set" >> {
     "should set key/value pairs" ! client { r ⇒
       for {
-        a <- r.set("anshin-1", "debasish")
-        b <- r.set("anshin-2", "maulindu")
+        a ← r.set("anshin-1", "debasish")
+        b ← r.set("anshin-2", "maulindu")
       } yield {
         a === ()
         b === ()
@@ -29,10 +29,10 @@ class StringSpec extends mutable.Specification with TestClient {
   "getset" >> {
     "should set new values and return old values" ! client { r ⇒
       for {
-        _ <- r.set("anshin-1", "debasish")
-        a <- r.get("anshin-1").parse[String]
-        b <- r.getset("anshin-1", "maulindu").parse[String]
-        c <- r.get("anshin-1").parse[String]
+        _ ← r.set("anshin-1", "debasish")
+        a ← r.get("anshin-1").parse[String]
+        b ← r.getset("anshin-1", "maulindu").parse[String]
+        c ← r.get("anshin-1").parse[String]
       } yield {
         a === Some("debasish")
         b === Some("debasish")
