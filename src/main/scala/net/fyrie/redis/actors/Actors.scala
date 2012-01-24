@@ -74,8 +74,6 @@ private[redis] final class RedisClientSession(host: String, port: Int, config: R
     case IO.Read(handle, bytes) ⇒
       state(handle)(IO Chunk bytes)
 
-    case IO.Connected(handle) ⇒
-
     case RequestCallback(callback) ⇒
       requestCallbacks +:= callback
 
@@ -174,8 +172,6 @@ private[redis] final class RedisSubscriberSession(listener: ActorRef)(host: Stri
 
     case IO.Read(handle, bytes) ⇒
       state(IO Chunk bytes)
-
-    case IO.Connected(handle) ⇒
 
     case IO.Closed(handle, cause) if socket == handle ⇒
       log info ("Connection closed" + (cause map (e ⇒ ", cause: " + e.toString) getOrElse ""))
