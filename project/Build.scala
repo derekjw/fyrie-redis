@@ -1,5 +1,5 @@
 import sbt._
-import Keys._
+import sbt.Keys._
 
 import com.typesafe.sbtscalariform.ScalariformPlugin
 import com.typesafe.sbtscalariform.ScalariformPlugin.ScalariformKeys
@@ -16,9 +16,9 @@ object FyrieRedisBuild extends Build {
     organization := "net.fyrie",
     version := "2.0-SNAPSHOT",
     resolvers ++= Seq("Sonatype OSS Repo" at "http://oss.sonatype.org/content/repositories/snapshots",
-                      "Akka Snapshot Repo" at "http://akka.io/snapshots"),
-    libraryDependencies ++= Seq("com.typesafe.akka" % "akka-actor" % "2.0-20120124-000638",
-                                "com.typesafe.akka" % "akka-testkit" % "2.0-20120124-000638" % "test",
+                      "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"),
+    libraryDependencies ++= Seq("com.typesafe.akka" % "akka-actor" % "2.0",
+                                "com.typesafe.akka" % "akka-testkit" % "2.0",
                                 "org.specs2" % "specs2_2.9.1" % "1.6.1",
                                 "org.specs2" % "specs2-scalaz-core_2.9.1" % "6.0.1" % "test"),
                                 //"com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" % "benchmark",
